@@ -11,7 +11,5 @@ class SMSBloc extends Bloc<SMSEvent, SMSState> {
 
   @override
   Stream<SMSState> mapEventToState(
-      SMSState currentState, SMSEvent event) async* {
-    // TODO: implement mapEventToState
-  }
+      SMSState currentState, SMSEvent event) async* {}
 }
