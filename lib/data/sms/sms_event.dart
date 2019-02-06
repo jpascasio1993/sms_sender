@@ -9,6 +9,13 @@ abstract class SMSEvent extends BaseEvent {
   }
 }
 
+class SMSPermission extends SMSEvent {
+  @override
+  String toString() {
+    return 'SMSPermission';
+  }
+}
+
 class SMSFetchAllMessage extends SMSEvent {
   @override
   String toString() {
