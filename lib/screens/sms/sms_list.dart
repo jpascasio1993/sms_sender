@@ -7,13 +7,19 @@ class SMSList extends StatefulWidget {
   _SMSListState createState() => _SMSListState();
 }
 
-class _SMSListState extends State<SMSList> {
+class _SMSListState extends State<SMSList>
+    with AutomaticKeepAliveClientMixin<SMSList> {
   SMSBloc bloc;
   ThemeData themeData;
+
   @override
   void didChangeDependencies() {
-    bloc = BlocProvider.of<SMSBloc>(context);
-    themeData = Theme.of(context).copyWith(dividerColor: Colors.transparent);
+    print('didChangeDependencies SMSList');
+    if (bloc == null) {
+      print('bloc is null');
+      bloc = BlocProvider.of<SMSBloc>(context);
+      themeData = Theme.of(context).copyWith(dividerColor: Colors.transparent);
+    }
     super.didChangeDependencies();
   }
 
@@ -28,12 +34,13 @@ class _SMSListState extends State<SMSList> {
 
   @override
   Widget build(BuildContext context) {
+    print('smslist build');
     return Scaffold(
       body: BlocBuilder(
         bloc: bloc,
         builder: (BuildContext context, SMSState state) {
           //print('List ${state.data}');
-          print('smslist build');
+
           return ListView.builder(
             itemCount: state.data.length,
             itemBuilder: (BuildContext context, int index) {
@@ -125,4 +132,8 @@ class _SMSListState extends State<SMSList> {
       ),
     );
   }
+
+  @override
+  // TODO: implement wantKeepAlive
+  bool get wantKeepAlive => true;
 }

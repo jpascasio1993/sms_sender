@@ -19,7 +19,7 @@ class RootTab extends StatelessWidget {
   Widget build(BuildContext context) {
     // TODO: implement build
     return DefaultTabController(
-        length: 1,
+        length: 2,
         child: Scaffold(
           appBar: AppBar(
             title: Text('SMS Sender'),
@@ -30,11 +30,17 @@ class RootTab extends StatelessWidget {
                 Tab(
                   key: UniqueKey(),
                   text: 'Inbox',
+                ),
+                Tab(
+                  key: UniqueKey(),
+                  text: 'Outbox',
                 )
               ],
             ),
           ),
-          body: SMSList(),
+          body: TabBarView(
+            children: <Widget>[SMSList(), Text('test')],
+          ),
         ));
   }
 }
