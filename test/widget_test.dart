@@ -10,7 +10,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 //import 'package:bloc_challenge/main.dart';
 
-
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -118,7 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

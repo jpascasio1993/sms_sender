@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:sms_sender/routes.dart';
 
-void main() => runApp(MyApp());
+void main() => Routes();
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
