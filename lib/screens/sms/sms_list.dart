@@ -92,11 +92,11 @@ class _SMSListState extends State<SMSList>
                           children: <Widget>[
                             FlatButton.icon(
                                 icon: Icon(
-                                  Icons.send,
+                                  Icons.cached,
                                   color: Colors.blueAccent,
                                 ),
                                 label: Text(
-                                  'Reprocessed',
+                                  'Reprocess',
                                   style: theme.positiveStyle,
                                 ),
                                 onPressed: () {}),
