@@ -5,6 +5,7 @@ import 'package:sms_sender/screens/outbox/index.dart';
 import 'package:sms_sender/data/sms/index.dart' as SMSBloc;
 import 'package:sms_sender/data/outbox/index.dart' as OutboxBloc;
 import 'package:sms_sender/theme/style.dart';
+import 'package:sms/sms.dart';
 
 class Routes {
   Map<String, WidgetBuilder> routes = {
@@ -12,6 +13,8 @@ class Routes {
   };
 
   Routes() {
+    SmsReceiver receiver = new SmsReceiver();
+    receiver.onSmsReceived.listen((SmsMessage msg) => print(msg.body));
     runApp(MyApp(routes: routes));
   }
 }
