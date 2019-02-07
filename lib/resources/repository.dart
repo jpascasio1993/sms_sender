@@ -9,6 +9,8 @@ class Repository {
 
   Future<List<OutboxModel>> fetchAllOutbox() => outboxResource.fetchData();
   Future<List<SmsMessage>> fetchAllSMS() => smsResource.fetchData();
+  Future<SmsMessage> sendOutboxSms(OutboxModel outbox) =>
+      smsResource.sendOutbox(outbox);
 }
 
 Repository repository = Repository();

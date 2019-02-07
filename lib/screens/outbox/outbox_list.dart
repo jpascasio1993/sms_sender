@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sms_sender/data/outbox/index.dart';
 import 'package:sms_sender/theme/style.dart' as theme;
+import 'package:sms_sender/models/outbox_model.dart';
 
 class OutboxList extends StatefulWidget {
   _OutboxListState createState() => _OutboxListState();
@@ -31,9 +32,12 @@ class _OutboxListState extends State<OutboxList>
       body: BlocBuilder(
         bloc: bloc,
         builder: (BuildContext context, OutboxState state) {
+          print('state $state');
+
           return ListView.builder(
             itemCount: state.data.length,
             itemBuilder: (BuildContext context, int index) {
+              OutboxModel outbox = state.data[index];
               MaterialAccentColor statusColor = getStatusColor('sent');
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,7 +76,7 @@ class _OutboxListState extends State<OutboxList>
                                 ],
                               ),
                             ),
-                            Text(state.data[index].body),
+                            Text(outbox.body),
                           ],
                         ),
                       ),
@@ -89,7 +93,10 @@ class _OutboxListState extends State<OutboxList>
                                   'Send',
                                   style: theme.positiveStyle,
                                 ),
-                                onPressed: () {}),
+                                onPressed: () {
+                                  bloc.dispatch(OutboxSendSms(outbox: outbox));
+                                  print('send pressed');
+                                }),
                             FlatButton.icon(
                                 icon:
                                     Icon(Icons.delete, color: Colors.redAccent),

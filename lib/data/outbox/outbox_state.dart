@@ -28,3 +28,12 @@ class OutboxFetchResult extends OutboxState {
     return 'OutboxFetchResult';
   }
 }
+
+class OutboxSent extends OutboxState {
+  OutboxSent({data}) : super(data);
+
+  @override
+  String toString() {
+    return 'OutboxSent';
+  }
+}
