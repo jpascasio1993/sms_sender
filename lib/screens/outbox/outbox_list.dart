@@ -1,49 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:sms_sender/data/sms/index.dart';
+import 'package:sms_sender/data/outbox/index.dart';
 import 'package:sms_sender/theme/style.dart' as theme;
 
-class SMSList extends StatefulWidget {
-  _SMSListState createState() => _SMSListState();
+class OutboxList extends StatefulWidget {
+  _OutboxListState createState() => _OutboxListState();
 }
 
-class _SMSListState extends State<SMSList>
-    with AutomaticKeepAliveClientMixin<SMSList> {
-  SMSBloc bloc;
+class _OutboxListState extends State<OutboxList>
+    with AutomaticKeepAliveClientMixin<OutboxList> {
+  OutboxBloc bloc;
   ThemeData themeData;
 
   @override
-  void didChangeDependencies() {
-    print('didChangeDependencies SMSList');
+  bool get wantKeepAlive => true;
 
-    bloc = BlocProvider.of<SMSBloc>(context);
+  @override
+  void didChangeDependencies() {
+    print('didChangeDependencies OutboxList');
+
+    bloc = BlocProvider.of<OutboxBloc>(context);
     themeData = Theme.of(context).copyWith(dividerColor: Colors.transparent);
 
     super.didChangeDependencies();
   }
 
-  MaterialAccentColor getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case "processed":
-        return Colors.greenAccent;
-      case "pending":
-        return Colors.redAccent;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    print('smslist build');
     return Scaffold(
       body: BlocBuilder(
         bloc: bloc,
-        builder: (BuildContext context, SMSState state) {
-          //print('List ${state.data}');
-
+        builder: (BuildContext context, OutboxState state) {
           return ListView.builder(
             itemCount: state.data.length,
             itemBuilder: (BuildContext context, int index) {
-              MaterialAccentColor statusColor = getStatusColor('processed');
+              MaterialAccentColor statusColor = getStatusColor('sent');
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
@@ -74,7 +65,7 @@ class _SMSListState extends State<SMSList>
                                         borderRadius: BorderRadius.circular(2),
                                         color: statusColor),
                                     child: Text(
-                                      'PROCESSED',
+                                      'SENT',
                                       style: theme.textWhiteStyle,
                                     ),
                                   ),
@@ -91,11 +82,11 @@ class _SMSListState extends State<SMSList>
                           children: <Widget>[
                             FlatButton.icon(
                                 icon: Icon(
-                                  Icons.cached,
+                                  Icons.send,
                                   color: Colors.blueAccent,
                                 ),
                                 label: Text(
-                                  'Reprocess',
+                                  'Send',
                                   style: theme.positiveStyle,
                                 ),
                                 onPressed: () {}),
@@ -126,13 +117,18 @@ class _SMSListState extends State<SMSList>
       ),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Click',
-        onPressed: () => bloc.dispatch(SMSFetchAllMessage()),
+        onPressed: () => bloc.dispatch(OutboxFetchAll()),
         child: Icon(Icons.add),
       ),
     );
   }
 
-  @override
-  // TODO: implement wantKeepAlive
-  bool get wantKeepAlive => true;
+  MaterialAccentColor getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case "sent":
+        return Colors.greenAccent;
+      case "pending":
+        return Colors.redAccent;
+    }
+  }
 }
