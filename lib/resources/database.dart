@@ -2,22 +2,19 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sms_sender/resources/enum.dart';
 
-class Database {
+class DatabaseProvider {
   Database db;
 
   Future<Null> open() async {
     String databasePath = await getDatabasesPath();
     String path = join(databasePath, 'sms_sender.db');
 
-    // db = await openDatabase(path, version: 1,
-    //     onCreate: (Database db, int version) async {
-    //   await db.execute('''
-    //     create table $tableTodo (
-    //       $columnId integer primary key autoincrement,
-    //       $columnTitle text not null,
-    //       $columnDone integer not null)
-    //     ''');
-    // });
+    db = await openDatabase(path, version: 1,
+        onCreate: (Database db, int version) async {
+      // When creating the db, create the table
+      await db.execute(
+          'CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)');
+    });
   }
 }
 
