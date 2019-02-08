@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:sms_sender/routes.dart';
+import 'package:android_alarm_manager/android_alarm_manager.dart';
+import 'dart:isolate';
+import 'package:fluttertoast/fluttertoast.dart';
 
-void main() => Routes();
+void printHello() {
+  final DateTime now = DateTime.now();
+  final int isolateId = Isolate.current.hashCode;
+  print("[$now] Hello, world! isolate=${isolateId} function='$printHello'");
+  Fluttertoast.showToast(
+      msg: "This is Center Short Toast",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIos: 1,
+      backgroundColor: Colors.red,
+      textColor: Colors.white);
+}
+
+void main() async {
+  final int helloAlarmID = 0;
+  await AndroidAlarmManager.initialize();
+  Routes();
+  await AndroidAlarmManager.periodic(
+      const Duration(minutes: 1), helloAlarmID, printHello);
+}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
