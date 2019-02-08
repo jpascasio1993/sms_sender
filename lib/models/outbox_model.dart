@@ -19,13 +19,15 @@ class OutboxModel {
   String _title;
   String _body;
   String _sendTo;
-
+  String _date;
+  
   OutboxModel(result) {
     _userId = result['userId'];
     _id = result['id'];
     _title = result['title'];
     _body = result['body'];
     _sendTo = result['sendTo'] != null ? result['sendTo'] : "+639162507727";
+    _date = result['date'];
   }
 
   int get userId => _userId;
