@@ -14,15 +14,13 @@
 // }
 
 class OutboxModel {
-  int _userId;
   int _id;
   String _title;
   String _body;
   String _sendTo;
   String _date;
-  
+
   OutboxModel(result) {
-    _userId = result['userId'];
     _id = result['id'];
     _title = result['title'];
     _body = result['body'];
@@ -30,9 +28,19 @@ class OutboxModel {
     _date = result['date'];
   }
 
-  int get userId => _userId;
   int get id => _id;
   String get title => _title;
   String get body => _body;
   String get sendTo => _sendTo;
+  String get date => _date;
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': _id,
+      'title': title,
+      'body': body,
+      'sendTo': sendTo,
+      'date': date
+    };
+  }
 }
