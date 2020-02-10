@@ -10,6 +10,8 @@ import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository
 class OutboxRepositoryImpl implements OutboxRepository {
   final RemoteSource remoteSource;
   final LocalSource localSource;
+  final String localErrorMessage = 'Local Failure';
+  final String remoteErrorMessage = 'Remote Error';
 
   OutboxRepositoryImpl(
       {@required this.remoteSource, @required this.localSource});
@@ -21,7 +23,7 @@ class OutboxRepositoryImpl implements OutboxRepository {
       final res = await localSource.getOutbox(limit, offset);
       return Right(res);
     } catch (error) {
-      return Left(LocalFailure());
+      return Left(LocalFailure(message: localErrorMessage));
     }
   }
 
@@ -32,7 +34,7 @@ class OutboxRepositoryImpl implements OutboxRepository {
       await localSource.bulkInsertOutbox(res);
       return Right(res);
     } on ServerException {
-      return Left(ServerFailure());
+      return Left(ServerFailure(message: remoteErrorMessage));
     }
   }
 }

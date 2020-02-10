@@ -19,6 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_bloc: ^3.2.0
   equatable: ^1.0.3
   meta: ^1.1.8
   dartz: ^0.8.9
@@ -26,9 +27,13 @@ dependencies:
   http: ^0.12.0+4
   sms:
       path: ./sms-0.2.4
+  get_it: ^3.1.0
+  flutter_screenutil: ^1.0.2
+  
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
+  
 
 dev_dependencies:
   flutter_test:
