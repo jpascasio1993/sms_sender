@@ -4,11 +4,11 @@ import 'package:meta/meta.dart';
 @immutable
 abstract class OutboxEvent extends Equatable {}
 
-class GetOutbox extends OutboxEvent {
+class GetOutboxEvent extends OutboxEvent {
   final int limit;
   final int offset;
 
-  GetOutbox({@required this.limit, @required this.offset});
+  GetOutboxEvent({@required this.limit, @required this.offset});
 
   @override
   List<Object> get props => [limit, offset];
@@ -19,11 +19,20 @@ class GetOutbox extends OutboxEvent {
   }
 }
 
-class LoadMoreOutbox extends GetOutbox {
-  LoadMoreOutbox({@required int limit, @required int offset}): super(limit: limit, offset: offset);
+class LoadMoreOutboxEvent extends GetOutboxEvent {
+  LoadMoreOutboxEvent({@required int limit, @required int offset}): super(limit: limit, offset: offset);
 
   @override
   String toString() {
     return 'LoadMoreOutboxEvent';
   }
+}
+
+class AddOutboxEvent extends OutboxEvent {
+  final Map<String, dynamic> data;
+
+  AddOutboxEvent({@required this.data});
+
+  @override
+  List<Object> get props => [data];
 }

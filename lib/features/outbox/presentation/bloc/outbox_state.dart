@@ -6,7 +6,9 @@ import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 abstract class OutboxState extends Equatable {}
 
 class InitialOutboxState extends OutboxState {
-  final List<OutboxModel> outboxList = [];
+  final List<OutboxModel> outboxList;
+
+  InitialOutboxState({this.outboxList = const []});
 
   @override
   List<Object> get props => [outboxList];
@@ -19,6 +21,7 @@ class InitialOutboxState extends OutboxState {
 
 class RetrievedOutboxState extends OutboxState {
   final List<OutboxModel> outboxList;
+  
   RetrievedOutboxState({@required this.outboxList});
 
   @override
@@ -30,9 +33,9 @@ class RetrievedOutboxState extends OutboxState {
   }
 }
 
-class OutboxError extends OutboxState {
+class OutboxErrorState extends OutboxState {
   final String message;
-  OutboxError({@required this.message});
+  OutboxErrorState({@required this.message});
 
   @override
   List<Object> get props => [message];

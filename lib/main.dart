@@ -44,6 +44,10 @@ class _MyAppState extends State<MyApp> {
 
 
 class RootTab extends StatefulWidget {
+  //Default guideline sizes are based on standard ~5" screen mobile device
+  final int guidelineBaseWidth = 350;
+  final int guidelineBaseHeight = 680;
+  
   RootTab({Key key}) : super(key: key);
 
   @override
@@ -55,11 +59,12 @@ class _RootTabState extends State<RootTab> {
   @override
   void initState() {
     super.initState();
+    
   }
   
   @override
   Widget build(BuildContext context) {
-    ScreenUtil.init(context, width: 350, height: 680);
+    ScreenUtil.init(context, width: widget.guidelineBaseWidth, height: widget.guidelineBaseHeight);
     return DefaultTabController(
       length: 2, 
       child: Scaffold(
