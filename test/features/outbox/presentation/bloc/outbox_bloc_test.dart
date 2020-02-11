@@ -95,8 +95,24 @@ void main(){
     });
   });
 
-  group('LoadMoreEvent',(){
-  
+  group('[OUTBOX] presentation/bloc LoadMoreEvent',(){
+    test('should load more outbox messages', () async {
+    
+      //arrange
+      when(mockGetOutbox(any)).thenAnswer((_) async => Right(outboxList));
+
+     //assert 
+      final expectedCalls = [
+        InitialOutboxState(outboxList: emptyList),
+        RetrievedOutboxState.copyWith(state: outboxBloc.state, outboxList: (outboxBloc.state as InitialOutboxState).outboxList + outboxList)
+      ];
+
+      expectLater(outboxBloc, emitsInOrder(expectedCalls));
+
+      //act
+      outboxBloc.add(LoadMoreOutboxEvent(limit: limit, offset: offset)); 
+    
+    });
   });
 
 
