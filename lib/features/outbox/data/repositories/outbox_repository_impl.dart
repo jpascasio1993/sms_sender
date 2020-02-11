@@ -7,11 +7,13 @@ import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
 
+final String localErrorMessage = 'Local Failure';
+final String remoteErrorMessage = 'Remote Error';
+
 class OutboxRepositoryImpl implements OutboxRepository {
   final RemoteSource remoteSource;
   final LocalSource localSource;
-  final String localErrorMessage = 'Local Failure';
-  final String remoteErrorMessage = 'Remote Error';
+  
 
   OutboxRepositoryImpl(
       {@required this.remoteSource, @required this.localSource});

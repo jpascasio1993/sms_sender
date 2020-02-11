@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
@@ -37,7 +38,7 @@ void main() {
     sampleData.forEach((any) => listOutbox.add(OutboxModel.fromJson(any)));
   });
 
-  group('Outbox Repository', () {
+  group('[OUTBOX] data/repositories OutboxRepository :: ', () {
     test('should get outbox list from local source', () async {
       // arrange
       when(localSource.getOutbox(any, any)).thenAnswer((_) async => listOutbox);
@@ -66,7 +67,7 @@ void main() {
       // act
       final res = await outboxRepositoryImpl.fetchOutboxRemote();
       // assert
-      expect(res, Left(ServerFailure()));
+      expect(res, Left(ServerFailure(message: remoteErrorMessage)));
     });
   });
 }

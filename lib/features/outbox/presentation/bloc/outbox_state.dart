@@ -8,8 +8,9 @@ abstract class OutboxState extends Equatable {}
 class InitialOutboxState extends OutboxState {
   final List<OutboxModel> outboxList;
 
-  InitialOutboxState({this.outboxList = const []});
-
+  InitialOutboxState({@required this.outboxList});
+  InitialOutboxState.fromState({@required InitialOutboxState state}): outboxList = state.outboxList ?? [];
+  
   @override
   List<Object> get props => [outboxList];
 
@@ -19,10 +20,16 @@ class InitialOutboxState extends OutboxState {
   }
 }
 
-class RetrievedOutboxState extends OutboxState {
-  final List<OutboxModel> outboxList;
-  
-  RetrievedOutboxState({@required this.outboxList});
+class RetrievedOutboxState extends InitialOutboxState {
+
+  RetrievedOutboxState._({@required InitialOutboxState state}): super.fromState(state: state);
+
+  factory RetrievedOutboxState.copyWith({
+    @required InitialOutboxState state,
+    List<OutboxModel> outboxList
+  }) {
+    return RetrievedOutboxState._(state: InitialOutboxState(outboxList: outboxList));
+  }
 
   @override
   List<Object> get props => [outboxList];
@@ -33,12 +40,20 @@ class RetrievedOutboxState extends OutboxState {
   }
 }
 
-class OutboxErrorState extends OutboxState {
+class OutboxErrorState extends InitialOutboxState {
   final String message;
-  OutboxErrorState({@required this.message});
+
+  OutboxErrorState._({@required InitialOutboxState state, this.message}): super.fromState(state: state);
+
+  factory OutboxErrorState.copyWith({
+    @required InitialOutboxState state,
+    String message
+  }) {
+    return OutboxErrorState._(state: state, message: message);
+  }
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [outboxList, message];
   
   @override
   String toString() {

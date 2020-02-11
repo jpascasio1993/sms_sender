@@ -38,8 +38,8 @@ void main() {
     when(client.post(any, body: anyNamed('body'))).thenAnswer((_) async => http.Response('Something went wrong', 404));
   }
 
-  group('should get data from remote source', () {
-      test('when response is 200', () async { 
+  group('[OUTBOX] data/datasources RemoteSource :: ', () {
+      test('should return outbox list when response is 200', () async { 
       
         // arrange 
         setUpMockHttpClientResponse200();
@@ -49,7 +49,7 @@ void main() {
         expect(res, listOutbox);
       });
 
-      test('when response is 404', () async { 
+      test('should throw error when response is 404', () async { 
       
         // arrange 
         setUpMockHttpClientResponse404();
@@ -59,7 +59,7 @@ void main() {
         expect(() => res(), throwsA(TypeMatcher<ServerException>()));
       });
 
-      test('when url is empty', () async { 
+      test('should return empty list when url is empty', () async { 
       
         // arrange 
         setUpMockHttpClientResponse200();

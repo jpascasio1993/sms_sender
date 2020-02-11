@@ -404,6 +404,7 @@ class SmsQuery {
       int count,
       String address,
       int threadId,
+      bool read,
       SmsQueryKind kind: SmsQueryKind.Inbox}) async {
     Map arguments = {};
     if (start != null && start >= 0) {
@@ -418,6 +419,10 @@ class SmsQuery {
     if (threadId != null && threadId >= 0) {
       arguments["thread_id"] = threadId;
     }
+    if(read != null) {
+      arguments["read"] = read;
+    }
+
     String function;
     SmsMessageKind msgKind;
     if (kind == SmsQueryKind.Inbox) {
@@ -447,6 +452,7 @@ class SmsQuery {
       int count,
       String address,
       int threadId,
+      bool read,
       List<SmsQueryKind> kinds: const [SmsQueryKind.Inbox],
       bool sort: true}) async {
     List<SmsMessage> result = [];
@@ -457,6 +463,7 @@ class SmsQuery {
           count: count,
           address: address,
           threadId: threadId,
+          read: read,
           kind: kind,
         ));
     }

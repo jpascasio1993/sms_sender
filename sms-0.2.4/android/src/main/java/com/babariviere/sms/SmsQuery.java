@@ -48,9 +48,10 @@ class SmsQueryHandler implements RequestPermissionsResultListener {
   private int count = -1;
   private int threadId = -1;
   private String address = null;
-
+  private Boolean read = null;
+  
   SmsQueryHandler(PluginRegistry.Registrar registrar, MethodChannel.Result result, SmsQueryRequest request, int start,
-      int count, int threadId, String address) {
+      int count, int threadId, String address, Boolean read) {
     this.registrar = registrar;
     this.result = result;
     this.request = request;
@@ -58,6 +59,7 @@ class SmsQueryHandler implements RequestPermissionsResultListener {
     this.count = count;
     this.threadId = threadId;
     this.address = address;
+    this.read = read;
   }
 
   void handle(Permissions permissions) {
@@ -92,8 +94,8 @@ class SmsQueryHandler implements RequestPermissionsResultListener {
 
   private void querySms() {
     ArrayList<JSONObject> list = new ArrayList<>();
-    //Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, "read=0", null, null);
-    Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, null, null, null);
+    Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, read != null ? read : null, null, null);
+    // Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, null, null, null);
     if (cursor == null) {
       result.error("#01", "permission denied", null);
       return;
@@ -165,6 +167,7 @@ class SmsQuery implements MethodCallHandler {
     int threadId = -1;
     String address = null;
     SmsQueryRequest request;
+    Boolean read;
     switch (call.method) {
     case "getInbox":
       request = SmsQueryRequest.Inbox;
@@ -175,6 +178,7 @@ class SmsQuery implements MethodCallHandler {
     case "getDraft":
       request = SmsQueryRequest.Draft;
       break;
+    
     default:
       result.notImplemented();
       return;
@@ -191,7 +195,11 @@ class SmsQuery implements MethodCallHandler {
     if (call.hasArgument("address")) {
       address = call.argument("address");
     }
-    SmsQueryHandler handler = new SmsQueryHandler(registrar, result, request, start, count, threadId, address);
+    if(call.hasArgument("read")) {
+      read = call.argument("read");
+    }
+
+    SmsQueryHandler handler = new SmsQueryHandler(registrar, result, request, start, count, threadId, address, read);
     this.registrar.addRequestPermissionsResultListener(handler);
     handler.handle(permissions);
   }

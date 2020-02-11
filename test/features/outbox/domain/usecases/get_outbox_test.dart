@@ -33,17 +33,20 @@ void main() {
     getOutboxUseCase = GetOutbox(outboxRepository: mockOutboxRepository);
   });
 
-  test('Should get outbox list', () async {
-    // arrange
-    when(mockOutboxRepository.getOutbox(limit, offset))
-        .thenAnswer((_) async => Right(outboxRes));
+  group('[OUTBOX] domain/usecases GetOutboxUseCase :: ', (){
+    test('Should get outbox list', () async {
+        // arrange
+      when(mockOutboxRepository.getOutbox(limit, offset))
+          .thenAnswer((_) async => Right(outboxRes));
 
-    // act
-    final result = await getOutboxUseCase(params);
+      // act
+      final result = await getOutboxUseCase(params);
 
-    // assert
-    expect(result, Right(outboxRes));
+      // assert
+      expect(result, Right(outboxRes));
 
-    verify(mockOutboxRepository.getOutbox(limit, offset));
+      verify(mockOutboxRepository.getOutbox(limit, offset));
+    });
   });
+  
 }
