@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/failures.dart';
@@ -30,11 +31,13 @@ class InboxRepositoryImpl extends InboxRepository {
   Future<Either<Failure, bool>> getSmsAndSaveToDb(int limit, int offset, bool read) async {
     try {
       final res = await inboxSource.getSms(limit, offset, queryKinds, read);
+      print('res ${res.length}');
+
       final inboxMessages = res.map((message) => InboxMessagesCompanion.insert(
-        address: message.address, 
-        body: message.body, 
-        date: DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.date.toLocal()), 
-        dateSent: DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.dateSent.toLocal())
+        address: Value(message.address), 
+        body: Value(message.body), 
+        date: Value(DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.date.toLocal())), 
+        dateSent: Value(DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.dateSent.toLocal()))
         )); 
       final insertRes = await inboxSource.insertInbox(inboxMessages);
       return Right(insertRes);

@@ -16,10 +16,10 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
   final bool sent;
   OutboxMessage(
       {@required this.id,
-      @required this.title,
-      @required this.body,
-      @required this.recipient,
-      @required this.date,
+      this.title,
+      this.body,
+      this.recipient,
+      this.date,
       @required this.sent});
   factory OutboxMessage.fromData(
       Map<String, dynamic> data, GeneratedDatabase db,
@@ -145,15 +145,12 @@ class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
   });
   OutboxMessagesCompanion.insert({
     this.id = const Value.absent(),
-    @required String title,
-    @required String body,
-    @required String recipient,
-    @required String date,
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.recipient = const Value.absent(),
+    this.date = const Value.absent(),
     this.sent = const Value.absent(),
-  })  : title = Value(title),
-        body = Value(body),
-        recipient = Value(recipient),
-        date = Value(date);
+  });
   OutboxMessagesCompanion copyWith(
       {Value<int> id,
       Value<String> title,
@@ -194,7 +191,7 @@ class $OutboxMessagesTable extends OutboxMessages
     return GeneratedTextColumn(
       'title',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -206,7 +203,7 @@ class $OutboxMessagesTable extends OutboxMessages
     return GeneratedTextColumn(
       'body',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -218,7 +215,7 @@ class $OutboxMessagesTable extends OutboxMessages
     return GeneratedTextColumn(
       'recipient',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -230,7 +227,7 @@ class $OutboxMessagesTable extends OutboxMessages
     return GeneratedTextColumn(
       'date',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -262,26 +259,18 @@ class $OutboxMessagesTable extends OutboxMessages
     if (d.title.present) {
       context.handle(
           _titleMeta, title.isAcceptableValue(d.title.value, _titleMeta));
-    } else if (isInserting) {
-      context.missing(_titleMeta);
     }
     if (d.body.present) {
       context.handle(
           _bodyMeta, body.isAcceptableValue(d.body.value, _bodyMeta));
-    } else if (isInserting) {
-      context.missing(_bodyMeta);
     }
     if (d.recipient.present) {
       context.handle(_recipientMeta,
           recipient.isAcceptableValue(d.recipient.value, _recipientMeta));
-    } else if (isInserting) {
-      context.missing(_recipientMeta);
     }
     if (d.date.present) {
       context.handle(
           _dateMeta, date.isAcceptableValue(d.date.value, _dateMeta));
-    } else if (isInserting) {
-      context.missing(_dateMeta);
     }
     if (d.sent.present) {
       context.handle(
@@ -337,10 +326,10 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
   final bool sent;
   InboxMessage(
       {@required this.id,
-      @required this.address,
-      @required this.body,
-      @required this.date,
-      @required this.dateSent,
+      this.address,
+      this.body,
+      this.date,
+      this.dateSent,
       @required this.sent});
   factory InboxMessage.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
@@ -464,15 +453,12 @@ class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
   });
   InboxMessagesCompanion.insert({
     this.id = const Value.absent(),
-    @required String address,
-    @required String body,
-    @required String date,
-    @required String dateSent,
+    this.address = const Value.absent(),
+    this.body = const Value.absent(),
+    this.date = const Value.absent(),
+    this.dateSent = const Value.absent(),
     this.sent = const Value.absent(),
-  })  : address = Value(address),
-        body = Value(body),
-        date = Value(date),
-        dateSent = Value(dateSent);
+  });
   InboxMessagesCompanion copyWith(
       {Value<int> id,
       Value<String> address,
@@ -513,7 +499,7 @@ class $InboxMessagesTable extends InboxMessages
     return GeneratedTextColumn(
       'address',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -525,7 +511,7 @@ class $InboxMessagesTable extends InboxMessages
     return GeneratedTextColumn(
       'body',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -537,7 +523,7 @@ class $InboxMessagesTable extends InboxMessages
     return GeneratedTextColumn(
       'date',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -549,7 +535,7 @@ class $InboxMessagesTable extends InboxMessages
     return GeneratedTextColumn(
       'date_sent',
       $tableName,
-      false,
+      true,
     );
   }
 
@@ -581,26 +567,18 @@ class $InboxMessagesTable extends InboxMessages
     if (d.address.present) {
       context.handle(_addressMeta,
           address.isAcceptableValue(d.address.value, _addressMeta));
-    } else if (isInserting) {
-      context.missing(_addressMeta);
     }
     if (d.body.present) {
       context.handle(
           _bodyMeta, body.isAcceptableValue(d.body.value, _bodyMeta));
-    } else if (isInserting) {
-      context.missing(_bodyMeta);
     }
     if (d.date.present) {
       context.handle(
           _dateMeta, date.isAcceptableValue(d.date.value, _dateMeta));
-    } else if (isInserting) {
-      context.missing(_dateMeta);
     }
     if (d.dateSent.present) {
       context.handle(_dateSentMeta,
           dateSent.isAcceptableValue(d.dateSent.value, _dateSentMeta));
-    } else if (isInserting) {
-      context.missing(_dateSentMeta);
     }
     if (d.sent.present) {
       context.handle(

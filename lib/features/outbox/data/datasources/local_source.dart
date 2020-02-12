@@ -19,7 +19,7 @@ class LocalSourceImpl implements LocalSource {
     final list = remoteSourceOutbox
     .where((outbox) => outbox.recipient != null)
     .map((outbox) => OutboxMessagesCompanion
-    .insert(body: outbox.body, date: outbox.date, title: outbox.title, recipient: outbox.recipient, sent: Value(outbox.sent)))
+    .insert(body: Value(outbox.body), date: Value(outbox.date), title: Value(outbox.title), recipient: Value(outbox.recipient), sent: Value(outbox.sent)))
     .toList();
     return await appDatabase.outboxMessageDao.insertOutbox(list).catchError((error) => throw LocalException());
   }

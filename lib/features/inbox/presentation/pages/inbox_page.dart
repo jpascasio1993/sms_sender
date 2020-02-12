@@ -11,20 +11,26 @@ class InboxPage extends StatefulWidget {
 
 class _InboxPageState extends State<InboxPage> {
   InboxBloc inboxBloc;
-
+  final limit = -1;
+  final offset = 0;
   @override
   void initState() {
     super.initState();
     inboxBloc = BlocProvider.of<InboxBloc>(context);
   }
   void _onPress() {
-    inboxBloc.add(GetInboxEvent(limit: -1, offset: 0));
+    inboxBloc.add(GetInboxEvent(limit: limit, offset: offset));
+  }
+
+  void _onPressSaveSms() {
+    inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 10, offset: (inboxBloc.state as InitialInboxState).inboxList.length));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<InboxBloc, InboxState>(
       listener: (BuildContext context, InboxState state){
+
         if(state is RetrievedInboxState) {
           debugPrint('outboxlist size ${state.inboxList.length}');
         }
@@ -38,7 +44,11 @@ class _InboxPageState extends State<InboxPage> {
                 Text('Inbox', style: Theme.of(context).textTheme.display1),
                 RaisedButton(
                   onPressed: _onPress,
-                  child: const Text('Button'),
+                  child: const Text('GetInboxEvent'),
+                ),
+                RaisedButton(
+                  onPressed: _onPressSaveSms,
+                  child: const Text('GetSMSAndSaveToDB'),
                 )
               ],
             )

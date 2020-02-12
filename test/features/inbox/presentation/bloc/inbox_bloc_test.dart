@@ -4,20 +4,22 @@ import 'package:mockito/mockito.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'dart:convert';
 import '../../../../fixtures/fixture_reader.dart';
 
 class MockGetInbox extends Mock implements GetInbox {}
-
+class MockGetSmsAndSaveToDb extends Mock implements GetSmsAndSaveToDb {}
 void main() {
-
+  MockGetSmsAndSaveToDb mockGetSmsAndSaveToDb;
   MockGetInbox mockGetInbox;
   InboxBloc inboxBloc;
   List<InboxMessage> messages;
   setUp((){
+    mockGetSmsAndSaveToDb = MockGetSmsAndSaveToDb();
     mockGetInbox = MockGetInbox();
-    inboxBloc = InboxBloc(getInbox: mockGetInbox);
+    inboxBloc = InboxBloc(getInbox: mockGetInbox, getSmsAndSaveToDb: mockGetSmsAndSaveToDb);
     messages = [InboxMessage.fromJson(json.decode(fixture('inbox.json')))];
     // messages = [SmsMessage.fromJson(json.decode(fixture('inbox.json')))];
   });
@@ -37,7 +39,7 @@ void main() {
       //act
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
-      inboxBloc.add(GetInboxEvent(limit: 0, offset: 0, read: true));
+      inboxBloc.add(GetInboxEvent(limit: 0, offset: 0, sent: true));
     });
   });
 
@@ -56,7 +58,7 @@ void main() {
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
       //act
-      inboxBloc.add(LoadMoreInboxEvent(limit: 0, offset: 0, read: true)); 
+      inboxBloc.add(LoadMoreInboxEvent(limit: 0, offset: 0, sent: true)); 
     
     });
   });

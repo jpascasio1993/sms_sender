@@ -6,6 +6,7 @@ import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
@@ -21,10 +22,10 @@ final bool smsIsRead = false;
 Future<void> init() async {
 
   //Database
-  serviceLocator.registerFactory<AppDatabase>(() => AppDatabase());
+  serviceLocator.registerSingleton<AppDatabase>(AppDatabase());
 
   //Bloc
-  serviceLocator.registerFactory(() => InboxBloc(getInbox: serviceLocator()));
+  serviceLocator.registerFactory(() => InboxBloc(getInbox: serviceLocator(), getSmsAndSaveToDb: serviceLocator()));
   serviceLocator.registerFactory(() => OutboxBloc(getOutbox: serviceLocator()));
 
   //Sms
@@ -42,5 +43,6 @@ Future<void> init() async {
 
   //usecases
   serviceLocator.registerLazySingleton<GetInbox>(() => GetInbox(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton<GetSmsAndSaveToDb>(() => GetSmsAndSaveToDb(repository: serviceLocator()));
   serviceLocator.registerLazySingleton<GetOutbox>(() => GetOutbox(outboxRepository: serviceLocator()));
 }

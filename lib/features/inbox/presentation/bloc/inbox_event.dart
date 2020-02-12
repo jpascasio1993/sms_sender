@@ -24,8 +24,7 @@ class LoadMoreInboxEvent extends GetInboxEvent {
   LoadMoreInboxEvent({
       @required int limit, 
       @required int offset,
-      bool sent, 
-      bool read
+      bool sent
     }): super(limit: limit, offset: offset, sent: sent);
 
   @override
@@ -47,6 +46,9 @@ class GetSmsAndSaveToDbEvent extends GetInboxEvent {
   String toString() {
     return 'GetSmsAndSaveToDbEvent';
   }
+
+  @override
+  List<Object> get props => [limit, offset, sent, read];
 }
 
 class AddInboxEvent extends InboxEvent {

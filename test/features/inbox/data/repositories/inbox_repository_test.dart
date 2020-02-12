@@ -27,7 +27,7 @@ void main() {
     sent = false;
     mockAppDatabase = MockAppDatabase();
     mockInboxMessageDao = MockInboxMessageDao();
-    inboxRepository = InboxRepositoryImpl(appDatabase: mockAppDatabase, inboxSource: mockInboxSource, queryKinds: querykinds);
+    inboxRepository = InboxRepositoryImpl(inboxSource: mockInboxSource, queryKinds: querykinds);
   });
 
   group('[INBOX] data/datasources InboxRepositoryImpl :: ', (){
@@ -35,7 +35,7 @@ void main() {
   
     //arrange
     // when(mockInboxSource.getSms(any, any, any, any)).thenAnswer((_) async => messages);
-    when(mockAppDatabase.inboxMessageDao).thenReturn(mockInboxMessageDao);
+    // when(mockAppDatabase.inboxMessageDao).thenReturn(mockInboxMessageDao);
     when(mockInboxSource.getInbox(any, any, any)).thenAnswer((_) async => messages);
 
     //act
