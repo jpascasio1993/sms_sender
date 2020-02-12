@@ -20,9 +20,9 @@ class OutboxRepositoryImpl implements OutboxRepository {
 
   @override
   Future<Either<Failure, List<OutboxModel>>> getOutbox(
-      int limit, int offset) async {
+      int limit, int offset, bool sent) async {
     try {
-      final res = await localSource.getOutbox(limit, offset);
+      final res = await localSource.getOutbox(limit, offset, sent);
       return Right(res);
     } catch (error) {
       return Left(LocalFailure(message: localErrorMessage));
@@ -37,6 +37,8 @@ class OutboxRepositoryImpl implements OutboxRepository {
       return Right(res);
     } on ServerException {
       return Left(ServerFailure(message: remoteErrorMessage));
+    } on LocalException {
+      return Left(LocalFailure(message: localErrorMessage));
     }
   }
 }

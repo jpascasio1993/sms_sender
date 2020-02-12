@@ -1,9 +1,8 @@
 {
     "address": "09123456789",
     "body": "Sample message",
-    "read": 0,
-    "_id": 0,
-    "date": 1581274815508,
-    "date_sent": 1581274815508,
-    "thread_id": 0
+    "sent": false,
+    "id": 0,
+    "date": "1581274815508",
+    "dateSent": "1581274815508"
 }

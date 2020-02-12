@@ -26,7 +26,7 @@ void main() {
   List sampleData;
   int limit = -1;
   int offset = 0;
-
+  bool sent = false;
   setUp(() {
     sampleData = json.decode(fixture('outbox.json'));
     remoteSource = MockRemoteSource();
@@ -40,10 +40,10 @@ void main() {
   group('[OUTBOX] data/repositories OutboxRepository :: ', () {
     test('should get outbox list from local source', () async {
       // arrange
-      when(localSource.getOutbox(any, any)).thenAnswer((_) async => listOutbox);
+      when(localSource.getOutbox(any, any, any)).thenAnswer((_) async => listOutbox);
 
       // act
-      final res = await outboxRepositoryImpl.getOutbox(limit, offset);
+      final res = await outboxRepositoryImpl.getOutbox(limit, offset, sent);
 
       // assert
       expect(res, Right(listOutbox));

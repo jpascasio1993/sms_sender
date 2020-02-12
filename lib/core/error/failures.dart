@@ -16,3 +16,7 @@ class ServerFailure extends Failure {
 class LocalFailure extends Failure {
   LocalFailure({String message}) : super(message: message);
 }
+
+class SMSFailure extends Failure {
+  SMSFailure({String message}) : super(message: message);
+}

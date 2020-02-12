@@ -1,6 +1,7 @@
 
 import 'package:get_it/get_it.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
@@ -20,7 +21,7 @@ final bool smsIsRead = false;
 Future<void> init() async {
 
   //Database
-  // serviceLocator.registerFactory(() => AppDatabase());
+  serviceLocator.registerFactory<AppDatabase>(() => AppDatabase());
 
   //Bloc
   serviceLocator.registerFactory(() => InboxBloc(getInbox: serviceLocator()));
@@ -32,12 +33,12 @@ Future<void> init() async {
 
   // Data sources
   serviceLocator.registerLazySingleton<RemoteSource>(() => RemoteSourceImpl(client: serviceLocator(), url: remoteUrl));
-  serviceLocator.registerLazySingleton<LocalSource>(() => LocalSourceImpl());
-  serviceLocator.registerLazySingleton<InboxSource>(() => InboxSourceImpl(smsQuery: serviceLocator()));
+  serviceLocator.registerLazySingleton<LocalSource>(() => LocalSourceImpl(appDatabase: serviceLocator()));
+  serviceLocator.registerLazySingleton<InboxSource>(() => InboxSourceImpl(appDatabase: serviceLocator(), smsQuery: serviceLocator()));
 
   // Repository
   serviceLocator.registerLazySingleton<OutboxRepository>(() => OutboxRepositoryImpl(remoteSource: serviceLocator(), localSource: serviceLocator()));
-  serviceLocator.registerLazySingleton<InboxRepository>(() => InboxRepositoryImpl(inboxSource: serviceLocator(), queryKinds: serviceLocator(), read: smsIsRead));
+  serviceLocator.registerLazySingleton<InboxRepository>(() => InboxRepositoryImpl(inboxSource: serviceLocator(), queryKinds: serviceLocator()));
 
   //usecases
   serviceLocator.registerLazySingleton<GetInbox>(() => GetInbox(repository: serviceLocator()));

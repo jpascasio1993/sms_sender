@@ -1,12 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:sms/sms.dart';
+import 'package:sms_sender/core/database/database.dart';
 
 @immutable
 abstract class InboxState extends Equatable {}
 
 class InitialInboxState extends InboxState {
-  final List<SmsMessage> inboxList;
+  final List<InboxMessage> inboxList;
 
   InitialInboxState({@required this.inboxList});
   InitialInboxState.fromState({@required InitialInboxState state}): inboxList = state.inboxList ?? [];
@@ -26,7 +26,7 @@ class RetrievedInboxState extends InitialInboxState {
 
   factory RetrievedInboxState.copyWith({
     @required InitialInboxState state,
-    List<SmsMessage> inboxList
+    List<InboxMessage> inboxList
   }) {
     return RetrievedInboxState._(state: InitialInboxState(inboxList: inboxList));
   }

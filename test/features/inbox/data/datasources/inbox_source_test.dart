@@ -1,11 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 
 class MockSmsQuery extends Mock implements SmsQuery {}
+class MockAppDatabase extends Mock implements AppDatabase {}
 
 void main() {
+  MockAppDatabase mockAppDatabase;
   MockSmsQuery mockSmsQuery;
   InboxSourceImpl inboxSourceImpl;
   List<SmsQueryKind> querykinds;
@@ -19,7 +22,8 @@ void main() {
     messages = [];
     querykinds = [SmsQueryKind.Inbox];
     mockSmsQuery = MockSmsQuery();
-    inboxSourceImpl = InboxSourceImpl(smsQuery: mockSmsQuery);
+    mockAppDatabase = MockAppDatabase();
+    inboxSourceImpl = InboxSourceImpl( appDatabase: mockAppDatabase, smsQuery: mockSmsQuery);
   });
 
   group('[INBOX] data/datasource InboxSource', (){

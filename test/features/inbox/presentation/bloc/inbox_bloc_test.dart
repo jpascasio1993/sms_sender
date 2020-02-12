@@ -1,6 +1,8 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'dart:convert';
@@ -12,18 +14,19 @@ void main() {
 
   MockGetInbox mockGetInbox;
   InboxBloc inboxBloc;
-  List<SmsMessage> messages;
+  List<InboxMessage> messages;
   setUp((){
     mockGetInbox = MockGetInbox();
     inboxBloc = InboxBloc(getInbox: mockGetInbox);
-    messages = [SmsMessage.fromJson(json.decode(fixture('inbox.json')))];
+    messages = [InboxMessage.fromJson(json.decode(fixture('inbox.json')))];
+    // messages = [SmsMessage.fromJson(json.decode(fixture('inbox.json')))];
   });
 
   group('[INBOX] presentation/bloc GetInboxEvent', (){
     test('should retrieve list of sms', () async { 
     
       //arrange
-      when(mockGetInbox(any)).thenAnswer((_) async => messages);
+      when(mockGetInbox(any)).thenAnswer((_) async => Right(messages));
       
       //assert 
       final expectedCalls = [
@@ -42,7 +45,7 @@ void main() {
     test('should load more messages', () async {
     
       //arrange
-      when(mockGetInbox(any)).thenAnswer((_) async => messages);
+      when(mockGetInbox(any)).thenAnswer((_) async => Right(messages));
 
      //assert 
       final expectedCalls = [

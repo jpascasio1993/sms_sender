@@ -1,6 +1,6 @@
 [
     {
-        "_id": 0,
+        "id": 0,
         "title": "title",
         "body": "Sample body",
         "recipient": "+639162507727",

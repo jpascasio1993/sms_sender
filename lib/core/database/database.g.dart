@@ -35,8 +35,7 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
       body: stringType.mapFromDatabaseResponse(data['${effectivePrefix}body']),
       recipient: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}recipient']),
-      date: stringType
-          .mapFromDatabaseResponse(data['${effectivePrefix}date_time']),
+      date: stringType.mapFromDatabaseResponse(data['${effectivePrefix}date']),
       sent: boolType.mapFromDatabaseResponse(data['${effectivePrefix}sent']),
     );
   }
@@ -229,7 +228,7 @@ class $OutboxMessagesTable extends OutboxMessages
   GeneratedTextColumn get date => _date ??= _constructDate();
   GeneratedTextColumn _constructDate() {
     return GeneratedTextColumn(
-      'date_time',
+      'date',
       $tableName,
       false,
     );
@@ -315,7 +314,7 @@ class $OutboxMessagesTable extends OutboxMessages
       map['recipient'] = Variable<String, StringType>(d.recipient.value);
     }
     if (d.date.present) {
-      map['date_time'] = Variable<String, StringType>(d.date.value);
+      map['date'] = Variable<String, StringType>(d.date.value);
     }
     if (d.sent.present) {
       map['sent'] = Variable<bool, BoolType>(d.sent.value);
@@ -329,18 +328,344 @@ class $OutboxMessagesTable extends OutboxMessages
   }
 }
 
+class InboxMessage extends DataClass implements Insertable<InboxMessage> {
+  final int id;
+  final String address;
+  final String body;
+  final String date;
+  final String dateSent;
+  final bool sent;
+  InboxMessage(
+      {@required this.id,
+      @required this.address,
+      @required this.body,
+      @required this.date,
+      @required this.dateSent,
+      @required this.sent});
+  factory InboxMessage.fromData(Map<String, dynamic> data, GeneratedDatabase db,
+      {String prefix}) {
+    final effectivePrefix = prefix ?? '';
+    final intType = db.typeSystem.forDartType<int>();
+    final stringType = db.typeSystem.forDartType<String>();
+    final boolType = db.typeSystem.forDartType<bool>();
+    return InboxMessage(
+      id: intType.mapFromDatabaseResponse(data['${effectivePrefix}id']),
+      address:
+          stringType.mapFromDatabaseResponse(data['${effectivePrefix}address']),
+      body: stringType.mapFromDatabaseResponse(data['${effectivePrefix}body']),
+      date: stringType.mapFromDatabaseResponse(data['${effectivePrefix}date']),
+      dateSent: stringType
+          .mapFromDatabaseResponse(data['${effectivePrefix}date_sent']),
+      sent: boolType.mapFromDatabaseResponse(data['${effectivePrefix}sent']),
+    );
+  }
+  factory InboxMessage.fromJson(Map<String, dynamic> json,
+      {ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return InboxMessage(
+      id: serializer.fromJson<int>(json['id']),
+      address: serializer.fromJson<String>(json['address']),
+      body: serializer.fromJson<String>(json['body']),
+      date: serializer.fromJson<String>(json['date']),
+      dateSent: serializer.fromJson<String>(json['dateSent']),
+      sent: serializer.fromJson<bool>(json['sent']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'address': serializer.toJson<String>(address),
+      'body': serializer.toJson<String>(body),
+      'date': serializer.toJson<String>(date),
+      'dateSent': serializer.toJson<String>(dateSent),
+      'sent': serializer.toJson<bool>(sent),
+    };
+  }
+
+  @override
+  InboxMessagesCompanion createCompanion(bool nullToAbsent) {
+    return InboxMessagesCompanion(
+      id: id == null && nullToAbsent ? const Value.absent() : Value(id),
+      address: address == null && nullToAbsent
+          ? const Value.absent()
+          : Value(address),
+      body: body == null && nullToAbsent ? const Value.absent() : Value(body),
+      date: date == null && nullToAbsent ? const Value.absent() : Value(date),
+      dateSent: dateSent == null && nullToAbsent
+          ? const Value.absent()
+          : Value(dateSent),
+      sent: sent == null && nullToAbsent ? const Value.absent() : Value(sent),
+    );
+  }
+
+  InboxMessage copyWith(
+          {int id,
+          String address,
+          String body,
+          String date,
+          String dateSent,
+          bool sent}) =>
+      InboxMessage(
+        id: id ?? this.id,
+        address: address ?? this.address,
+        body: body ?? this.body,
+        date: date ?? this.date,
+        dateSent: dateSent ?? this.dateSent,
+        sent: sent ?? this.sent,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('InboxMessage(')
+          ..write('id: $id, ')
+          ..write('address: $address, ')
+          ..write('body: $body, ')
+          ..write('date: $date, ')
+          ..write('dateSent: $dateSent, ')
+          ..write('sent: $sent')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => $mrjf($mrjc(
+      id.hashCode,
+      $mrjc(
+          address.hashCode,
+          $mrjc(body.hashCode,
+              $mrjc(date.hashCode, $mrjc(dateSent.hashCode, sent.hashCode))))));
+  @override
+  bool operator ==(dynamic other) =>
+      identical(this, other) ||
+      (other is InboxMessage &&
+          other.id == this.id &&
+          other.address == this.address &&
+          other.body == this.body &&
+          other.date == this.date &&
+          other.dateSent == this.dateSent &&
+          other.sent == this.sent);
+}
+
+class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
+  final Value<int> id;
+  final Value<String> address;
+  final Value<String> body;
+  final Value<String> date;
+  final Value<String> dateSent;
+  final Value<bool> sent;
+  const InboxMessagesCompanion({
+    this.id = const Value.absent(),
+    this.address = const Value.absent(),
+    this.body = const Value.absent(),
+    this.date = const Value.absent(),
+    this.dateSent = const Value.absent(),
+    this.sent = const Value.absent(),
+  });
+  InboxMessagesCompanion.insert({
+    this.id = const Value.absent(),
+    @required String address,
+    @required String body,
+    @required String date,
+    @required String dateSent,
+    this.sent = const Value.absent(),
+  })  : address = Value(address),
+        body = Value(body),
+        date = Value(date),
+        dateSent = Value(dateSent);
+  InboxMessagesCompanion copyWith(
+      {Value<int> id,
+      Value<String> address,
+      Value<String> body,
+      Value<String> date,
+      Value<String> dateSent,
+      Value<bool> sent}) {
+    return InboxMessagesCompanion(
+      id: id ?? this.id,
+      address: address ?? this.address,
+      body: body ?? this.body,
+      date: date ?? this.date,
+      dateSent: dateSent ?? this.dateSent,
+      sent: sent ?? this.sent,
+    );
+  }
+}
+
+class $InboxMessagesTable extends InboxMessages
+    with TableInfo<$InboxMessagesTable, InboxMessage> {
+  final GeneratedDatabase _db;
+  final String _alias;
+  $InboxMessagesTable(this._db, [this._alias]);
+  final VerificationMeta _idMeta = const VerificationMeta('id');
+  GeneratedIntColumn _id;
+  @override
+  GeneratedIntColumn get id => _id ??= _constructId();
+  GeneratedIntColumn _constructId() {
+    return GeneratedIntColumn('id', $tableName, false,
+        hasAutoIncrement: true, declaredAsPrimaryKey: true);
+  }
+
+  final VerificationMeta _addressMeta = const VerificationMeta('address');
+  GeneratedTextColumn _address;
+  @override
+  GeneratedTextColumn get address => _address ??= _constructAddress();
+  GeneratedTextColumn _constructAddress() {
+    return GeneratedTextColumn(
+      'address',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _bodyMeta = const VerificationMeta('body');
+  GeneratedTextColumn _body;
+  @override
+  GeneratedTextColumn get body => _body ??= _constructBody();
+  GeneratedTextColumn _constructBody() {
+    return GeneratedTextColumn(
+      'body',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _dateMeta = const VerificationMeta('date');
+  GeneratedTextColumn _date;
+  @override
+  GeneratedTextColumn get date => _date ??= _constructDate();
+  GeneratedTextColumn _constructDate() {
+    return GeneratedTextColumn(
+      'date',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _dateSentMeta = const VerificationMeta('dateSent');
+  GeneratedTextColumn _dateSent;
+  @override
+  GeneratedTextColumn get dateSent => _dateSent ??= _constructDateSent();
+  GeneratedTextColumn _constructDateSent() {
+    return GeneratedTextColumn(
+      'date_sent',
+      $tableName,
+      false,
+    );
+  }
+
+  final VerificationMeta _sentMeta = const VerificationMeta('sent');
+  GeneratedBoolColumn _sent;
+  @override
+  GeneratedBoolColumn get sent => _sent ??= _constructSent();
+  GeneratedBoolColumn _constructSent() {
+    return GeneratedBoolColumn('sent', $tableName, false,
+        defaultValue: Constant(false));
+  }
+
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, address, body, date, dateSent, sent];
+  @override
+  $InboxMessagesTable get asDslTable => this;
+  @override
+  String get $tableName => _alias ?? 'inbox_messages';
+  @override
+  final String actualTableName = 'inbox_messages';
+  @override
+  VerificationContext validateIntegrity(InboxMessagesCompanion d,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    if (d.id.present) {
+      context.handle(_idMeta, id.isAcceptableValue(d.id.value, _idMeta));
+    }
+    if (d.address.present) {
+      context.handle(_addressMeta,
+          address.isAcceptableValue(d.address.value, _addressMeta));
+    } else if (isInserting) {
+      context.missing(_addressMeta);
+    }
+    if (d.body.present) {
+      context.handle(
+          _bodyMeta, body.isAcceptableValue(d.body.value, _bodyMeta));
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (d.date.present) {
+      context.handle(
+          _dateMeta, date.isAcceptableValue(d.date.value, _dateMeta));
+    } else if (isInserting) {
+      context.missing(_dateMeta);
+    }
+    if (d.dateSent.present) {
+      context.handle(_dateSentMeta,
+          dateSent.isAcceptableValue(d.dateSent.value, _dateSentMeta));
+    } else if (isInserting) {
+      context.missing(_dateSentMeta);
+    }
+    if (d.sent.present) {
+      context.handle(
+          _sentMeta, sent.isAcceptableValue(d.sent.value, _sentMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  InboxMessage map(Map<String, dynamic> data, {String tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : null;
+    return InboxMessage.fromData(data, _db, prefix: effectivePrefix);
+  }
+
+  @override
+  Map<String, Variable> entityToSql(InboxMessagesCompanion d) {
+    final map = <String, Variable>{};
+    if (d.id.present) {
+      map['id'] = Variable<int, IntType>(d.id.value);
+    }
+    if (d.address.present) {
+      map['address'] = Variable<String, StringType>(d.address.value);
+    }
+    if (d.body.present) {
+      map['body'] = Variable<String, StringType>(d.body.value);
+    }
+    if (d.date.present) {
+      map['date'] = Variable<String, StringType>(d.date.value);
+    }
+    if (d.dateSent.present) {
+      map['date_sent'] = Variable<String, StringType>(d.dateSent.value);
+    }
+    if (d.sent.present) {
+      map['sent'] = Variable<bool, BoolType>(d.sent.value);
+    }
+    return map;
+  }
+
+  @override
+  $InboxMessagesTable createAlias(String alias) {
+    return $InboxMessagesTable(_db, alias);
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(SqlTypeSystem.defaultInstance, e);
   $OutboxMessagesTable _outboxMessages;
   $OutboxMessagesTable get outboxMessages =>
       _outboxMessages ??= $OutboxMessagesTable(this);
+  $InboxMessagesTable _inboxMessages;
+  $InboxMessagesTable get inboxMessages =>
+      _inboxMessages ??= $InboxMessagesTable(this);
   OutboxMessageDao _outboxMessageDao;
   OutboxMessageDao get outboxMessageDao =>
       _outboxMessageDao ??= OutboxMessageDao(this as AppDatabase);
+  InboxMessageDao _inboxMessageDao;
+  InboxMessageDao get inboxMessageDao =>
+      _inboxMessageDao ??= InboxMessageDao(this as AppDatabase);
   @override
   Iterable<TableInfo> get allTables => allSchemaEntities.whereType<TableInfo>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [outboxMessages];
+  List<DatabaseSchemaEntity> get allSchemaEntities =>
+      [outboxMessages, inboxMessages];
 }
 
 // **************************************************************************
@@ -349,4 +674,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
 
 mixin _$OutboxMessageDaoMixin on DatabaseAccessor<AppDatabase> {
   $OutboxMessagesTable get outboxMessages => db.outboxMessages;
+}
+mixin _$InboxMessageDaoMixin on DatabaseAccessor<AppDatabase> {
+  $InboxMessagesTable get inboxMessages => db.inboxMessages;
 }

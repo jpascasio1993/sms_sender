@@ -5,7 +5,7 @@ class OutboxMessages extends Table {
   TextColumn get title => text()();
   TextColumn get body => text()();
   TextColumn get recipient => text()();
-  TextColumn get date => text().named('date_time')();
+  TextColumn get date => text()();
   BoolColumn get sent => boolean().withDefault(Constant(false))(); 
 }
 

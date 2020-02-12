@@ -13,6 +13,7 @@ void main() {
   MockOutboxRepository mockOutboxRepository;
   int offset = 0;
   int limit = 0;
+  bool sent;
   List<OutboxModel> outboxRes;
   OutboxParams params;
   
@@ -36,7 +37,7 @@ void main() {
   group('[OUTBOX] domain/usecases GetOutboxUseCase :: ', (){
     test('Should get outbox list', () async {
         // arrange
-      when(mockOutboxRepository.getOutbox(limit, offset))
+      when(mockOutboxRepository.getOutbox(limit, offset, sent))
           .thenAnswer((_) async => Right(outboxRes));
 
       // act
@@ -45,7 +46,7 @@ void main() {
       // assert
       expect(result, Right(outboxRes));
 
-      verify(mockOutboxRepository.getOutbox(limit, offset));
+      verify(mockOutboxRepository.getOutbox(limit, offset, sent));
     });
   });
   
