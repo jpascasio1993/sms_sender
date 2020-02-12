@@ -31,7 +31,7 @@ class RemoteSourceImpl extends RemoteSource {
 
       return items.where((OutboxModel outboxModel) {
         //debugPrint('filterWhere $outboxModel');
-        return outboxModel.sendTo != null;
+        return outboxModel.recipient != null;
       }).toList();
     } else {
       throw ServerException();

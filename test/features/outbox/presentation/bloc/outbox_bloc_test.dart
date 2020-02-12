@@ -3,7 +3,6 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'dart:convert';
-import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_impl.dart';

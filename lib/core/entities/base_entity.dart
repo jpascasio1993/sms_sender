@@ -3,6 +3,6 @@ import 'package:meta/meta.dart';
 
 abstract class BaseEntity extends Equatable {
   final int id;
-  final int status;
-  BaseEntity({@required this.id, @required this.status});
+  final bool sent;
+  BaseEntity({@required this.id, @required this.sent});
 }

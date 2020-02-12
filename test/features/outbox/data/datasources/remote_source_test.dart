@@ -4,7 +4,6 @@ import 'package:http/http.dart' as http;
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
-import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_impl.dart';
 import 'dart:convert';
 import 'package:matcher/matcher.dart';
 import '../../../../fixtures/fixture_reader.dart';
@@ -27,7 +26,7 @@ void main() {
     client = MockHttpClient();
     remoteSource = RemoteSourceImpl(client: client, url: url);
     emptyUrlRemoteSource = RemoteSourceImpl(client: client, url: '');
-    sampleData.forEach((any) => listOutbox.add(OutboxModel.fromJson(any)));
+    sampleData.forEach((value) => listOutbox.add(OutboxModel.fromJson(value)));
   });
 
   void setUpMockHttpClientResponse200(){
@@ -45,8 +44,10 @@ void main() {
         setUpMockHttpClientResponse200();
         // act 
         final res = await remoteSource.getOutbox();
+        
         // assert 
-        expect(res, listOutbox);
+        expect(res, equals(listOutbox));
+        
       });
 
       test('should throw error when response is 404', () async { 

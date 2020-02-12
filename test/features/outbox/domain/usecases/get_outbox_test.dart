@@ -23,9 +23,9 @@ void main() {
       OutboxModel(
           id: 0,
           body: 'test',
-          sendTo: '09123456789',
+          recipient: '09123456789',
           date: '2020-02-09 21:13:10',
-          status: 0,
+          sent: false,
           title: 'title')
     ];
     params = OutboxParams(limit: limit, offset: offset);

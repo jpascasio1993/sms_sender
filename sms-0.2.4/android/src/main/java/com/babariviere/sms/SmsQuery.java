@@ -94,7 +94,7 @@ class SmsQueryHandler implements RequestPermissionsResultListener {
 
   private void querySms() {
     ArrayList<JSONObject> list = new ArrayList<>();
-    Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, read != null ? read : null, null, null);
+    Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, read != null ? (read ? "read=1" : "read=0") : null, null, null);
     // Cursor cursor = registrar.context().getContentResolver().query(this.request.toUri(), null, null, null, null);
     if (cursor == null) {
       result.error("#01", "permission denied", null);
@@ -167,7 +167,7 @@ class SmsQuery implements MethodCallHandler {
     int threadId = -1;
     String address = null;
     SmsQueryRequest request;
-    Boolean read;
+    Boolean read = null;
     switch (call.method) {
     case "getInbox":
       request = SmsQueryRequest.Inbox;

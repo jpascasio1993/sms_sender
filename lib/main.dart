@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sms_sender/core/bloc/bloc_delegate.dart';
 import 'package:sms_sender/features/inbox/presentation/pages/inbox_page.dart';
 import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
 import './injectors.dart' as di;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'features/inbox/presentation/bloc/inbox_bloc.dart';
 // void main() => runApp(MyApp());
 
 
@@ -19,6 +23,7 @@ class Routes {
   };
   
   Routes() {
+    BlocSupervisor.delegate = SimpleBlocDelegate();
     runApp(MyApp(routes: routes));
   }
 }
@@ -65,29 +70,36 @@ class _RootTabState extends State<RootTab> {
   @override
   Widget build(BuildContext context) {
     ScreenUtil.init(context, width: widget.guidelineBaseWidth, height: widget.guidelineBaseHeight);
+
     return DefaultTabController(
-      length: 2, 
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text('SMS Sender'),
-          centerTitle: true,
-          bottom: TabBar(
-            tabs: <Widget>[
-              Tab(
-                key: UniqueKey(),
-                child: Text('inbox', style: TextStyle(fontSize: ScreenUtil().setSp(16))),
-              ),
-              Tab(
-                key: UniqueKey(),
-                text: 'Outbox'
-              )
-            ]
+        length: 2, 
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('SMS Sender'),
+            centerTitle: true,
+            bottom: TabBar(
+              tabs: <Widget>[
+                Tab(
+                  key: UniqueKey(),
+                  child: Text('inbox', style: TextStyle(fontSize: ScreenUtil().setSp(16))),
+                ),
+                Tab(
+                  key: UniqueKey(),
+                  text: 'Outbox'
+                )
+              ]
+            ),
           ),
-        ),
-        body: TabBarView(
-          children: <Widget>[InboxPage(), OutboxPage()],
-        ),
-      )
-    );
+          body: MultiBlocProvider(
+            providers: [
+              BlocProvider<InboxBloc>(create: (BuildContext context) =>  di.serviceLocator<InboxBloc>())
+            ],
+            child: TabBarView(
+              children: <Widget>[InboxPage(), OutboxPage()],
+            ), 
+          )
+        )
+      );
+   
   }
 }
