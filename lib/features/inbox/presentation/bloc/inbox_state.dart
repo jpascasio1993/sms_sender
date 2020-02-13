@@ -3,13 +3,17 @@ import 'package:meta/meta.dart';
 import 'package:sms_sender/core/database/database.dart';
 
 @immutable
-abstract class InboxState extends Equatable {}
+abstract class InboxState extends Equatable {
+  final List<InboxMessage> inboxList;
+  InboxState({@required this.inboxList});
+  InboxState.fromState({@required InboxState state}): inboxList = state.inboxList;
+}
 
 class InitialInboxState extends InboxState {
-  final List<InboxMessage> inboxList;
-
-  InitialInboxState({@required this.inboxList});
-  InitialInboxState.fromState({@required InitialInboxState state}): inboxList = state.inboxList ?? [];
+  
+  InitialInboxState({@required List<InboxMessage> inboxList}): super(inboxList: inboxList);
+  // inboxList = state.inboxList ?? [], super(inboxList:  );
+  InitialInboxState.fromState({@required InboxState state}): super.fromState(state: state);
   
   @override
   List<Object> get props => [inboxList];
@@ -20,12 +24,12 @@ class InitialInboxState extends InboxState {
   }
 }
 
-class RetrievedInboxState extends InitialInboxState {
+class RetrievedInboxState extends InboxState {
 
-  RetrievedInboxState._({@required InitialInboxState state}): super.fromState(state: state);
+  RetrievedInboxState._({@required InboxState state}): super.fromState(state: state);
 
   factory RetrievedInboxState.copyWith({
-    @required InitialInboxState state,
+    @required InboxState state,
     List<InboxMessage> inboxList
   }) {
     return RetrievedInboxState._(state: InitialInboxState(inboxList: inboxList));
@@ -40,13 +44,13 @@ class RetrievedInboxState extends InitialInboxState {
   }
 }
 
-class InboxErrorState extends InitialInboxState {
+class InboxErrorState extends InboxState {
   final String message;
 
-  InboxErrorState._({@required InitialInboxState state, this.message}): super.fromState(state: state);
+  InboxErrorState._({@required InboxState state, this.message}): super.fromState(state: state);
 
   factory InboxErrorState.copyWith({
-    @required InitialInboxState state,
+    @required InboxState state,
     String message
   }) {
     return InboxErrorState._(state: state, message: message);

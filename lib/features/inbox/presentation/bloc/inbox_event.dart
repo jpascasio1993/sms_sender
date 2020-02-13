@@ -2,14 +2,18 @@ import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 @immutable
-abstract class InboxEvent extends Equatable {}
-
-class GetInboxEvent extends InboxEvent {
+abstract class InboxEvent extends Equatable {
   final int limit;
   final int offset;
   final bool sent;
 
-  GetInboxEvent({@required this.limit, @required this.offset, this.sent });
+  InboxEvent({@required this.limit, @required this.offset, this.sent});
+}
+
+class GetInboxEvent extends InboxEvent {
+  
+
+  GetInboxEvent({@required int limit, @required int offset, bool sent }): super(limit: limit, offset: offset, sent: sent);
 
   @override
   List<Object> get props => [limit, offset, sent];
@@ -20,7 +24,7 @@ class GetInboxEvent extends InboxEvent {
   }
 }
 
-class LoadMoreInboxEvent extends GetInboxEvent {
+class LoadMoreInboxEvent extends InboxEvent {
   LoadMoreInboxEvent({
       @required int limit, 
       @required int offset,
@@ -28,12 +32,15 @@ class LoadMoreInboxEvent extends GetInboxEvent {
     }): super(limit: limit, offset: offset, sent: sent);
 
   @override
+  List<Object> get props => [limit, offset, sent];
+
+  @override
   String toString() {
     return 'LoadMoreInboxEvent';
   }
 }
 
-class GetSmsAndSaveToDbEvent extends GetInboxEvent {
+class GetSmsAndSaveToDbEvent extends InboxEvent {
   final bool read;
   GetSmsAndSaveToDbEvent({
       @required int limit, 

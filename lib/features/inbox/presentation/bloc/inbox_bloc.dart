@@ -16,24 +16,26 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
 
   @override
   Stream<InboxState> mapEventToState(InboxEvent event) async* {
+
     if(event is GetInboxEvent) {
       final res = await getInbox(InboxParams(limit: event.limit, offset: event.offset, sent: event.sent));
       // yield RetrievedInboxState.copyWith(state: state, inboxList: res);
-
       yield res.fold(
         (failure) => InboxErrorState.copyWith(state: state, message: failure.message), 
-        (inboxList) => RetrievedInboxState.copyWith(state: state, inboxList: inboxList));
+        (inboxList){
+          return RetrievedInboxState.copyWith(state: state, inboxList: inboxList);
+        });
     }
     else if(event is LoadMoreInboxEvent) {
       final res = await getInbox(InboxParams(limit: event.limit, offset: event.offset));
       yield res.fold(
         (failure) => InboxErrorState.copyWith(state: state, message: failure.message), 
-        (inboxList) => RetrievedInboxState.copyWith(state: state, inboxList: (state as InitialInboxState).inboxList + inboxList));
+        (inboxList) => RetrievedInboxState.copyWith(state: state, inboxList: state.inboxList + inboxList));
       // yield RetrievedInboxState.copyWith(state: state, inboxList: (state as InitialInboxState).inboxList + res);
     }
     else if(event is GetSmsAndSaveToDbEvent){
       final res = await getSmsAndSaveToDb(InboxParams(limit: event.limit, offset: event.offset, read: event.read));
-      final res2 = await getInbox(InboxParams(limit: event.limit, offset: (state as InitialInboxState).inboxList.length, sent: event.sent));
+      final res2 = await getInbox(InboxParams(limit: event.limit, offset: state.inboxList.length, sent: event.sent));
       yield* res2.fold(
          (failure) async* {
              yield InboxErrorState.copyWith(state: state, message: failure.message);
@@ -41,7 +43,9 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
          (inboxList) async* {
             yield res.fold(
                   (failure) => InboxErrorState.copyWith(state: state, message: failure.message), 
-                  (success) => RetrievedInboxState.copyWith(state: state, inboxList: (state as InitialInboxState).inboxList + (success ? inboxList : [])));
+                  (success){
+                    return RetrievedInboxState.copyWith(state: state, inboxList: state.inboxList + (success ? inboxList : []));
+                  });
          });
      
     }

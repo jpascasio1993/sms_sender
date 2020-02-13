@@ -23,7 +23,7 @@ class _InboxPageState extends State<InboxPage> {
   }
 
   void _onPressSaveSms() {
-    inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 10, offset: (inboxBloc.state as InitialInboxState).inboxList.length));
+    inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 10, offset: inboxBloc.state.inboxList.length));
   }
 
   @override

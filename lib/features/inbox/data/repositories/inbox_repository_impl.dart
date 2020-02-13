@@ -38,7 +38,7 @@ class InboxRepositoryImpl extends InboxRepository {
         body: Value(message.body), 
         date: Value(DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.date.toLocal())), 
         dateSent: Value(DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.dateSent.toLocal()))
-        )); 
+        )).toList(); 
       final insertRes = await inboxSource.insertInbox(inboxMessages);
       return Right(insertRes);
     }catch(error) {

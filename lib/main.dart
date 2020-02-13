@@ -5,7 +5,6 @@ import 'package:sms_sender/features/inbox/presentation/pages/inbox_page.dart';
 import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
 import './injectors.dart' as di;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'features/inbox/presentation/bloc/inbox_bloc.dart';
 // void main() => runApp(MyApp());
 
