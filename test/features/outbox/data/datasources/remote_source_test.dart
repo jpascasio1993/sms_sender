@@ -27,8 +27,8 @@ void main() {
     sampleData = json.decode(tFixture);
     listOutbox = [];
     client = MockHttpClient();
-    remoteSource = RemoteSourceImpl(client: client, url: url);
-    emptyUrlRemoteSource = RemoteSourceImpl(client: client, url: '');
+    remoteSource = RemoteSourceImpl(client: client, url: url, apiKey: '');
+    emptyUrlRemoteSource = RemoteSourceImpl(client: client, url: '', apiKey: '');
     sampleData.forEach((value) => listOutbox.add(OutboxModel.fromJson(value)));
   });
 

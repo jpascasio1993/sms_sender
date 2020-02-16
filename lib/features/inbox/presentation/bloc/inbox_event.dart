@@ -8,15 +8,14 @@ abstract class InboxEvent extends Equatable {
   final bool sent;
 
   InboxEvent({@required this.limit, @required this.offset, this.sent});
-}
-
-class GetInboxEvent extends InboxEvent {
-  
-
-  GetInboxEvent({@required int limit, @required int offset, bool sent }): super(limit: limit, offset: offset, sent: sent);
 
   @override
   List<Object> get props => [limit, offset, sent];
+}
+
+class GetInboxEvent extends InboxEvent {
+
+  GetInboxEvent({@required int limit, @required int offset, bool sent }): super(limit: limit, offset: offset, sent: sent);
 
   @override
   String toString() {
@@ -30,9 +29,6 @@ class LoadMoreInboxEvent extends InboxEvent {
       @required int offset,
       bool sent
     }): super(limit: limit, offset: offset, sent: sent);
-
-  @override
-  List<Object> get props => [limit, offset, sent];
 
   @override
   String toString() {

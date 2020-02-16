@@ -11,15 +11,17 @@ abstract class RemoteSource {
 class RemoteSourceImpl extends RemoteSource {
   final http.Client client;
   final String url;
+  final String apiKey;
 
-  RemoteSourceImpl({@required this.client, @required this.url});
+  RemoteSourceImpl({@required this.client, @required this.url, @required this.apiKey});
 
   @override
   Future<List<OutboxModel>> getOutbox() async {
     if (url == null || (url != null && url.isEmpty)) return [];
     final response = await client
-        .post('$url', body: {'api': 'AIzaSyC3N-q-3HMMCRTIdfZLk75AtA_1Zn5SO1A'});
+        .post('$url', body: {'api': apiKey});
     if (response.statusCode == 200) {
+      print('response.body ${response.body}');
       List<OutboxModel> items = [];
       List fetchedData = response.body.toLowerCase() == 'no available data!'
           ? []

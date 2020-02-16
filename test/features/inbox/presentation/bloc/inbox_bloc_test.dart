@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
+import 'package:sms_sender/core/error/failures.dart';
+import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
@@ -16,11 +18,15 @@ void main() {
   MockGetInbox mockGetInbox;
   InboxBloc inboxBloc;
   List<InboxMessage> messages;
+  List<InboxMessage> messages2;
+  List<InboxMessage> emptyMessages;
   setUp((){
     mockGetSmsAndSaveToDb = MockGetSmsAndSaveToDb();
     mockGetInbox = MockGetInbox();
     inboxBloc = InboxBloc(getInbox: mockGetInbox, getSmsAndSaveToDb: mockGetSmsAndSaveToDb);
     messages = [InboxMessage.fromJson(json.decode(fixture('inbox.json')))];
+    messages2 = List.from(messages);
+    emptyMessages = [];
     // messages = [SmsMessage.fromJson(json.decode(fixture('inbox.json')))];
   });
 
@@ -52,7 +58,7 @@ void main() {
      //assert 
       final expectedCalls = [
         InitialInboxState(inboxList: []),
-        RetrievedInboxState.copyWith(state: inboxBloc.state, inboxList: (inboxBloc.state as InitialInboxState).inboxList + messages)
+        RetrievedInboxState.copyWith(state: inboxBloc.state, inboxList: inboxBloc.state.inboxList + messages)
       ];
 
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
@@ -62,4 +68,45 @@ void main() {
     
     });
   });
+
+  group('[OUTBOX] presentation/bloc GetSmsAndSaveToDbEvent', (){
+    
+      test('should fetch from sms database and save to local', () async {
+      
+        // arrange 
+        when(mockGetSmsAndSaveToDb(any)).thenAnswer((_) async => Right(true));
+        
+        when(mockGetInbox(any)).thenAnswer((_) async => Right(messages2));
+
+        // assert 
+        final expectedCalls = [
+          InitialInboxState(inboxList: emptyMessages),
+          RetrievedInboxState.copyWith(state: inboxBloc.state, inboxList: inboxBloc.state.inboxList + messages2)
+        ];
+
+        expectLater(inboxBloc, emitsInOrder(expectedCalls));
+        
+        // act 
+        inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, sent: false));
+
+      });
+
+      test('should return LocalFailure when failed fetching outbox from remote', () async {
+      
+        // arrange 
+        when(mockGetSmsAndSaveToDb(any)).thenAnswer((_) async => Left(SMSFailure(message: inboxSmsInsertErrorMessage)));
+        when(mockGetInbox(any)).thenAnswer((_) async => Right(messages2));
+        // assert 
+        final expectedCalls = [
+          InitialInboxState(inboxList: emptyMessages),
+          InboxErrorState.copyWith(state: inboxBloc.state, message: inboxSmsInsertErrorMessage)
+        ];
+
+        expectLater(inboxBloc, emitsInOrder(expectedCalls));
+
+        // act
+        inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, sent: false));
+      });
+
+    });
 }

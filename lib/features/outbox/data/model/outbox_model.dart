@@ -23,7 +23,8 @@ class OutboxModel extends Outbox {
     RegExp regex =
         RegExp(r"^(09|\+639)\d{9}$", caseSensitive: false, multiLine: false);
 
-    int id = json['_id'] ?? -1;
+    int id = json['_id'] != null ? int.tryParse(json['_id']) : json['id'] ?? -1;
+    // int id = int.tryParse(json['_id']) ?? -1;
     String title = json['title'];
     String body = json['body'];
     String sendTo = json['recipient'] ?? '+639162507727';
@@ -42,8 +43,8 @@ class OutboxModel extends Outbox {
             : DateTime.now().toLocal());
 
     // int status = json['status'];
-
-    bool sent = json['status'] != null && json['status'] == 0 ? false: true ;
+    
+    bool sent = json['status'] != null && (json['status'] == '0' || json['status'] == 0)  ? false: true ;
 
     return OutboxModel(
         id: id,

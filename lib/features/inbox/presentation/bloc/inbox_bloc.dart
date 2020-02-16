@@ -44,7 +44,7 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
             yield res.fold(
                   (failure) => InboxErrorState.copyWith(state: state, message: failure.message), 
                   (success){
-                    return RetrievedInboxState.copyWith(state: state, inboxList: state.inboxList + (success ? inboxList : []));
+                    return RetrievedInboxState.copyWith(state: state, inboxList: state.inboxList + inboxList);
                   });
          });
      

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:sms_sender/core/bloc/bloc_delegate.dart';
+import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/inbox/presentation/pages/inbox_page.dart';
+import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
 import './injectors.dart' as di;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'features/inbox/presentation/bloc/inbox_bloc.dart';
+
 // void main() => runApp(MyApp());
 
 
@@ -91,7 +93,8 @@ class _RootTabState extends State<RootTab> {
           ),
           body: MultiBlocProvider(
             providers: [
-              BlocProvider<InboxBloc>(create: (BuildContext context) =>  di.serviceLocator<InboxBloc>())
+              BlocProvider<InboxBloc>(create: (BuildContext context) =>  di.serviceLocator<InboxBloc>()),
+              BlocProvider<OutboxBloc>(create: (BuildContext context) => di.serviceLocator<OutboxBloc>())
             ],
             child: TabBarView(
               children: <Widget>[InboxPage(), OutboxPage()],

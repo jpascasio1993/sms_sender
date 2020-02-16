@@ -3,36 +3,38 @@ import 'package:meta/meta.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 
 @immutable
-abstract class OutboxState extends Equatable {}
-
-class InitialOutboxState extends OutboxState {
+abstract class OutboxState extends Equatable {
   final List<OutboxModel> outboxList;
+  OutboxState({@required this.outboxList});
+  OutboxState.fromState({@required OutboxState state}): outboxList = state.outboxList;
 
-  InitialOutboxState({@required this.outboxList});
-  InitialOutboxState.fromState({@required InitialOutboxState state}): outboxList = state.outboxList ?? [];
-  
-  @override
+   @override
   List<Object> get props => [outboxList];
 
+}
+
+class InitialOutboxState extends OutboxState {
+  
+
+  InitialOutboxState({@required List<OutboxModel> outboxList}): super(outboxList: outboxList);
+  InitialOutboxState.fromState({@required OutboxState state}): super.fromState(state: state);
+  
   @override
   String toString() {
     return 'InitialOutboxState';
   }
 }
 
-class RetrievedOutboxState extends InitialOutboxState {
+class RetrievedOutboxState extends OutboxState {
 
-  RetrievedOutboxState._({@required InitialOutboxState state}): super.fromState(state: state);
+  RetrievedOutboxState._({@required OutboxState state}): super.fromState(state: state);
 
   factory RetrievedOutboxState.copyWith({
-    @required InitialOutboxState state,
+    @required OutboxState state,
     List<OutboxModel> outboxList
   }) {
     return RetrievedOutboxState._(state: InitialOutboxState(outboxList: outboxList));
   }
-
-  @override
-  List<Object> get props => [outboxList];
 
   @override
   String toString() {
@@ -40,13 +42,13 @@ class RetrievedOutboxState extends InitialOutboxState {
   }
 }
 
-class OutboxErrorState extends InitialOutboxState {
+class OutboxErrorState extends OutboxState {
   final String message;
 
   OutboxErrorState._({@required InitialOutboxState state, this.message}): super.fromState(state: state);
 
   factory OutboxErrorState.copyWith({
-    @required InitialOutboxState state,
+    @required OutboxState state,
     String message
   }) {
     return OutboxErrorState._(state: state, message: message);

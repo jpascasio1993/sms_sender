@@ -7,6 +7,9 @@ abstract class InboxState extends Equatable {
   final List<InboxMessage> inboxList;
   InboxState({@required this.inboxList});
   InboxState.fromState({@required InboxState state}): inboxList = state.inboxList;
+
+  @override
+  List<Object> get props => [inboxList];
 }
 
 class InitialInboxState extends InboxState {
@@ -14,9 +17,6 @@ class InitialInboxState extends InboxState {
   InitialInboxState({@required List<InboxMessage> inboxList}): super(inboxList: inboxList);
   // inboxList = state.inboxList ?? [], super(inboxList:  );
   InitialInboxState.fromState({@required InboxState state}): super.fromState(state: state);
-  
-  @override
-  List<Object> get props => [inboxList];
 
   @override
   String toString() {
@@ -34,9 +34,6 @@ class RetrievedInboxState extends InboxState {
   }) {
     return RetrievedInboxState._(state: InitialInboxState(inboxList: inboxList));
   }
-
-  @override
-  List<Object> get props => [inboxList];
 
   @override
   String toString() {
