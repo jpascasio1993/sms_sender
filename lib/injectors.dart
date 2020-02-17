@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
+import 'package:sms_sender/features/inbox/data/datasources/inbox_remote_source.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
@@ -47,10 +48,11 @@ Future<void> init() async {
   serviceLocator.registerLazySingleton<RemoteSource>(() => RemoteSourceImpl(client: serviceLocator(), url: outboxGetRemoteURL, apiKey: outboxAPIKey));
   serviceLocator.registerLazySingleton<LocalSource>(() => LocalSourceImpl(appDatabase: serviceLocator()));
   serviceLocator.registerLazySingleton<InboxSource>(() => InboxSourceImpl(appDatabase: serviceLocator(), smsQuery: serviceLocator()));
+  serviceLocator.registerLazySingleton<InboxRemoteSource>(() => InboxRemoteSourceImpl(url: null, apikey: null, client: null));
 
   // Repository
   serviceLocator.registerLazySingleton<OutboxRepository>(() => OutboxRepositoryImpl(remoteSource: serviceLocator(), localSource: serviceLocator()));
-  serviceLocator.registerLazySingleton<InboxRepository>(() => InboxRepositoryImpl(inboxSource: serviceLocator(), queryKinds: serviceLocator()));
+  serviceLocator.registerLazySingleton<InboxRepository>(() => InboxRepositoryImpl(inboxSource: serviceLocator(),  inboxRemoteSource: serviceLocator(), queryKinds: serviceLocator()));
 
   //external
   serviceLocator.registerLazySingleton<Client>(() => Client());

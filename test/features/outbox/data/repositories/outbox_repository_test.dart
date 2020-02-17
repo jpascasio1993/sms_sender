@@ -62,7 +62,7 @@ void main() {
     test('should return ServerFailure when failed to fetch data from remote',
         () async {
       // arrange
-      when(remoteSource.getOutbox()).thenThrow(ServerException());
+      when(remoteSource.getOutbox()).thenThrow(ServerException(message: remoteErrorMessage));
       // act
       final res = await outboxRepositoryImpl.fetchOutboxRemote();
       // assert

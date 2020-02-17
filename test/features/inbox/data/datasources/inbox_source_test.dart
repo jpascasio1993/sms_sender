@@ -3,6 +3,7 @@ import 'package:mockito/mockito.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
+import 'package:sms_sender/features/inbox/data/model/inbox_model.dart';
 
 class MockSmsQuery extends Mock implements SmsQuery {}
 class MockAppDatabase extends Mock implements AppDatabase {}
@@ -26,10 +27,10 @@ void main() {
     inboxSourceImpl = InboxSourceImpl( appDatabase: mockAppDatabase, smsQuery: mockSmsQuery);
   });
 
-  group('[INBOX] data/datasource InboxSource', (){
+  group('[INBOX] data/datasource InboxSourceImpl', (){
 
     test('should retrieve list of sms messages through datasource directly', () async { 
-    
+  
      //arrange
       when(mockSmsQuery.querySms(count: limit, start: offset, read: read, kinds: querykinds)).thenAnswer((_) async => messages);
      //act

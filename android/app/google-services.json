@@ -1,0 +1,236 @@
+{
+  "project_info": {
+    "project_number": "1042396097004",
+    "firebase_url": "https://sms-sender-8924a.firebaseio.com",
+    "project_id": "sms-sender-8924a",
+    "storage_bucket": "sms-sender-8924a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042396097004:android:902d578d263722c9",
+        "android_client_info": {
+          "package_name": "com.example.smssender"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042396097004-r0rjhgqaecbjtar5oljl0um9k8cusog6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smssender",
+            "certificate_hash": "14b390063f9900729ab53729a2a2c7996c983561"
+          }
+        },
+        {
+          "client_id": "1042396097004-p0teacdvje41989ft4fbb35ti2c5ov4h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smssender",
+            "certificate_hash": "513f58d6540622c38eef557a8d4fa4bd8135ff95"
+          }
+        },
+        {
+          "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiXB9z_T66umYzSRl36MV07pMbPoeOcdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042396097004:android:ab927c35b73adf3d",
+        "android_client_info": {
+          "package_name": "com.example.smssender.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042396097004-tjslns7rs8md10t8d86omhnm6svv9kgo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smssender.debug",
+            "certificate_hash": "513f58d6540622c38eef557a8d4fa4bd8135ff95"
+          }
+        },
+        {
+          "client_id": "1042396097004-tdfsqt5h6dprrts4uicupn6pge3hpbdd.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smssender.debug",
+            "certificate_hash": "14b390063f9900729ab53729a2a2c7996c983561"
+          }
+        },
+        {
+          "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiXB9z_T66umYzSRl36MV07pMbPoeOcdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042396097004:android:ad9660081d7c53df",
+        "android_client_info": {
+          "package_name": "com.example.smssender.release"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042396097004-c4asol4kenalt85cdtj9j33domqv184v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smssender.release",
+            "certificate_hash": "513f58d6540622c38eef557a8d4fa4bd8135ff95"
+          }
+        },
+        {
+          "client_id": "1042396097004-v8pgqheg1gf1mfjgnuk0fplnagh4p23l.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.smssender.release",
+            "certificate_hash": "14b390063f9900729ab53729a2a2c7996c983561"
+          }
+        },
+        {
+          "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiXB9z_T66umYzSRl36MV07pMbPoeOcdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042396097004:android:e9a7744ddcbe541fd2b8c9",
+        "android_client_info": {
+          "package_name": "com.flux.smssender.sms_sender"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042396097004-9er38jsu6ful4p9h29cba4foef4sjsdj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flux.smssender.sms_sender",
+            "certificate_hash": "513f58d6540622c38eef557a8d4fa4bd8135ff95"
+          }
+        },
+        {
+          "client_id": "1042396097004-om8ph0l5orrq8953qr1ili8nkiqhm3k8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.flux.smssender.sms_sender",
+            "certificate_hash": "14b390063f9900729ab53729a2a2c7996c983561"
+          }
+        },
+        {
+          "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiXB9z_T66umYzSRl36MV07pMbPoeOcdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042396097004:android:58f1e3f583db435ed2b8c9",
+        "android_client_info": {
+          "package_name": "com.smssender"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1042396097004-bkrqf808k37v5sc3gjqf4agi0te2j9f1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smssender",
+            "certificate_hash": "513f58d6540622c38eef557a8d4fa4bd8135ff95"
+          }
+        },
+        {
+          "client_id": "1042396097004-daqt2cvk3t7qsvqsv83595k6vm891mfm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.smssender",
+            "certificate_hash": "14b390063f9900729ab53729a2a2c7996c983561"
+          }
+        },
+        {
+          "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBiXB9z_T66umYzSRl36MV07pMbPoeOcdA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1042396097004-sos1tuhkjmjssbis5l5coo2p4ranlf7g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -21,12 +21,12 @@ class LocalSourceImpl implements LocalSource {
     .map((outbox) => OutboxMessagesCompanion
     .insert(body: Value(outbox.body), date: Value(outbox.date), title: Value(outbox.title), recipient: Value(outbox.recipient), sent: Value(outbox.sent)))
     .toList();
-    return await appDatabase.outboxMessageDao.insertOutbox(list).catchError((error) => throw LocalException());
+    return await appDatabase.outboxMessageDao.insertOutbox(list).catchError((error) => throw LocalException(message: localErrorMessage));
   }
 
   @override
   Future<List<OutboxModel>> getOutbox(int limit, int offset, bool sent) async {
-    final res = await appDatabase.outboxMessageDao.getOutboxMessages(limit: limit, offset: offset, sent: sent).catchError((error) => throw LocalException());
+    final res = await appDatabase.outboxMessageDao.getOutboxMessages(limit: limit, offset: offset, sent: sent).catchError((error) => throw LocalException(message: localErrorMessage));
     return res.map((outboxMessage) => OutboxModel(
       id: outboxMessage.id, 
       title: outboxMessage.title, 

@@ -36,7 +36,7 @@ class RemoteSourceImpl extends RemoteSource {
         return outboxModel.recipient != null;
       }).toList();
     } else {
-      throw ServerException();
+      throw ServerException(message: remoteErrorMessage);
     }
   }
 }

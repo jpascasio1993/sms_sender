@@ -6,7 +6,7 @@ import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.d
 import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';
 
 class GetSmsAndSaveToDb extends UseCase<bool, InboxParams> {
-  InboxRepository repository;
+  final InboxRepository repository;
   
   GetSmsAndSaveToDb({@required this.repository});
 

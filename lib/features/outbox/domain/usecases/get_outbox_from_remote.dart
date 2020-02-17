@@ -7,7 +7,7 @@ import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
 
 class GetOutboxFromRemote extends UseCase<List<OutboxModel>, OutboxParams> {
-  OutboxRepository repository;
+  final OutboxRepository repository;
 
   GetOutboxFromRemote({@required this.repository});
   

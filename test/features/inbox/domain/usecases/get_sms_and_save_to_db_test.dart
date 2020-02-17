@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
-import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';

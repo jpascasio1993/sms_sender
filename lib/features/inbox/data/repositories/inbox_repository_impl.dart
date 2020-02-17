@@ -4,26 +4,27 @@ import 'package:meta/meta.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
+import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
+import 'package:sms_sender/features/inbox/data/datasources/inbox_remote_source.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
 
-final String inboxSmsInsertErrorMessage = 'SMS Insert Error';
-final String inboxSmsRetrieveErrorMessage = 'Inbox failed to retrieve';
-
 class InboxRepositoryImpl extends InboxRepository {
   InboxSource inboxSource;
+  InboxRemoteSource inboxRemoteSource;
+
   List<SmsQueryKind> queryKinds;
 
-  InboxRepositoryImpl({ @required this.inboxSource, this.queryKinds = const [SmsQueryKind.Inbox]});
+  InboxRepositoryImpl({ @required this.inboxSource, @required this.inboxRemoteSource, this.queryKinds = const [SmsQueryKind.Inbox]});
 
   @override
   Future<Either<Failure, List<InboxMessage>>> getInbox(int limit, int offset, bool sent) async {
    try{
      final res = await inboxSource.getInbox(limit, offset, sent);
      return Right(res);
-   }catch(error) {
-     return Left(SMSFailure(message: inboxSmsRetrieveErrorMessage));
+   } on SMSException catch(error) {
+     return Left(SMSFailure(message: error.message));
    }
   }
 
@@ -41,8 +42,18 @@ class InboxRepositoryImpl extends InboxRepository {
         )).toList(); 
       final insertRes = await inboxSource.insertInbox(inboxMessages);
       return Right(insertRes);
-    }catch(error) {
-      return Left(SMSFailure(message: inboxSmsInsertErrorMessage));
+    } on SMSException catch(error) {
+      return Left(SMSFailure(message: error.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> sendSmsToServer(List<InboxMessage> messages) async {
+    try{
+      final res = await inboxRemoteSource.sendInboxToServer(messages);
+      return Right(res);
+    } on ServerException catch(error) {
+      return Left(ServerFailure(message: error.message));
     }
   }
 }

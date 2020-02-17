@@ -2,10 +2,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:sms_sender/core/error/exceptions.dart';
 import 'dart:convert';
 import 'package:sms_sender/core/error/failures.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
-import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_impl.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';

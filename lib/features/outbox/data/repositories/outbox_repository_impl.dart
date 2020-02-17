@@ -7,9 +7,6 @@ import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
 
-final String localErrorMessage = 'Local Failure';
-final String remoteErrorMessage = 'Remote Error';
-
 class OutboxRepositoryImpl implements OutboxRepository {
   final RemoteSource remoteSource;
   final LocalSource localSource;
@@ -24,8 +21,8 @@ class OutboxRepositoryImpl implements OutboxRepository {
     try {
       final res = await localSource.getOutbox(limit, offset, sent);
       return Right(res);
-    } catch (error) {
-      return Left(LocalFailure(message: localErrorMessage));
+    } on LocalException catch(error) {
+      return Left(LocalFailure(message: error.message));
     }
   }
 
@@ -35,10 +32,10 @@ class OutboxRepositoryImpl implements OutboxRepository {
       final res = await remoteSource.getOutbox();
       await localSource.bulkInsertOutbox(res);
       return Right(res);
-    } on ServerException {
-      return Left(ServerFailure(message: remoteErrorMessage));
-    } on LocalException {
-      return Left(LocalFailure(message: localErrorMessage));
+    } on ServerException catch(error) {
+      return Left(ServerFailure(message: error.message));
+    } on LocalException catch(error){
+      return Left(LocalFailure(message: error.message));
     }
   }
 }

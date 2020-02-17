@@ -1,9 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
 import 'package:http/http.dart' as http;
-import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
-import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'dart:convert';
