@@ -20,3 +20,6 @@ class LocalFailure extends Failure {
 class SMSFailure extends Failure {
   SMSFailure({String message}) : super(message: message);
 }
+class PermissionFailure extends Failure {
+  PermissionFailure({String message}) : super(message: message);
+}

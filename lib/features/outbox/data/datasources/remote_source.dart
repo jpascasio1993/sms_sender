@@ -1,4 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:meta/meta.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sms_sender/core/datasources/constants.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'package:http/http.dart' as http;
@@ -10,13 +13,20 @@ abstract class RemoteSource {
 
 class RemoteSourceImpl extends RemoteSource {
   final http.Client client;
-  final String url;
+  final FirebaseDatabase firebaseDatabase;
+  final SharedPreferences preferences;
   final String apiKey;
 
-  RemoteSourceImpl({@required this.client, @required this.url, @required this.apiKey});
+  RemoteSourceImpl({@required this.client, @required this.firebaseDatabase, @required this.preferences, @required this.apiKey});
 
   @override
   Future<List<OutboxModel>> getOutbox() async {
+    final String url = await firebaseDatabase
+      .reference()
+      .child(FirebaseURLS.outboxUrl(preferences))
+      .once()
+      .then((DataSnapshot snapshot) => snapshot.value);
+
     if (url == null || (url != null && url.isEmpty)) return [];
     final response = await client
         .post('$url', body: {'api': apiKey});

@@ -3,7 +3,6 @@ import 'package:mockito/mockito.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
-import 'package:sms_sender/features/inbox/data/model/inbox_model.dart';
 
 class MockSmsQuery extends Mock implements SmsQuery {}
 class MockAppDatabase extends Mock implements AppDatabase {}

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_version/get_version.dart';
 import 'package:sms_sender/core/bloc/bloc_delegate.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/inbox/presentation/pages/inbox_page.dart';
@@ -7,12 +8,17 @@ import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
 import './injectors.dart' as di;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:imei_plugin/imei_plugin.dart';
 
 // void main() => runApp(MyApp());
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // final imei = await ImeiPlugin.getId();
+  // final version = await GetVersion.appID;
+  // debugPrint('imei ${imei}');
+  // debugPrint('version ${version}');
   await di.init();
   Routes();
 }

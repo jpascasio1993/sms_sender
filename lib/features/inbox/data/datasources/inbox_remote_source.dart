@@ -1,6 +1,9 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:meta/meta.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:http/http.dart' as http;
+import 'package:sms_sender/core/datasources/constants.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 
 import 'package:sms_sender/features/inbox/data/model/inbox_model.dart';
@@ -11,19 +14,26 @@ abstract class InboxRemoteSource {
 
 class InboxRemoteSourceImpl extends InboxRemoteSource {
 
-  final String url;
+  final FirebaseDatabase firebaseDatabase;
+  final SharedPreferences preferences;
   final String apikey;
   final http.Client client;
 
   InboxRemoteSourceImpl({
-      @required this.url,
+      @required this.firebaseDatabase,
+      @required this.preferences,
       @required this.apikey,
       @required this.client
   });  
 
    @override
   Future<bool> sendInboxToServer(List<InboxMessage> messages) async {
-    
+     final String url = await firebaseDatabase
+      .reference()
+      .child(FirebaseURLS.inboxUrl(preferences))
+      .once()
+      .then((DataSnapshot snapshot) => snapshot.value);
+      
     if ((url == null || (url != null && url.isEmpty)) || 
       (apikey == null) || (apikey !=null && apikey.isEmpty)) 
         throw ServerException(message: inboxRemoteErrorMissingApiUrlKey);
