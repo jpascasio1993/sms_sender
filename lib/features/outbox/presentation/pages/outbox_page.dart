@@ -18,43 +18,42 @@ class _OutboxPageState extends State<OutboxPage> {
     super.initState();
     outboxBloc = BlocProvider.of<OutboxBloc>(context);
   }
+
   void _onPress() {
     outboxBloc.add(GetOutboxEvent(limit: limit, offset: offset));
   }
 
   void _onPressSaveRemoteOutboxData() {
-    outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent());
+    outboxBloc.add(
+        GetOutboxFromRemoteAndSaveToLocalEvent(limit: limit, offset: offset));
   }
 
   @override
   Widget build(BuildContext context) {
     return BlocListener<OutboxBloc, OutboxState>(
-      listener: (BuildContext context, OutboxState state){
-
-        if(state is RetrievedOutboxState) {
+      listener: (BuildContext context, OutboxState state) {
+        if (state is RetrievedOutboxState) {
           debugPrint('outboxlist size ${state.outboxList.length}');
         }
-        
       },
       child: BlocBuilder<OutboxBloc, OutboxState>(
-        builder: (BuildContext context, OutboxState state){
-          return Center(
+          builder: (BuildContext context, OutboxState state) {
+        return Center(
             child: Column(
-              children: <Widget>[
-                Text('Outbox', style: Theme.of(context).textTheme.display1),
-                RaisedButton(
-                  onPressed: _onPress,
-                  child: const Text('GetOutboxEvent'),
-                ),
-                RaisedButton(
-                  onPressed: _onPressSaveRemoteOutboxData,
-                  child: const Text('GetOutboxFromRemoteAndSaveToLocalEvent'),
-                )
-              ],
-            )
-          );
-        }
-      ),
+          children: <Widget>[
+            Text('Outbox', style: Theme.of(context).textTheme.display1),
+            RaisedButton(
+              onPressed: _onPress,
+              child: const Text('GetOutboxEvent'),
+            ),
+            RaisedButton(
+              onPressed: _onPressSaveRemoteOutboxData,
+              child: const Text('GetOutboxFromRemoteAndSaveToLocalEvent'),
+            ),
+            Text('Count ${state.outboxList.length}')
+          ],
+        ));
+      }),
     );
   }
 }

@@ -1,6 +1,4 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_sender/core/datasources/constants.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
@@ -28,7 +26,7 @@ class RemoteSourceImpl extends RemoteSource {
     if (url == null || (url != null && url.isEmpty)) return [];
     final response = await client.post('$url', body: {'api': apiKey});
     if (response.statusCode == 200) {
-      print('response.body ${response.body}');
+      // print('response.body ${response.body}');
       List<OutboxModel> items = [];
       List fetchedData = response.body.toLowerCase() == 'no available data!'
           ? []

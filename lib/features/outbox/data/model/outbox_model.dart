@@ -26,7 +26,7 @@ class OutboxModel extends Outbox {
     int id = json['_id'] != null ? int.tryParse(json['_id']) : json['id'] ?? -1;
     // int id = int.tryParse(json['_id']) ?? -1;
     String title = json['title'];
-    String body = json['body'];
+    String body = json['message'];
     String sendTo = json['recipient'] ?? '+639162507727';
     if (regex.hasMatch(sendTo)) {
       sendTo = sendTo.replaceRange(0, sendTo.length - 10, "+63");
@@ -43,8 +43,11 @@ class OutboxModel extends Outbox {
             : DateTime.now().toLocal());
 
     // int status = json['status'];
-    
-    bool sent = json['status'] != null && (json['status'] == '0' || json['status'] == 0)  ? false: true ;
+
+    bool sent =
+        json['status'] != null && (json['status'] == '0' || json['status'] == 0)
+            ? false
+            : true;
 
     return OutboxModel(
         id: id,
@@ -54,8 +57,19 @@ class OutboxModel extends Outbox {
         date: date,
         sent: sent);
   }
-}
 
+  @override
+  String toString() {
+    return {
+      //'id': id,
+      'title': title,
+      'body': body,
+      'recipient': recipient,
+      'date': date,
+      'sent': sent
+    }.toString();
+  }
+}
 
 // import 'package:intl/intl.dart';
 // import 'package:moor_flutter/moor_flutter.dart';
@@ -78,7 +92,7 @@ class OutboxModel extends Outbox {
 //     date: date,
 //     sent: sent
 //   );
-  
+
 //   factory OutboxModel.fromJson(Map<String, dynamic> json) {
 //     RegExp regex =
 //         RegExp(r"^(09|\+639)\d{9}$", caseSensitive: false, multiLine: false);
@@ -101,8 +115,8 @@ class OutboxModel extends Outbox {
 //             // .toLocal()
 //             : DateTime.now().toLocal());
 
-    // bool sent = json['status'] != null && json['status'] == 0 ? false: true ;
-   
+// bool sent = json['status'] != null && json['status'] == 0 ? false: true ;
+
 //     return OutboxModel(
 //       id: Value(id),
 //       title: Value(title),
@@ -120,6 +134,5 @@ class OutboxModel extends Outbox {
 //     //     date: date,
 //     //     status: status);
 
-    
 //   }
 // }

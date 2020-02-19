@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_version/get_version.dart';
 import 'package:imei_plugin/imei_plugin.dart';
@@ -32,9 +33,13 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
       }, (success) async* {
         final res2 = await permissionRequest(
             PermissionParams(permissionGroups: event.permissions));
-        yield res2.fold(
-            (failure) => PermissionErrorState(message: failure.message),
-            (success) => PermissionGrantedState());
+        yield* res2.fold((failure) async* {
+          yield PermissionErrorState(message: failure.message);
+        }, (success) async* {
+          await setUpAppInfo();
+          await setUpImei();
+          yield PermissionGrantedState();
+        });
       });
     }
   }
@@ -46,17 +51,17 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
   }
 
   Future<void> setUpAppInfo() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    SharedPreferences prefs = preferences;
     String projectAppID = await GetVersion.appID;
     await prefs.setString('appId', projectAppID);
   }
 
   Future<void> setUpImei() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    SharedPreferences prefs = preferences;
     // prefs.refreshCache();
     String imei =
         await ImeiPlugin.getImei(shouldShowRequestPermissionRationale: true);
-
+    debugPrint('imei $imei');
     if (imei != null || imei != '') {
       await prefs.setString('imei', imei);
     }
