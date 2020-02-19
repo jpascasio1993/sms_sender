@@ -13,52 +13,45 @@ abstract class InboxRemoteSource {
 }
 
 class InboxRemoteSourceImpl extends InboxRemoteSource {
-
-  final FirebaseDatabase firebaseDatabase;
-  final SharedPreferences preferences;
+  final FirebaseReference firebaseReference;
   final String apikey;
   final http.Client client;
 
-  InboxRemoteSourceImpl({
-      @required this.firebaseDatabase,
-      @required this.preferences,
+  InboxRemoteSourceImpl(
+      {@required this.firebaseReference,
       @required this.apikey,
-      @required this.client
-  });  
+      @required this.client});
 
-   @override
+  @override
   Future<bool> sendInboxToServer(List<InboxMessage> messages) async {
-     final String url = await firebaseDatabase
-      .reference()
-      .child(FirebaseURLS.inboxUrl(preferences))
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
-      
-    if ((url == null || (url != null && url.isEmpty)) || 
-      (apikey == null) || (apikey !=null && apikey.isEmpty)) 
-        throw ServerException(message: inboxRemoteErrorMissingApiUrlKey);
+    final String url = await firebaseReference.inboxUrl();
+
+    if ((url == null || (url != null && url.isEmpty)) ||
+        (apikey == null) ||
+        (apikey != null && apikey.isEmpty))
+      throw ServerException(message: inboxRemoteErrorMissingApiUrlKey);
 
     final response = await client.post('$url', body: {
       'api': apikey,
-      'data': messages.map((inboxMessage) => InboxModel()
-        .copyWith(
-          address: inboxMessage.address,
-          id: inboxMessage.id,
-          body: inboxMessage.body,
-          date: inboxMessage.date,
-          dateSent: inboxMessage.dateSent,
-          sent: inboxMessage.sent
-        ).toJson()
-      )
-      .toList()
-      .toString()
+      'data': messages
+          .map((inboxMessage) => InboxModel()
+              .copyWith(
+                  address: inboxMessage.address,
+                  id: inboxMessage.id,
+                  body: inboxMessage.body,
+                  date: inboxMessage.date,
+                  dateSent: inboxMessage.dateSent,
+                  sent: inboxMessage.sent)
+              .toJson())
+          .toList()
+          .toString()
     });
 
     if ((response != null &&
         response.statusCode == 200 &&
         response.body.toLowerCase() == 'data inserted successfully!')) {
-        return true;
-    }else {
+      return true;
+    } else {
       throw ServerException(message: inboxRemoteErrorServer);
     }
   }

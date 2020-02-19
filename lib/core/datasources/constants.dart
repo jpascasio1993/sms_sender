@@ -1,35 +1,33 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class FirebaseURLS {
-  static String outboxUrl(SharedPreferences preferences) {
+abstract class FirebaseURLS {
+  final SharedPreferences preferences;
+  FirebaseURLS({@required this.preferences});
+  String outboxUrl();
+  String outboxFetchDelay();
+  String inboxUrl();
+  String inboxPostDelay();
+  String deviceStatus();
+}
+
+class FirebaseURLSImpl extends FirebaseURLS {
+  FirebaseURLSImpl({@required SharedPreferences preferences})
+      : super(preferences: preferences);
+
+  @override
+  String deviceStatus() {
     SharedPreferences prefs = preferences;
     prefs.reload();
     String imei = prefs.getString('imei');
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
-    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/url';
+    return '${debug ? "client_updates_debug" : "client_updates"}/device_status/$imei';
   }
 
-  static String outboxFetchDelay(SharedPreferences preferences) {
-    SharedPreferences prefs = preferences;
-    prefs.reload();
-    String imei = prefs.getString('imei');
-    String projectAppID = prefs.getString('appId');
-    bool debug = projectAppID.contains('debug');
-    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/fetch_delay';
-  }
-
-  static String inboxUrl(SharedPreferences preferences){
-    SharedPreferences prefs = preferences;
-    prefs.reload();
-    String imei = prefs.getString('imei');
-    String projectAppID = prefs.getString('appId');
-    bool debug = projectAppID.contains('debug');
-    return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/url';
-  }
-
-  static String inboxPostDelay(SharedPreferences preferences){
+  @override
+  String inboxPostDelay() {
     SharedPreferences prefs = preferences;
     prefs.reload();
     String imei = prefs.getString('imei');
@@ -38,44 +36,177 @@ class FirebaseURLS {
     return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/post_delay';
   }
 
-  static String deviceStatus(SharedPreferences preferences){
+  @override
+  String inboxUrl() {
     SharedPreferences prefs = preferences;
     prefs.reload();
     String imei = prefs.getString('imei');
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
-    return '${debug ? "client_updates_debug" : "client_updates"}/device_status/$imei';
+    return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/url';
   }
+
+  @override
+  String outboxFetchDelay() {
+    SharedPreferences prefs = preferences;
+    prefs.reload();
+    String imei = prefs.getString('imei');
+    String projectAppID = prefs.getString('appId');
+    bool debug = projectAppID.contains('debug');
+    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/fetch_delay';
+  }
+
+  @override
+  String outboxUrl() {
+    SharedPreferences prefs = preferences;
+    prefs.reload();
+    String imei = prefs.getString('imei');
+    String projectAppID = prefs.getString('appId');
+    bool debug = projectAppID.contains('debug');
+    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/url';
+  }
+
+  // static String outboxUrl(SharedPreferences preferences) {
+  // SharedPreferences prefs = preferences;
+  // prefs.reload();
+  // String imei = prefs.getString('imei');
+  // String projectAppID = prefs.getString('appId');
+  // bool debug = projectAppID.contains('debug');
+  // return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/url';
+  // }
+
+  // static String outboxFetchDelay(SharedPreferences preferences) {
+  //   SharedPreferences prefs = preferences;
+  //   prefs.reload();
+  //   String imei = prefs.getString('imei');
+  //   String projectAppID = prefs.getString('appId');
+  //   bool debug = projectAppID.contains('debug');
+  //   return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/fetch_delay';
+  // }
+
+  // static String inboxUrl(SharedPreferences preferences) {
+  // SharedPreferences prefs = preferences;
+  // prefs.reload();
+  // String imei = prefs.getString('imei');
+  // String projectAppID = prefs.getString('appId');
+  // bool debug = projectAppID.contains('debug');
+  // return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/url';
+  // }
+
+  // static String inboxPostDelay(SharedPreferences preferences) {
+  // SharedPreferences prefs = preferences;
+  // prefs.reload();
+  // String imei = prefs.getString('imei');
+  // String projectAppID = prefs.getString('appId');
+  // bool debug = projectAppID.contains('debug');
+  // return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/post_delay';
+  // }
+
+  // static String deviceStatus(SharedPreferences preferences) {
+  // SharedPreferences prefs = preferences;
+  // prefs.reload();
+  // String imei = prefs.getString('imei');
+  // String projectAppID = prefs.getString('appId');
+  // bool debug = projectAppID.contains('debug');
+  // return '${debug ? "client_updates_debug" : "client_updates"}/device_status/$imei';
+  // }
 }
 
-class FirebaseReference {
-    static Future<String> outboxUrl(FirebaseDatabase database, String url) => database
-      .reference()
-      .child(url)
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
+abstract class FirebaseReference {
+  final FirebaseURLS firebaseURLS;
+  final FirebaseDatabase firebaseDatabase;
+  FirebaseReference(
+      {@required this.firebaseURLS, @required this.firebaseDatabase});
 
-  static Future<int> outboxFetchDelay(FirebaseDatabase database, String url) => database
-      .reference()
-      .child(url)
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
+  Future<String> outboxUrl();
+  Future<int> outboxFetchDelay();
+  Future<String> inboxUrl();
+  Future<int> inboxPostDelay();
+  Future<String> deviceStatus();
+}
 
-  static Future<String> inboxUrl(FirebaseDatabase database, String url) => database
-      .reference()
-      .child(url)
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
+class FirebaseReferenceImpl extends FirebaseReference {
+  FirebaseReferenceImpl(
+      {@required FirebaseURLS firebaseURLS,
+      @required FirebaseDatabase firebaseDatabase})
+      : super(firebaseURLS: firebaseURLS, firebaseDatabase: firebaseDatabase);
 
-  static Future<int> inboxPostDelay(FirebaseDatabase database, String url) => database
-      .reference()
-      .child(url)
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
+  @override
+  Future<String> deviceStatus() {
+    return firebaseDatabase
+        .reference()
+        .child(firebaseURLS.deviceStatus())
+        .once()
+        .then((DataSnapshot snapshot) => snapshot.value);
+  }
 
-  static Future<String> deviceStatus(FirebaseDatabase database, String url) => database
-      .reference()
-      .child(url)
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
+  @override
+  Future<int> inboxPostDelay() {
+    return firebaseDatabase
+        .reference()
+        .child(firebaseURLS.inboxPostDelay())
+        .once()
+        .then((DataSnapshot snapshot) => snapshot.value);
+  }
+
+  @override
+  Future<String> inboxUrl() {
+    return firebaseDatabase
+        .reference()
+        .child(firebaseURLS.inboxUrl())
+        .once()
+        .then((DataSnapshot snapshot) => snapshot.value);
+  }
+
+  @override
+  Future<int> outboxFetchDelay() {
+    return firebaseDatabase
+        .reference()
+        .child(firebaseURLS.outboxFetchDelay())
+        .once()
+        .then((DataSnapshot snapshot) => snapshot.value);
+  }
+
+  @override
+  Future<String> outboxUrl() {
+    return firebaseDatabase
+        .reference()
+        .child(firebaseURLS.outboxUrl())
+        .once()
+        .then((DataSnapshot snapshot) => snapshot.value);
+  }
+  // static Future<String> outboxUrl(FirebaseDatabase database, String url) =>
+  // database
+  //     .reference()
+  //     .child(url)
+  //     .once()
+  //     .then((DataSnapshot snapshot) => snapshot.value);
+
+  // static Future<int> outboxFetchDelay(FirebaseDatabase database, String url) =>
+  //     database
+  //         .reference()
+  //         .child(url)
+  //         .once()
+  //         .then((DataSnapshot snapshot) => snapshot.value);
+
+  // static Future<String> inboxUrl(FirebaseDatabase database, String url) =>
+  //     database
+  //         .reference()
+  //         .child(url)
+  //         .once()
+  //         .then((DataSnapshot snapshot) => snapshot.value);
+
+  // static Future<int> inboxPostDelay(FirebaseDatabase database, String url) =>
+  //     database
+  //         .reference()
+  //         .child(url)
+  //         .once()
+  //         .then((DataSnapshot snapshot) => snapshot.value);
+
+  // static Future<String> deviceStatus(FirebaseDatabase database, String url) =>
+  //     database
+  //         .reference()
+  //         .child(url)
+  //         .once()
+  //         .then((DataSnapshot snapshot) => snapshot.value);
 }

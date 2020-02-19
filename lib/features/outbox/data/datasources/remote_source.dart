@@ -13,23 +13,20 @@ abstract class RemoteSource {
 
 class RemoteSourceImpl extends RemoteSource {
   final http.Client client;
-  final FirebaseDatabase firebaseDatabase;
-  final SharedPreferences preferences;
+  final FirebaseReference firebaseReference;
   final String apiKey;
 
-  RemoteSourceImpl({@required this.client, @required this.firebaseDatabase, @required this.preferences, @required this.apiKey});
+  RemoteSourceImpl(
+      {@required this.client,
+      @required this.firebaseReference,
+      @required this.apiKey});
 
   @override
   Future<List<OutboxModel>> getOutbox() async {
-    final String url = await firebaseDatabase
-      .reference()
-      .child(FirebaseURLS.outboxUrl(preferences))
-      .once()
-      .then((DataSnapshot snapshot) => snapshot.value);
+    final String url = await firebaseReference.outboxUrl();
 
     if (url == null || (url != null && url.isEmpty)) return [];
-    final response = await client
-        .post('$url', body: {'api': apiKey});
+    final response = await client.post('$url', body: {'api': apiKey});
     if (response.statusCode == 200) {
       print('response.body ${response.body}');
       List<OutboxModel> items = [];
