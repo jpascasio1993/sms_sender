@@ -15,6 +15,12 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
       : assert(getOutbox != null);
 
   @override
+  Stream<OutboxState> transformEvents(Stream<OutboxEvent> events, Stream<OutboxState> Function(OutboxEvent) next) {
+    // TODO: implement transformEvents
+    return super.transformEvents(events, next);
+  }
+
+  @override
   OutboxState get initialState => InitialOutboxState(outboxList: []);
 
   @override

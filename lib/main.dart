@@ -83,10 +83,12 @@ class _RootTabState extends State<RootTab> {
               bottom: TabBar(tabs: <Widget>[
                 Tab(
                   key: UniqueKey(),
-                  child: Text('inbox',
-                      style: TextStyle(fontSize: ScreenUtil().setSp(16))),
+                  child: Text('Inbox',
+                      style: TextStyle(fontSize: ScreenUtil().setSp(18))),
                 ),
-                Tab(key: UniqueKey(), text: 'Outbox')
+                Tab(key: UniqueKey(), child: Text('Outbox',
+                      style: TextStyle(fontSize: ScreenUtil().setSp(18)))
+                )
               ]),
             ),
             body: MultiBlocProvider(

@@ -75,7 +75,7 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
           (failure) =>
               InboxErrorState.copyWith(state: state, message: failure.message),
           (inboxList) {
-        return RetrievedInboxState.copyWith(state: state, inboxList: inboxList);
+        return RetrievedInboxState.copyWith(state: state, inboxList: state.inboxList + inboxList);
       });
     }
   }

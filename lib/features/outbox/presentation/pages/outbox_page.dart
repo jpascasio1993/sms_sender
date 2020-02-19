@@ -13,12 +13,12 @@ class OutboxPage extends StatefulWidget {
   _OutboxPageState createState() => _OutboxPageState();
 }
 
-class _OutboxPageState extends State<OutboxPage> {
+class _OutboxPageState extends State<OutboxPage> with AutomaticKeepAliveClientMixin<OutboxPage> {
   OutboxBloc outboxBloc;
   final limit = 30;
   final offset = 0;
   final ScrollController _scrollController = ScrollController();
-  final PageStorageKey storageKey = PageStorageKey('sms_list_view');
+  final PageStorageKey storageKey = PageStorageKey('outbox_list_view');
   final _scrollThreshold = 200.0;
   ThemeData themeData;
 
@@ -27,7 +27,8 @@ class _OutboxPageState extends State<OutboxPage> {
     super.initState();
     outboxBloc = BlocProvider.of<OutboxBloc>(context);
     _initScrolLListener();
-    _onPress();
+     WidgetsBinding.instance.addPostFrameCallback(
+        (_) => _onPress());
   }
 
   @override
@@ -36,6 +37,9 @@ class _OutboxPageState extends State<OutboxPage> {
     debugPrint('OutboxPage didChangeDependencies');
     themeData = Theme.of(context).copyWith(dividerColor: Colors.transparent);
   }
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -53,24 +57,8 @@ class _OutboxPageState extends State<OutboxPage> {
   }
 
   Map<String, dynamic> getStatus(int status) {
-    //print('status ${status.value}');
-    // switch (status) {
-    //   case OutboxStatus.sent:
-    //     return {'color': Colors.greenAccent, 'label': 'SENT'};
-    //   case OutboxEnum.UNSENT:
-    //     return {'color': Colors.redAccent, 'label': 'UNSENT'};
-    //   case OutboxEnum.FAILED:
-    //     return {'color': Colors.redAccent, 'label': 'FAILED'};
-    //   case OutboxEnum.RESEND:
-    //     return {'color': Colors.purpleAccent, 'label': 'RESENDING'};
-    //   default:
-    //     return null;
-    // }
     if(status == OutboxStatus.sent) {
        return {'color': Colors.greenAccent, 'label': 'SENT'};
-    }
-    else if(status == OutboxStatus.unsent) {
-      return {'color': Colors.redAccent, 'label': 'UNSENT'};
     }
     else if(status == OutboxStatus.failed) { 
       return {'color': Colors.redAccent, 'label': 'FAILED'};
@@ -79,7 +67,7 @@ class _OutboxPageState extends State<OutboxPage> {
       return {'color': Colors.purpleAccent, 'label': 'RESENDING'};
     }
     else {
-      return {'color': Colors.greenAccent, 'label': 'PENDING'};
+      return {'color': Colors.redAccent, 'label': 'PENDING'};
     }
   }
 
