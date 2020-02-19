@@ -10,21 +10,21 @@ class InboxModel extends InboxMessage with EquatableMixin{
     String body, 
     String date, 
     String dateSent, 
-    bool sent}): super(
+    int status}): super(
       id: id, 
       address: address, 
       body: body, 
       date: date, 
       dateSent: dateSent, 
-      sent: sent
+      status: status
     );
 
   @override
-  List<Object> get props => [id, address, body, date, dateSent, sent];
+  List<Object> get props => [id, address, body, date, dateSent, status];
   
   @override
-  InboxMessage copyWith({int id, String address, String body, String date, String dateSent, bool sent}) {
-    return InboxModel(id: id, address: address, body: body, date: date, dateSent: dateSent, sent: sent);
+  InboxMessage copyWith({int id, String address, String body, String date, String dateSent, int status}) {
+    return InboxModel(id: id, address: address, body: body, date: date, dateSent: dateSent, status: status);
   }
 
   @override
@@ -33,7 +33,7 @@ class InboxModel extends InboxMessage with EquatableMixin{
     return <String, dynamic> {
       '_id': serializer.toJson<int>(id),
       'message': serializer.toJson<String>(address),
-      'status': serializer.toJson<bool>(sent),
+      'status': serializer.toJson<int>(status),
       'datetime': serializer.toJson<String>(date),
       'sender_number': serializer.toJson<String>(address),
     };

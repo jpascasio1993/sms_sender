@@ -14,6 +14,6 @@ class GetOutbox implements UseCase<List<OutboxModel>, OutboxParams> {
 
   @override
   Future<Either<Failure, List<OutboxModel>>> call(OutboxParams params) async {
-    return await repository.getOutbox(params.limit, params.offset, params.sent);
+    return await repository.getOutbox(params.limit, params.offset, params.status);
   }
 }

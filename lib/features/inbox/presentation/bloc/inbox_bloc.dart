@@ -19,9 +19,17 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
 
   @override
   Stream<InboxState> mapEventToState(InboxEvent event) async* {
+
+    if (state is InboxLoadingState) {
+      return;
+    }
+    
     if (event is GetInboxEvent) {
+      
+      yield InboxLoadingState.copyWith(state: state);
+
       final res = await getInbox(InboxParams(
-          limit: event.limit, offset: event.offset, sent: event.sent));
+          limit: event.limit, offset: event.offset, status: event.status));
       // yield RetrievedInboxState.copyWith(state: state, inboxList: res);
       yield res.fold(
           (failure) =>
@@ -30,6 +38,7 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
         return RetrievedInboxState.copyWith(state: state, inboxList: inboxList);
       });
     } else if (event is LoadMoreInboxEvent) {
+      yield InboxLoadingState.copyWith(state: state);
       final res =
           await getInbox(InboxParams(limit: event.limit, offset: event.offset));
       yield res.fold(
@@ -39,12 +48,13 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
               state: state, inboxList: state.inboxList + inboxList));
       // yield RetrievedInboxState.copyWith(state: state, inboxList: (state as InitialInboxState).inboxList + res);
     } else if (event is GetSmsAndSaveToDbEvent) {
+      yield InboxLoadingState.copyWith(state: state);
       final res = await getSmsAndSaveToDb(InboxParams(
           limit: event.limit, offset: event.offset, read: event.read));
       final res2 = await getInbox(InboxParams(
           limit: event.limit,
           offset: state.inboxList.length,
-          sent: event.sent));
+          status: event.status));
       yield* res2.fold((failure) async* {
         yield InboxErrorState.copyWith(state: state, message: failure.message);
       }, (inboxList) async* {
@@ -54,6 +64,18 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
           return RetrievedInboxState.copyWith(
               state: state, inboxList: state.inboxList + inboxList);
         });
+      });
+    } else if (event is GetMoreInboxEvent) {
+      yield InboxLoadingState.copyWith(state: state);
+
+      final res = await getInbox(InboxParams(
+          limit: event.limit, offset: event.offset, status: event.status));
+      // yield RetrievedInboxState.copyWith(state: state, inboxList: res);
+      yield res.fold(
+          (failure) =>
+              InboxErrorState.copyWith(state: state, message: failure.message),
+          (inboxList) {
+        return RetrievedInboxState.copyWith(state: state, inboxList: inboxList);
       });
     }
   }

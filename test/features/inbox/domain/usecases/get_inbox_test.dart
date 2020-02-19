@@ -21,7 +21,7 @@ void main() {
   InboxParams params;
   int limit = 0;
   int offset = 0;
-  bool sent = false;
+  int status = 0;
   setUp(() {
     // SmsQueryKind kind = SmsQueryKind.Sent; 
     mockInboxRepository = MockInboxRepository();
@@ -29,14 +29,14 @@ void main() {
     // map.putIfAbsent('kind', () => kind);
     smsMessages = [InboxMessage.fromJson(map)];
     getInbox = GetInbox(repository: mockInboxRepository);
-    params = InboxParams(limit: limit, offset: offset, sent: sent);
+    params = InboxParams(limit: limit, offset: offset, status: status);
   });
 
   group('[INBOX] domain/usecases GetInbox', (){
     test('should retrieve sms messages', () async { 
   
     // arrange 
-    when(mockInboxRepository.getInbox(limit, offset, sent)).thenAnswer((_) async => Right(smsMessages));
+    when(mockInboxRepository.getInbox(limit, offset, status)).thenAnswer((_) async => Right(smsMessages));
     
     // act 
     final res = await getInbox(params);
@@ -50,7 +50,7 @@ void main() {
     test('should return SMSFailure when retrieving sms messages', () async { 
   
     // arrange 
-    when(mockInboxRepository.getInbox(limit, offset, sent)).thenAnswer((_) async => Left(SMSFailure(message: inboxSmsRetrieveErrorMessage)));
+    when(mockInboxRepository.getInbox(limit, offset, status)).thenAnswer((_) async => Left(SMSFailure(message: inboxSmsRetrieveErrorMessage)));
     
     // act 
     final res = await getInbox(params);

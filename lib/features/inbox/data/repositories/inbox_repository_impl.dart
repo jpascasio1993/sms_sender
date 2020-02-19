@@ -19,9 +19,9 @@ class InboxRepositoryImpl extends InboxRepository {
   InboxRepositoryImpl({ @required this.inboxSource, @required this.inboxRemoteSource, this.queryKinds = const [SmsQueryKind.Inbox]});
 
   @override
-  Future<Either<Failure, List<InboxMessage>>> getInbox(int limit, int offset, bool sent) async {
+  Future<Either<Failure, List<InboxMessage>>> getInbox(int limit, int offset, int status) async {
    try{
-     final res = await inboxSource.getInbox(limit, offset, sent);
+     final res = await inboxSource.getInbox(limit, offset, status);
      return Right(res);
    } on SMSException catch(error) {
      return Left(SMSFailure(message: error.message));

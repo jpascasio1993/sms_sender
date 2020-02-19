@@ -5,7 +5,7 @@ import 'package:sms_sender/core/error/exceptions.dart';
 
 abstract class InboxSource {
   Future<List<SmsMessage>> getSms(int limit, int offset, List<SmsQueryKind> kinds, bool read);
-  Future<List<InboxMessage>> getInbox(int limit, int offset, bool sent);
+  Future<List<InboxMessage>> getInbox(int limit, int offset, int status);
   Future<bool> insertInbox(List<InboxMessagesCompanion> messages);
 }
 
@@ -24,8 +24,8 @@ class InboxSourceImpl extends InboxSource{
   }
 
   @override
-  Future<List<InboxMessage>> getInbox(int limit, int offset, bool sent) async {
-    final res = await appDatabase.inboxMessageDao.getInboxMessages(limit: limit, offset: offset, sent: sent)
+  Future<List<InboxMessage>> getInbox(int limit, int offset, int status) async {
+    final res = await appDatabase.inboxMessageDao.getInboxMessages(limit: limit, offset: offset, status: status)
     .catchError((error) => throw SMSException(message: inboxSmsRetrieveErrorMessage));
     return res;
   }

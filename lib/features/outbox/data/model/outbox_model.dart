@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
+import 'package:sms_sender/core/global/constants.dart';
 import 'package:sms_sender/features/outbox/domain/entities/outbox.dart';
 
 class OutboxModel extends Outbox {
@@ -10,14 +11,14 @@ class OutboxModel extends Outbox {
       @required String body,
       @required String recipient,
       @required String date,
-      @required bool sent})
+      @required int status})
       : super(
             id: id,
             title: title,
             body: body,
             recipient: recipient,
             date: date,
-            sent: sent);
+            status: status);
 
   factory OutboxModel.fromJson(Map<String, dynamic> json) {
     RegExp regex =
@@ -25,13 +26,13 @@ class OutboxModel extends Outbox {
 
     int id = json['_id'] != null ? int.tryParse(json['_id']) : json['id'] ?? -1;
     // int id = int.tryParse(json['_id']) ?? -1;
-    String title = json['title'];
-    String body = json['message'];
+    String title = json['title'] ?? '';
+    String body = json['message'] ?? '';
     String sendTo = json['recipient'] ?? '+639162507727';
     if (regex.hasMatch(sendTo)) {
       sendTo = sendTo.replaceRange(0, sendTo.length - 10, "+63");
     } else {
-      sendTo = null;
+      sendTo = '';
     }
 
     String date = DateFormat('yyyy-MM-dd hh:mm:ss a').format(
@@ -44,10 +45,11 @@ class OutboxModel extends Outbox {
 
     // int status = json['status'];
 
-    bool sent =
-        json['status'] != null && (json['status'] == '0' || json['status'] == 0)
-            ? false
-            : true;
+    // int status = json['status'] ?? 0;
+    int status = json['status'] != null
+        ? (json['status'] == '0' ? OutboxStatus.unsent : OutboxStatus.sent)
+        : OutboxStatus.unsent;
+       
 
     return OutboxModel(
         id: id,
@@ -55,7 +57,7 @@ class OutboxModel extends Outbox {
         body: body,
         recipient: sendTo,
         date: date,
-        sent: sent);
+        status: status);
   }
 
   @override
@@ -66,7 +68,7 @@ class OutboxModel extends Outbox {
       'body': body,
       'recipient': recipient,
       'date': date,
-      'sent': sent
+      'status': status
     }.toString();
   }
 }

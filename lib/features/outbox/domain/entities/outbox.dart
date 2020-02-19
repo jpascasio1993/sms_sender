@@ -13,16 +13,9 @@ class Outbox extends BaseEntity {
       @required this.body,
       @required this.recipient,
       @required this.date,
-      @required bool sent})
-      : super(id: id, sent: sent);
+      @required int status})
+      : super(id: id, status: status);
 
   @override
-  List<Object> get props => [id, title, body, recipient, date, sent];
-}
-
-class OutboxStatus {
-  static final int unsent = 0;
-  static final int sent = 1;
-  static final int failed = 2;
-  static final int resend = 3;
+  List<Object> get props => [id, title, body, recipient, date, status];
 }

@@ -22,12 +22,12 @@ void main() {
   int limit = -1;
   int offset = 0;
   List<SmsQueryKind> querykinds;
-  bool sent;
+  int status;
   setUp((){
     messages = [];
     querykinds = [SmsQueryKind.Inbox];
     mockInboxSource = MockInboxSource();
-    sent = false;
+    status = 0;
     mockAppDatabase = MockAppDatabase();
     mockInboxMessageDao = MockInboxMessageDao();
     inboxRepository = InboxRepositoryImpl(inboxSource: mockInboxSource, inboxRemoteSource: mockInboxRemoteSource, queryKinds: querykinds);
@@ -42,7 +42,7 @@ void main() {
     when(mockInboxSource.getInbox(any, any, any)).thenAnswer((_) async => messages);
 
     //act
-      final res = await inboxRepository.getInbox(limit, offset, sent);
+      final res = await inboxRepository.getInbox(limit, offset, status);
     //assert 
       expect(res, Right(messages));
     });

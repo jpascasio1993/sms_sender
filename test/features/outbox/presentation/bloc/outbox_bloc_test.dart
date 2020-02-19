@@ -137,7 +137,7 @@ void main(){
       expectLater(outboxBloc, emitsInOrder(expectedCalls));
       
       // act 
-      outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent());
+      outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent(limit: limit, offset: offset));
     });
 
     test('should return ServerFailure when failed fetching outbox from remote', () async {
@@ -154,7 +154,7 @@ void main(){
       expectLater(outboxBloc, emitsInOrder(expectedCalls));
 
       // act
-      outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent());
+      outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent(limit: limit, offset: offset));
     });
 
 
@@ -173,7 +173,7 @@ void main(){
       expectLater(outboxBloc, emitsInOrder(expectedCalls));
 
       // act
-      outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent());
+      outboxBloc.add(GetOutboxFromRemoteAndSaveToLocalEvent(limit: limit, offset: offset));
     });
 
   });

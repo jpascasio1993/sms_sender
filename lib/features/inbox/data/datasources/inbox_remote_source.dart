@@ -41,7 +41,7 @@ class InboxRemoteSourceImpl extends InboxRemoteSource {
                   body: inboxMessage.body,
                   date: inboxMessage.date,
                   dateSent: inboxMessage.dateSent,
-                  sent: inboxMessage.sent)
+                  status: inboxMessage.status)
               .toJson())
           .toList()
           .toString()

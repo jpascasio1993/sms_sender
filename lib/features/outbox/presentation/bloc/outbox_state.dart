@@ -59,6 +59,21 @@ class OutboxErrorState extends OutboxState {
   
   @override
   String toString() {
-    return 'OutboxError';
+    return 'OutboxErrorState';
+  }
+}
+
+class OutboxLoadingState extends OutboxState {
+
+  OutboxLoadingState._({@required OutboxState state}): super.fromState(state: state);
+
+  factory OutboxLoadingState.copyWith({
+    @required OutboxState state
+  }) {
+    return OutboxLoadingState._(state: state);
+  }
+  @override
+  String toString() {
+    return 'OutboxLoadingState';
   }
 }

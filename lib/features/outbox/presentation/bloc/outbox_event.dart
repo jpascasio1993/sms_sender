@@ -51,3 +51,13 @@ class GetOutboxFromRemoteAndSaveToLocalEvent extends OutboxEvent {
     return "GetOutboxFromRemoteAndSaveToLocalEvent";
   }
 }
+
+class GetMoreOutboxEvent extends OutboxEvent {
+   GetMoreOutboxEvent({@required int limit, @required int offset})
+      : super(limit: limit, offset: offset);
+
+  @override
+  String toString() {
+    return 'GetMoreOutboxEvent';
+  }
+}

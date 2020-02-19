@@ -5,17 +5,17 @@ import 'package:meta/meta.dart';
 abstract class InboxEvent extends Equatable {
   final int limit;
   final int offset;
-  final bool sent;
+  final int status;
 
-  InboxEvent({@required this.limit, @required this.offset, this.sent});
+  InboxEvent({@required this.limit, @required this.offset, this.status});
 
   @override
-  List<Object> get props => [limit, offset, sent];
+  List<Object> get props => [limit, offset, status];
 }
 
 class GetInboxEvent extends InboxEvent {
 
-  GetInboxEvent({@required int limit, @required int offset, bool sent }): super(limit: limit, offset: offset, sent: sent);
+  GetInboxEvent({@required int limit, @required int offset, int status }): super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
@@ -27,8 +27,8 @@ class LoadMoreInboxEvent extends InboxEvent {
   LoadMoreInboxEvent({
       @required int limit, 
       @required int offset,
-      bool sent
-    }): super(limit: limit, offset: offset, sent: sent);
+      int status
+    }): super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
@@ -41,9 +41,9 @@ class GetSmsAndSaveToDbEvent extends InboxEvent {
   GetSmsAndSaveToDbEvent({
       @required int limit, 
       @required int offset,
-      bool sent, 
+      int status, 
       this.read
-    }): super(limit: limit, offset: offset, sent: sent);
+    }): super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
@@ -51,7 +51,17 @@ class GetSmsAndSaveToDbEvent extends InboxEvent {
   }
 
   @override
-  List<Object> get props => [limit, offset, sent, read];
+  List<Object> get props => [limit, offset, status, read];
+}
+
+class GetMoreInboxEvent extends InboxEvent {
+
+  GetMoreInboxEvent({@required int limit, @required int offset, int status }): super(limit: limit, offset: offset, status: status);
+
+  @override
+  String toString() {
+    return 'GetMoreInboxEvent';
+  }
 }
 
 class AddInboxEvent extends InboxEvent {

@@ -44,7 +44,7 @@ void main() {
       //act
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
-      inboxBloc.add(GetInboxEvent(limit: 0, offset: 0, sent: true));
+      inboxBloc.add(GetInboxEvent(limit: 0, offset: 0, status: 0));
     });
   });
 
@@ -63,7 +63,7 @@ void main() {
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
       //act
-      inboxBloc.add(LoadMoreInboxEvent(limit: 0, offset: 0, sent: true)); 
+      inboxBloc.add(LoadMoreInboxEvent(limit: 0, offset: 0, status: 0)); 
     
     });
   });
@@ -86,7 +86,7 @@ void main() {
         expectLater(inboxBloc, emitsInOrder(expectedCalls));
         
         // act 
-        inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, sent: false));
+        inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, status: 0));
 
       });
 
@@ -104,7 +104,7 @@ void main() {
         expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
         // act
-        inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, sent: false));
+        inboxBloc.add(GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, status: 0));
       });
 
     });

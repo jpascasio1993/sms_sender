@@ -61,3 +61,19 @@ class InboxErrorState extends InboxState {
     return 'InboxError';
   }
 }
+
+class InboxLoadingState extends InboxState {
+  InboxLoadingState._({@required InboxState state}): super.fromState(state: state);
+
+  factory InboxLoadingState.copyWith({
+    @required InboxState state,
+    String message
+  }) {
+    return InboxLoadingState._(state: state);
+  }
+  
+  @override
+  String toString() {
+    return 'InboxLoadingState';
+  }
+}

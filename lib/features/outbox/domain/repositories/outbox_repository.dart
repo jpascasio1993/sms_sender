@@ -3,6 +3,6 @@ import 'package:sms_sender/core/error/failures.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 
 abstract class OutboxRepository {
-  Future<Either<Failure, List<OutboxModel>>> getOutbox(int limit, int offset, bool sent);
+  Future<Either<Failure, List<OutboxModel>>> getOutbox(int limit, int offset, int status);
   Future<Either<Failure, List<OutboxModel>>> fetchOutboxRemote();
 }

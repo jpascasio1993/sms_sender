@@ -27,7 +27,7 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase> with _$OutboxMessag
 
   OutboxMessageDao(this.db): super(db);
 
-  Future<List<OutboxMessage>> getOutboxMessages({int limit = -1, int offset = 0, bool sent}) {
+  Future<List<OutboxMessage>> getOutboxMessages({int limit = -1, int offset = 0, int status}) {
     final query = (
     select(outboxMessages)
     ..orderBy([
@@ -35,18 +35,18 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase> with _$OutboxMessag
     ])
     ..limit(limit, offset: offset)
     );
-    if(sent != null) {
-      query..where((outbox) => outbox.sent.equals(sent));
+    if(status != null) {
+      query..where((outbox) => outbox.status.equals(status));
     }
     return query.get();
   }
 
-  Stream<List<OutboxMessage>> watchOutboxMessages({int limit = -1, int offset = 0, bool sent = false}) => (
+  Stream<List<OutboxMessage>> watchOutboxMessages({int limit = -1, int offset = 0, int status = 0}) => (
     select(outboxMessages)
     ..orderBy([
       (outbox) => OrderingTerm(expression: outbox.date, mode: OrderingMode.desc)
     ])
-    ..where((outbox) => outbox.sent.equals(sent))
+    ..where((outbox) => outbox.status.equals(status))
     ..limit(limit, offset: offset)
     )
   .watch();
@@ -76,7 +76,7 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase> with _$InboxMessageD
   final AppDatabase db;
   InboxMessageDao(this.db): super(db);
 
-  Future<List<InboxMessage>> getInboxMessages({int limit = -1, int offset = 0, bool sent}) {
+  Future<List<InboxMessage>> getInboxMessages({int limit = -1, int offset = 0, int status}) {
     final query = (
     select(inboxMessages)
     ..orderBy([
@@ -84,18 +84,18 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase> with _$InboxMessageD
     ])
     ..limit(limit, offset: offset)
     );
-    if(sent != null) {
-      query..where((inbox) => inbox.sent.equals(sent));
+    if(status != null) {
+      query..where((inbox) => inbox.status.equals(status));
     }
     return query.get();
   }
 
-  Stream<List<InboxMessage>> watchInboxMessages({int limit = -1, int offset = 0, bool sent = false}) => (
+  Stream<List<InboxMessage>> watchInboxMessages({int limit = -1, int offset = 0, int status = 0}) => (
     select(inboxMessages)
     ..orderBy([
       (inbox) => OrderingTerm(expression: inbox.date, mode: OrderingMode.desc)
     ])
-    ..where((inbox) => inbox.sent.equals(sent))
+    ..where((inbox) => inbox.status.equals(status))
     ..limit(limit, offset: offset)
     )
   .watch();

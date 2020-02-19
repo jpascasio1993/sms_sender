@@ -13,6 +13,6 @@ class GetInbox implements UseCase<List<InboxMessage>, InboxParams> {
   
   @override
   Future<Either<Failure, List<InboxMessage>>> call(InboxParams params) async {
-    return await repository.getInbox(params.limit, params.offset, params.sent);
+    return await repository.getInbox(params.limit, params.offset, params.status);
   }
 }

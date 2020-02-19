@@ -26,7 +26,7 @@ void main() {
   List sampleData;
   int limit = -1;
   int offset = 0;
-  bool sent = false;
+  int status = 0;
   setUp(() {
     sampleData = json.decode(fixture('outbox.json'));
     remoteSource = MockRemoteSource();
@@ -43,7 +43,7 @@ void main() {
       when(localSource.getOutbox(any, any, any)).thenAnswer((_) async => listOutbox);
 
       // act
-      final res = await outboxRepositoryImpl.getOutbox(limit, offset, sent);
+      final res = await outboxRepositoryImpl.getOutbox(limit, offset, status);
 
       // assert
       expect(res, Right(listOutbox));
