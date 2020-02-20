@@ -1,17 +1,27 @@
 package com.flux.sms_scheduler;
+import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Telephony;
 import android.telephony.SmsMessage;
 import android.util.Log;
 
+import java.util.Date;
+
 public class SmsReceiver extends BroadcastReceiver{
 
     public static final String SMS_BUNDLE = "pdus";
+
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    private SmsMessage[] readMessages(Intent intent) {
+        return Telephony.Sms.Intents.getMessagesFromIntent(intent);
+    }
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -23,20 +33,23 @@ public class SmsReceiver extends BroadcastReceiver{
 //                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 //                context.startService(i);
 //            }
-            SmsMessage[] msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent);
-            String format = intent.getStringExtra("format");
+            SmsMessage[] msgs = readMessages(intent);
+
 
             String phoneNumber = msgs[0].getDisplayOriginatingAddress();
-            Long timeDate = System.currentTimeMillis();
-            String message = msgs[0].getDisplayMessageBody();
+            Long timeDate = (new Date()).getTime();
+            // String body = msgs[0].getDisplayMessageBody();
+            String body = "";
+            for (SmsMessage msg : msgs) {
+                body = body.concat(msg.getMessageBody());
+            }
 
-
-            Log.i("SmsReceiver", "senderNum: "+ phoneNumber + "; message: " + message);
+            Log.i("SmsReceiver", "senderNum: "+ phoneNumber + "; message: " + body);
 
             ContentValues values = new ContentValues();
             values.put("address", phoneNumber);
             values.put("date", timeDate);
-            values.put("body", message);
+            values.put("body", body);
             values.put("type", 1);
             values.put("read", 0);
             Uri mUri = context.getContentResolver().insert(Uri.parse("content://sms"), values);
