@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:meta/meta.dart';
+import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
 import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
@@ -10,7 +11,6 @@ import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository
 class OutboxRepositoryImpl implements OutboxRepository {
   final RemoteSource remoteSource;
   final LocalSource localSource;
-  
 
   OutboxRepositoryImpl(
       {@required this.remoteSource, @required this.localSource});
@@ -21,7 +21,7 @@ class OutboxRepositoryImpl implements OutboxRepository {
     try {
       final res = await localSource.getOutbox(limit, offset, status);
       return Right(res);
-    } on LocalException catch(error) {
+    } on LocalException catch (error) {
       return Left(LocalFailure(message: error.message));
     }
   }
@@ -32,9 +32,20 @@ class OutboxRepositoryImpl implements OutboxRepository {
       final res = await remoteSource.getOutbox();
       await localSource.bulkInsertOutbox(res);
       return Right(res);
-    } on ServerException catch(error) {
+    } on ServerException catch (error) {
       return Left(ServerFailure(message: error.message));
-    } on LocalException catch(error){
+    } on LocalException catch (error) {
+      return Left(LocalFailure(message: error.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> bulkUpdateOutbox(
+      List<OutboxMessagesCompanion> messages) async {
+    try {
+      final res = await localSource.bulkUpdateOutbox(messages);
+      return Right(res);
+    } on LocalException catch (error) {
       return Left(LocalFailure(message: error.message));
     }
   }

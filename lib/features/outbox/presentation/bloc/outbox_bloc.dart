@@ -4,18 +4,24 @@ import 'package:meta/meta.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/update_outbox.dart';
 import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import './bloc.dart';
 
 class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
   final GetOutbox getOutbox;
   final GetOutboxFromRemote getOutboxFromRemote;
+  final UpdateOutbox updateOutbox;
 
-  OutboxBloc({@required this.getOutbox, @required this.getOutboxFromRemote})
+  OutboxBloc(
+      {@required this.getOutbox,
+      @required this.getOutboxFromRemote,
+      @required this.updateOutbox})
       : assert(getOutbox != null);
 
   @override
-  Stream<OutboxState> transformEvents(Stream<OutboxEvent> events, Stream<OutboxState> Function(OutboxEvent) next) {
+  Stream<OutboxState> transformEvents(Stream<OutboxEvent> events,
+      Stream<OutboxState> Function(OutboxEvent) next) {
     // TODO: implement transformEvents
     return super.transformEvents(events, next);
   }
@@ -25,8 +31,7 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
 
   @override
   Stream<OutboxState> mapEventToState(OutboxEvent event) async* {
-    
-    if(state is OutboxLoadingState) {
+    if (state is OutboxLoadingState) {
       return;
     }
 
@@ -65,9 +70,9 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
               state: state, outboxList: state.outboxList + outboxList);
         });
       });
-    } else if(event is GetMoreOutboxEvent) {
+    } else if (event is GetMoreOutboxEvent) {
       yield OutboxLoadingState.copyWith(state: state);
-       final res = await getOutbox(
+      final res = await getOutbox(
           OutboxParams(limit: event.limit, offset: event.offset));
       yield res.fold(
           (failure) =>

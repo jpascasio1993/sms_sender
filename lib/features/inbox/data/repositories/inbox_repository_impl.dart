@@ -16,44 +16,64 @@ class InboxRepositoryImpl extends InboxRepository {
 
   List<SmsQueryKind> queryKinds;
 
-  InboxRepositoryImpl({ @required this.inboxSource, @required this.inboxRemoteSource, this.queryKinds = const [SmsQueryKind.Inbox]});
+  InboxRepositoryImpl(
+      {@required this.inboxSource,
+      @required this.inboxRemoteSource,
+      this.queryKinds = const [SmsQueryKind.Inbox]});
 
   @override
-  Future<Either<Failure, List<InboxMessage>>> getInbox(int limit, int offset, int status) async {
-   try{
-     final res = await inboxSource.getInbox(limit, offset, status);
-     return Right(res);
-   } on SMSException catch(error) {
-     return Left(SMSFailure(message: error.message));
-   }
-  }
-
-  @override
-  Future<Either<Failure, bool>> getSmsAndSaveToDb(int limit, int offset, bool read) async {
+  Future<Either<Failure, List<InboxMessage>>> getInbox(
+      int limit, int offset, int status) async {
     try {
-      final res = await inboxSource.getSms(limit, offset, queryKinds, read);
-      print('res ${res.length}');
-
-      final inboxMessages = res.map((message) => InboxMessagesCompanion.insert(
-        address: Value(message.address), 
-        body: Value(message.body), 
-        date: Value(DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.date.toLocal())), 
-        dateSent: Value(DateFormat('yyyy-MM-dd hh:mm:ss a').format(message.dateSent.toLocal()))
-        )).toList(); 
-      final insertRes = await inboxSource.insertInbox(inboxMessages);
-      return Right(insertRes);
-    } on SMSException catch(error) {
+      final res = await inboxSource.getInbox(limit, offset, status);
+      return Right(res);
+    } on SMSException catch (error) {
       return Left(SMSFailure(message: error.message));
     }
   }
 
   @override
-  Future<Either<Failure, bool>> sendSmsToServer(List<InboxMessage> messages) async {
-    try{
+  Future<Either<Failure, bool>> getSmsAndSaveToDb(
+      int limit, int offset, bool read) async {
+    try {
+      final res = await inboxSource.getSms(limit, offset, queryKinds, read);
+      print('res ${res.length}');
+
+      final inboxMessages = res
+          .map((message) => InboxMessagesCompanion.insert(
+              address: Value(message.address),
+              body: Value(message.body),
+              date: Value(DateFormat('yyyy-MM-dd hh:mm:ss a')
+                  .format(message.date.toLocal())),
+              dateSent: Value(DateFormat('yyyy-MM-dd hh:mm:ss a')
+                  .format(message.dateSent.toLocal()))))
+          .toList();
+      final insertRes = await inboxSource.insertInbox(inboxMessages);
+      return Right(insertRes);
+    } on SMSException catch (error) {
+      return Left(SMSFailure(message: error.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> sendSmsToServer(
+      List<InboxMessage> messages) async {
+    try {
       final res = await inboxRemoteSource.sendInboxToServer(messages);
       return Right(res);
-    } on ServerException catch(error) {
+    } on ServerException catch (error) {
       return Left(ServerFailure(message: error.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> bulkUpdateInbox(
+      List<InboxMessagesCompanion> messages) async {
+    try {
+      final res = await inboxSource.bulkUpdateInbox(messages);
+      return Right(res);
+    } on SMSException catch (error) {
+      return Left(SMSFailure(message: error.message));
     }
   }
 }

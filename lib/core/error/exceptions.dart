@@ -1,10 +1,14 @@
 final String inboxLocalErrorMessage = 'Local Failure';
-final String inboxRemoteErrorMissingApiUrlKey = 'Missing api key/url. Please check.';
-final String inboxRemoteErrorServer = 'Failed to post data. Check server response';
+final String inboxLocalErrorMessageUpdate = 'Failed to update inbox';
+final String inboxRemoteErrorMissingApiUrlKey =
+    'Missing api key/url. Please check.';
+final String inboxRemoteErrorServer =
+    'Failed to post data. Check server response';
 final String inboxSmsInsertErrorMessage = 'SMS Insert Error';
 final String inboxSmsRetrieveErrorMessage = 'Inbox failed to retrieve';
 
 final String localErrorMessage = 'Local Failure';
+final String outboxLocalErrorMessageUpdate = 'Failed to update outbox';
 final String remoteErrorMessage = 'Remote Error';
 final String permissionRequestErrorMessage = 'Failed to request permission.';
 final String permissionFailedToSaveInfo = 'Failed to save info';

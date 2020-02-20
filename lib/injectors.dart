@@ -12,6 +12,7 @@ import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_imp
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/update_inbox.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
@@ -19,6 +20,7 @@ import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_i
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/update_outbox.dart';
 import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/permission/data/datasources/permission_local_source.dart';
 import 'package:sms_sender/features/permission/data/datasources/permission_remote_source.dart';
@@ -54,12 +56,20 @@ Future<void> init() async {
       () => PermissionSaveInfo(repository: serviceLocator()));
   serviceLocator.registerLazySingleton<PermissionRequest>(
       () => PermissionRequest(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton<UpdateOutbox>(
+      () => UpdateOutbox(repository: serviceLocator()));
+  serviceLocator.registerLazySingleton<UpdateInbox>(
+      () => UpdateInbox(repository: serviceLocator()));
 
   //Bloc
   serviceLocator.registerFactory(() => InboxBloc(
-      getInbox: serviceLocator(), getSmsAndSaveToDb: serviceLocator()));
+      getInbox: serviceLocator(),
+      getSmsAndSaveToDb: serviceLocator(),
+      updateInbox: serviceLocator()));
   serviceLocator.registerFactory(() => OutboxBloc(
-      getOutbox: serviceLocator(), getOutboxFromRemote: serviceLocator()));
+      getOutbox: serviceLocator(),
+      getOutboxFromRemote: serviceLocator(),
+      updateOutbox: serviceLocator()));
   serviceLocator.registerFactory(() => PermissionBloc(
       preferences: serviceLocator(),
       permissionRequest: serviceLocator(),

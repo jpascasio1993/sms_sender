@@ -3,14 +3,19 @@ import 'package:meta/meta.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/update_inbox.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import './bloc.dart';
 
 class InboxBloc extends Bloc<InboxEvent, InboxState> {
   final GetInbox getInbox;
   final GetSmsAndSaveToDb getSmsAndSaveToDb;
+  final UpdateInbox updateInbox;
 
-  InboxBloc({@required this.getInbox, @required this.getSmsAndSaveToDb})
+  InboxBloc(
+      {@required this.getInbox,
+      @required this.getSmsAndSaveToDb,
+      @required this.updateInbox})
       : assert(getInbox != null),
         assert(getSmsAndSaveToDb != null);
 
@@ -19,13 +24,11 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
 
   @override
   Stream<InboxState> mapEventToState(InboxEvent event) async* {
-
     if (state is InboxLoadingState) {
       return;
     }
-    
+
     if (event is GetInboxEvent) {
-      
       yield InboxLoadingState.copyWith(state: state);
 
       final res = await getInbox(InboxParams(
@@ -75,7 +78,8 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
           (failure) =>
               InboxErrorState.copyWith(state: state, message: failure.message),
           (inboxList) {
-        return RetrievedInboxState.copyWith(state: state, inboxList: state.inboxList + inboxList);
+        return RetrievedInboxState.copyWith(
+            state: state, inboxList: state.inboxList + inboxList);
       });
     }
   }
