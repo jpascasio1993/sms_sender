@@ -1,9 +1,9 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=D:\flutter-sdk-windows
-FLUTTER_APPLICATION_PATH=D:\Flutter\sms_sender\sms_scheduler\example
+FLUTTER_ROOT=C:\Users\Fluxi\Documents\Programming\Flutter\sdk\flutter
+FLUTTER_APPLICATION_PATH=C:\Users\Fluxi\Documents\Programming\Flutter\Projects\sms_sender\sms_scheduler\example
 FLUTTER_TARGET=lib\main.dart
 FLUTTER_BUILD_DIR=build
 SYMROOT=${SOURCE_ROOT}/../build\ios
-FLUTTER_FRAMEWORK_DIR=D:\flutter-sdk-windows\bin\cache\artifacts\engine\ios
+FLUTTER_FRAMEWORK_DIR=C:\Users\Fluxi\Documents\Programming\Flutter\sdk\flutter\bin\cache\artifacts\engine\ios
 FLUTTER_BUILD_NAME=1.0.0
 FLUTTER_BUILD_NUMBER=1

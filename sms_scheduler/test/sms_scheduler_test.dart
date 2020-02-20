@@ -5,6 +5,8 @@ import 'package:sms_scheduler/sms_scheduler.dart';
 void main() {
   const MethodChannel channel = MethodChannel('sms_scheduler');
 
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   setUp(() {
     channel.setMockMethodCallHandler((MethodCall methodCall) async {
       return '42';

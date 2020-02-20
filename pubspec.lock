@@ -609,6 +609,13 @@ packages:
       relative: true
     source: path
     version: "0.2.4"
+  sms_scheduler:
+    dependency: "direct main"
+    description:
+      path: sms_scheduler
+      relative: true
+    source: path
+    version: "0.0.1"
   source_gen:
     dependency: transitive
     description:
