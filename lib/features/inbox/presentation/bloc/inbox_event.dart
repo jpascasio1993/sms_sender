@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:sms_sender/core/database/database.dart';
 
 @immutable
 abstract class InboxEvent extends Equatable {
@@ -14,8 +15,8 @@ abstract class InboxEvent extends Equatable {
 }
 
 class GetInboxEvent extends InboxEvent {
-
-  GetInboxEvent({@required int limit, @required int offset, int status }): super(limit: limit, offset: offset, status: status);
+  GetInboxEvent({@required int limit, @required int offset, int status})
+      : super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
@@ -24,11 +25,8 @@ class GetInboxEvent extends InboxEvent {
 }
 
 class LoadMoreInboxEvent extends InboxEvent {
-  LoadMoreInboxEvent({
-      @required int limit, 
-      @required int offset,
-      int status
-    }): super(limit: limit, offset: offset, status: status);
+  LoadMoreInboxEvent({@required int limit, @required int offset, int status})
+      : super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
@@ -38,12 +36,9 @@ class LoadMoreInboxEvent extends InboxEvent {
 
 class GetSmsAndSaveToDbEvent extends InboxEvent {
   final bool read;
-  GetSmsAndSaveToDbEvent({
-      @required int limit, 
-      @required int offset,
-      int status, 
-      this.read
-    }): super(limit: limit, offset: offset, status: status);
+  GetSmsAndSaveToDbEvent(
+      {@required int limit, @required int offset, int status, this.read})
+      : super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
@@ -55,12 +50,25 @@ class GetSmsAndSaveToDbEvent extends InboxEvent {
 }
 
 class GetMoreInboxEvent extends InboxEvent {
-
-  GetMoreInboxEvent({@required int limit, @required int offset, int status }): super(limit: limit, offset: offset, status: status);
+  GetMoreInboxEvent({@required int limit, @required int offset, int status})
+      : super(limit: limit, offset: offset, status: status);
 
   @override
   String toString() {
     return 'GetMoreInboxEvent';
+  }
+}
+
+class InboxUpdateEvent extends InboxEvent {
+  final List<InboxMessagesCompanion> messages;
+
+  InboxUpdateEvent(
+      {@required this.messages, @required int limit, @required int offset})
+      : super(limit: limit, offset: offset);
+
+  @override
+  String toString() {
+    return 'InboxUpdateEvent';
   }
 }
 

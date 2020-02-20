@@ -8,7 +8,7 @@ final String inboxSmsInsertErrorMessage = 'SMS Insert Error';
 final String inboxSmsRetrieveErrorMessage = 'Inbox failed to retrieve';
 
 final String localErrorMessage = 'Local Failure';
-final String outboxLocalErrorMessageUpdate = 'Failed to update outbox';
+final String outboxLocalErrorMessageUpdate = 'Failed to update outbox.';
 final String remoteErrorMessage = 'Remote Error';
 final String permissionRequestErrorMessage = 'Failed to request permission.';
 final String permissionFailedToSaveInfo = 'Failed to save info';

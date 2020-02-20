@@ -86,9 +86,10 @@ class _RootTabState extends State<RootTab> {
                   child: Text('Inbox',
                       style: TextStyle(fontSize: ScreenUtil().setSp(18))),
                 ),
-                Tab(key: UniqueKey(), child: Text('Outbox',
-                      style: TextStyle(fontSize: ScreenUtil().setSp(18)))
-                )
+                Tab(
+                    key: UniqueKey(),
+                    child: Text('Outbox',
+                        style: TextStyle(fontSize: ScreenUtil().setSp(18))))
               ]),
             ),
             body: MultiBlocProvider(
@@ -104,7 +105,10 @@ class _RootTabState extends State<RootTab> {
                         di.serviceLocator<PermissionBloc>())
               ],
               child: TabBarView(
-                children: <Widget>[InboxPage(), OutboxPage()],
+                children: <Widget>[
+                  InboxPage(key: PageStorageKey('inbox_tab')),
+                  OutboxPage(key: PageStorageKey('outbox_tab'))
+                ],
               ),
             )));
   }

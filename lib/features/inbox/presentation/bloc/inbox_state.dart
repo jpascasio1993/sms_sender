@@ -6,17 +6,19 @@ import 'package:sms_sender/core/database/database.dart';
 abstract class InboxState extends Equatable {
   final List<InboxMessage> inboxList;
   InboxState({@required this.inboxList});
-  InboxState.fromState({@required InboxState state}): inboxList = state.inboxList;
+  InboxState.fromState({@required InboxState state})
+      : inboxList = state.inboxList;
 
   @override
   List<Object> get props => [inboxList];
 }
 
 class InitialInboxState extends InboxState {
-  
-  InitialInboxState({@required List<InboxMessage> inboxList}): super(inboxList: inboxList);
+  InitialInboxState({@required List<InboxMessage> inboxList})
+      : super(inboxList: inboxList);
   // inboxList = state.inboxList ?? [], super(inboxList:  );
-  InitialInboxState.fromState({@required InboxState state}): super.fromState(state: state);
+  InitialInboxState.fromState({@required InboxState state})
+      : super.fromState(state: state);
 
   @override
   String toString() {
@@ -25,14 +27,13 @@ class InitialInboxState extends InboxState {
 }
 
 class RetrievedInboxState extends InboxState {
+  RetrievedInboxState._({@required InboxState state})
+      : super.fromState(state: state);
 
-  RetrievedInboxState._({@required InboxState state}): super.fromState(state: state);
-
-  factory RetrievedInboxState.copyWith({
-    @required InboxState state,
-    List<InboxMessage> inboxList
-  }) {
-    return RetrievedInboxState._(state: InitialInboxState(inboxList: inboxList));
+  factory RetrievedInboxState.copyWith(
+      {@required InboxState state, List<InboxMessage> inboxList}) {
+    return RetrievedInboxState._(
+        state: InitialInboxState(inboxList: inboxList));
   }
 
   @override
@@ -44,18 +45,17 @@ class RetrievedInboxState extends InboxState {
 class InboxErrorState extends InboxState {
   final String message;
 
-  InboxErrorState._({@required InboxState state, this.message}): super.fromState(state: state);
+  InboxErrorState._({@required InboxState state, this.message})
+      : super.fromState(state: state);
 
-  factory InboxErrorState.copyWith({
-    @required InboxState state,
-    String message
-  }) {
+  factory InboxErrorState.copyWith(
+      {@required InboxState state, String message}) {
     return InboxErrorState._(state: state, message: message);
   }
 
   @override
   List<Object> get props => [inboxList, message];
-  
+
   @override
   String toString() {
     return 'InboxError';
@@ -63,17 +63,36 @@ class InboxErrorState extends InboxState {
 }
 
 class InboxLoadingState extends InboxState {
-  InboxLoadingState._({@required InboxState state}): super.fromState(state: state);
+  InboxLoadingState._({@required InboxState state})
+      : super.fromState(state: state);
 
-  factory InboxLoadingState.copyWith({
-    @required InboxState state,
-    String message
-  }) {
+  factory InboxLoadingState.copyWith(
+      {@required InboxState state, String message}) {
     return InboxLoadingState._(state: state);
   }
-  
+
   @override
   String toString() {
     return 'InboxLoadingState';
+  }
+}
+
+class InboxErrorUpdateState extends InboxState {
+  final String message;
+
+  InboxErrorUpdateState._({@required InboxState state, this.message})
+      : super.fromState(state: state);
+
+  factory InboxErrorUpdateState.copyWith(
+      {@required InboxState state, String message}) {
+    return InboxErrorUpdateState._(state: state, message: message);
+  }
+
+  @override
+  List<Object> get props => [inboxList, message];
+
+  @override
+  String toString() {
+    return 'InboxErrorUpdateState';
   }
 }

@@ -22,7 +22,6 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
   @override
   Stream<OutboxState> transformEvents(Stream<OutboxEvent> events,
       Stream<OutboxState> Function(OutboxEvent) next) {
-    // TODO: implement transformEvents
     return super.transformEvents(events, next);
   }
 
@@ -79,6 +78,22 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
               OutboxErrorState.copyWith(state: state, message: failure.message),
           (outboxList) => RetrievedOutboxState.copyWith(
               state: state, outboxList: state.outboxList + outboxList));
+    } else if (event is OutboxUpdateEvent) {
+      yield OutboxLoadingState.copyWith(state: state);
+      final res = await updateOutbox(OutboxParams(messages: event.messages));
+      yield* res.fold((failure) async* {
+        yield OutboxErrorUpdateState.copyWith(
+            state: state, message: failure.message);
+      }, (success) async* {
+        final res2 = await getOutbox(
+            OutboxParams(limit: event.limit, offset: event.offset));
+        yield res2.fold(
+            (failure) => OutboxErrorUpdateState.copyWith(
+                state: state, message: failure.message), (outboxList) {
+          return RetrievedOutboxState.copyWith(
+              state: state, outboxList: outboxList);
+        });
+      });
     }
   }
 }

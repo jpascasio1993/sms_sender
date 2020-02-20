@@ -81,6 +81,22 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
         return RetrievedInboxState.copyWith(
             state: state, inboxList: state.inboxList + inboxList);
       });
+    } else if (event is InboxUpdateEvent) {
+      yield InboxLoadingState.copyWith(state: state);
+      final res = await updateInbox(InboxParams(messages: event.messages));
+      yield* res.fold((failure) async* {
+        yield InboxErrorUpdateState.copyWith(
+            state: state, message: failure.message);
+      }, (success) async* {
+        final res2 = await getInbox(
+            InboxParams(limit: event.limit, offset: event.offset));
+        yield res2.fold(
+            (failure) => InboxErrorUpdateState.copyWith(
+                state: state, message: failure.message), (inboxList) {
+          return RetrievedInboxState.copyWith(
+              state: state, inboxList: inboxList);
+        });
+      });
     }
   }
 }

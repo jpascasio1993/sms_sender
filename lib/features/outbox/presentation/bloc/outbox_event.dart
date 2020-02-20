@@ -1,12 +1,13 @@
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
+import 'package:sms_sender/core/database/database.dart';
 
 @immutable
 abstract class OutboxEvent extends Equatable {
   final int limit;
   final int offset;
 
-  OutboxEvent({@required this.limit, @required this.offset});
+  OutboxEvent({this.limit, this.offset});
 
   @override
   List<Object> get props => [limit, offset];
@@ -53,11 +54,24 @@ class GetOutboxFromRemoteAndSaveToLocalEvent extends OutboxEvent {
 }
 
 class GetMoreOutboxEvent extends OutboxEvent {
-   GetMoreOutboxEvent({@required int limit, @required int offset})
+  GetMoreOutboxEvent({@required int limit, @required int offset})
       : super(limit: limit, offset: offset);
 
   @override
   String toString() {
     return 'GetMoreOutboxEvent';
+  }
+}
+
+class OutboxUpdateEvent extends OutboxEvent {
+  final List<OutboxMessagesCompanion> messages;
+
+  OutboxUpdateEvent(
+      {@required this.messages, @required int limit, @required int offset})
+      : super(limit: limit, offset: offset);
+
+  @override
+  String toString() {
+    return 'OutboxUpdateEvent';
   }
 }

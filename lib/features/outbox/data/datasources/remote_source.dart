@@ -33,7 +33,7 @@ class RemoteSourceImpl extends RemoteSource {
           : json.decode(response.body);
 
       for (var item in fetchedData) {
-        items.add(OutboxModel.fromJson(item));
+        items.add(OutboxModel.fromJsonWeb(item));
       }
 
       return items.where((OutboxModel outboxModel) {
