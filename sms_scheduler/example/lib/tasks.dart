@@ -6,7 +6,7 @@ void testTask() async {
   try{
     debugPrint('test Task');
   }catch(error) {
-    
+    debugPrint('testTaskerror $error');
   }finally {
      await SmsScheduler.addTask(PROCESS_INBOX_ID,
         Duration(seconds: 10), testTask);

@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -58,7 +59,7 @@ public class SmsService extends Service {
     private static Disposable disposableTask;
     private static BehaviorSubject<JSONObject> tasksBehavior = BehaviorSubject.create();
     private static HashMap<Integer, FunctionReply> functionReplies = new HashMap<>();
-
+    private static boolean isServiceRunning = false;
 
     // TODO: add wakelock
     public SmsService() {
@@ -76,11 +77,11 @@ public class SmsService extends Service {
         super.onCreate();
         System.out.println("Service => OnCreate");
         System.out.println("Service => OnCreate => sBackgroundChannel started? " + sIsIsolateRunning.get());
-//        Settings.System.putInt(getContentResolver(),
-//                Settings.System.WIFI_SLEEP_POLICY,
-//                Settings.System.WIFI_SLEEP_POLICY_NEVER);
+        Settings.System.putInt(getContentResolver(),
+                Settings.System.WIFI_SLEEP_POLICY,
+                Settings.System.WIFI_SLEEP_POLICY_NEVER);
         acquireWakeLock();
-        startForeground(SERVICE_ID, CustomNotification.createNotification(this));
+
     }
 
 
@@ -89,13 +90,20 @@ public class SmsService extends Service {
         Log.d("Service", "OnStartCommand");
         System.out.println("Service => OnStartCommand");
         SharedPreferences p = getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
-        p.edit().remove(SMS_SCHEDULER_TASKS_KEY).commit();
-        invokeCallbackDispatcher2(this);
+        // p.edit().remove(SMS_SCHEDULER_TASKS_KEY).commit();
         destroy();
+        invokeCallbackDispatcher2(this);
         long callbackHandle = p.getLong(CALLBACK_HANDLE_KEY, 0);
         startBackgroundIsolate(this,callbackHandle);
+        startForeground(SERVICE_ID, CustomNotification.createNotification(this));
+        try {
+            runQueuedTasks(this);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 //        startForeground(SERVICE_ID, CustomNotification.createNotification(context));
 //        return super.onStartCommand(intent, flags, startId);
+        isServiceRunning = true;
         return START_STICKY;
     }
 
@@ -109,9 +117,11 @@ public class SmsService extends Service {
             disposableTask.dispose();
         stopForeground(true);
         sIsIsolateRunning.set(false);
-        //destroy();
+        destroy();
         releaseWakeLock();
+        isServiceRunning = false;
         super.onDestroy();
+        startSmsService(getApplicationContext());
     }
 
     @Override
@@ -120,9 +130,11 @@ public class SmsService extends Service {
 //            disposableTask.dispose();
         //stopForeground(true);
         sIsIsolateRunning.set(false);
-        //destroy();
+        destroy();
         releaseWakeLock();
         super.onTaskRemoved(rootIntent);
+        isServiceRunning = false;
+        startSmsService(getApplicationContext());
 
 
     }
@@ -133,7 +145,7 @@ public class SmsService extends Service {
         //Acquire new wake lock
         PowerManager.WakeLock mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
         mWakeLock.setReferenceCounted(false);
-        mWakeLock.acquire();
+        mWakeLock.acquire(5000);
     }
     public void releaseWakeLock() {
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
@@ -180,6 +192,9 @@ public class SmsService extends Service {
                 args.libraryPath = cb.callbackLibraryPath;
                 sBackgroundFlutterView.runFromBundle(args);
                 sPluginRegistrantCallback.registerWith(sBackgroundFlutterView.getPluginRegistry());
+//                if(callbackHandle != 0) {
+//                    addTask(con);
+//                }
             // }
         }
 
@@ -300,6 +315,7 @@ public class SmsService extends Service {
             if (sBackgroundFlutterView != null && sBackgroundFlutterView.isAttached()) {
                 synchronized (sBackgroundFlutterView) {
                     sBackgroundFlutterView.destroy();
+                    sBackgroundFlutterView = null;
                 }
             }
     }
@@ -309,6 +325,8 @@ public class SmsService extends Service {
                 SmsService.class);
         context.stopService(serviceIntent);
     }
+
+    public static boolean isServiceRunning() { return isServiceRunning; }
 
     public static void addTask(Context context, JSONArray args) throws JSONException {
         HashMap<String, Object> task = new HashMap<>();
@@ -320,7 +338,11 @@ public class SmsService extends Service {
         SharedPreferences p = context.getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
         Set<String> taskIds = p.getStringSet(SMS_SCHEDULER_TASKS_KEY, new HashSet<String>());
 
-        taskIds.remove(Integer.toString(((int) task.get("id"))));
+//        String id = Integer.toString(((int) task.get("id")));
+//        if(taskIds.contains(id)) {
+//            taskIds.remove(Integer.toString(((int) task.get("id"))));
+//        }
+
         taskIds.add(Integer.toString(((int) task.get("id"))));
 
         p.edit().putString(key, object.toString())
@@ -328,6 +350,34 @@ public class SmsService extends Service {
 
         if (tasksBehavior != null)
             tasksBehavior.onNext(object);
+    }
+
+    private static void runQueuedTasks(Context context) throws JSONException {
+        SharedPreferences p = context.getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
+        Set<String> taskIds = p.getStringSet(SMS_SCHEDULER_TASKS_KEY, new HashSet<String>());
+
+        Iterator<String> it = taskIds.iterator();
+        Log.i(TAG, "runQueuedTasks: "+taskIds.size());
+        while(it.hasNext()) {
+            int taskId = Integer.parseInt(it.next());
+            String key = getTaskKey(Integer.toString(taskId));
+            String json = p.getString(key, null);
+            if(json == null) {
+                Log.e(TAG, "Data for task id " + Integer.toString(taskId) + " is invalid.");
+                continue;
+            }
+            try {
+
+                JSONObject jsonObject = new JSONObject(json);
+                JSONArray array = new JSONArray();
+                array.put(jsonObject.getInt("id"));
+                array.put(jsonObject.getLong("delay"));
+                array.put(jsonObject.getLong("callbackHandle"));
+                addTask(context, array);
+            }catch(JSONException e) {
+                Log.e(TAG, "Data for task id "+taskId+ " is invalid: "+ json);
+            }
+        }
     }
 
     public static boolean setBackgroundFlutterView(FlutterNativeView view) {
