@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:sms_scheduler/sms_scheduler.dart';
+import 'package:sms_scheduler_example/tasks.dart';
 
 void main() => runApp(MyApp());
 
@@ -40,6 +41,26 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void _onStartService() async {
+    await SmsScheduler.initialize();
+   
+  }
+
+  void _addTask() async {
+     await SmsScheduler.addTask(PROCESS_INBOX_ID,
+        Duration(seconds: 10), testTask);
+  }
+  void _onRequestPermission() async {
+    // await PermissionsPlugin.requestPermissions([
+    //   Permission.SEND_SMS,
+    //   Permission.READ_SMS,
+    //   Permission.READ_CONTACTS
+    // ]);
+    // final res =await PermissionsPlugin.requestIgnoreBatteryOptimization;
+    // final res = await SmsScheduler.requestIgonoreBatteryOptimization;
+    // debugPrint('success? $res');
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -47,8 +68,15 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+        body: Column(
+          children: <Widget>[
+            Center(
+              child: Text('Running on: $_platformVersion\n'),
+            ),
+            RaisedButton(onPressed: _onRequestPermission, child: Text('Request Permission')),
+            RaisedButton(onPressed: _onStartService, child: Text('Start Service')),
+            RaisedButton(onPressed: _addTask, child: Text('Add Task'))
+          ],
         ),
       ),
     );

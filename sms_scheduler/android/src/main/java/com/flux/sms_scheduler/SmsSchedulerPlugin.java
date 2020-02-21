@@ -1,20 +1,63 @@
 package com.flux.sms_scheduler;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.preference.PreferenceManager;
+import android.provider.Settings;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.view.FlutterNativeView;
+
+
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 /** SmsSchedulerPlugin */
-public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler {
+public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.ViewDestroyListener, ActivityAware {
+
+  private Context context;
+  private static ActivityPluginBinding activityPluginBinding;
+  private int CODE_REQUEST_CHECK_BATTERY = 3930;
+  private Result mResult;
+
+  public SmsSchedulerPlugin() {
+  }
+
+  public SmsSchedulerPlugin(Context context) {
+    this.context = context;
+  }
+
   @Override
   public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
-    final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "sms_scheduler");
-    channel.setMethodCallHandler(new SmsSchedulerPlugin());
+    final MethodChannel channel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "plugins.flutter.io/sms_scheduler", JSONMethodCodec.INSTANCE);
+    final MethodChannel smsMutationChannel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "plugins.flutter.io/sms_mutation", JSONMethodCodec.INSTANCE);
+    channel.setMethodCallHandler(new SmsSchedulerPlugin(flutterPluginBinding.getApplicationContext()));
+    smsMutationChannel.setMethodCallHandler(new SmsMutationHandler(flutterPluginBinding.getApplicationContext()));
+    Log.i(getClass().getSimpleName(), "onAttachedToEngine: SMSSCHEDULERPLUGIN");
   }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+
+  }
+
 
   // This static function is optional and equivalent to onAttachedToEngine. It supports the old
   // pre-Flutter-1.12 Android projects. You are encouraged to continue supporting
@@ -26,20 +69,130 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler {
   // depending on the user's project. onAttachedToEngine or registerWith must both be defined
   // in the same class.
   public static void registerWith(Registrar registrar) {
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "sms_scheduler");
-    channel.setMethodCallHandler(new SmsSchedulerPlugin());
+    final MethodChannel backgroundChannel = new MethodChannel(registrar.messenger(), "plugins.flutter.io/sms_scheduler_background",
+            JSONMethodCodec.INSTANCE);
+
+    backgroundChannel.setMethodCallHandler(new SmsSchedulerBackgroundHandler(registrar));
+    SmsService.setBackgroundChannel(backgroundChannel);
+
+    final MethodChannel channel = new MethodChannel(registrar.messenger(), "plugins.flutter.io/sms_scheduler",
+            JSONMethodCodec.INSTANCE);
+    channel.setMethodCallHandler(new SmsSchedulerPlugin(registrar.context()));
+    // SmsService.setBackgroundChannel(channel);
+
+    final MethodChannel smsMutationChannel = new MethodChannel(registrar.messenger(), "plugins.flutter.io/sms_mutation",
+            JSONMethodCodec.INSTANCE);
+    smsMutationChannel.setMethodCallHandler(new SmsMutationHandler(registrar.context()));
+    //SmsService.setBackgroundChannel(smsMutationChannel);
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
-    if (call.method.equals("getPlatformVersion")) {
-      result.success("Android " + android.os.Build.VERSION.RELEASE);
-    } else {
-      result.notImplemented();
+//    if (call.method.equals("getPlatformVersion")) {
+//      result.success("Android " + android.os.Build.VERSION.RELEASE);
+//    } else {
+//      result.notImplemented();
+//    }
+    mResult = result;
+    String method = call.method;
+    Object arguments = call.arguments;
+    System.out.println("method::" + method);
+    try {
+      if (method.equals("getPlatformVersion")) {
+        result.success("Android " + android.os.Build.VERSION.RELEASE);
+      }
+//      else if(method.equals("sms_scheduler.initialized")){
+//        //SmsService.destroy();
+//        SmsService.onInitialized();
+//        result.success(true);
+//      }
+      else if (method.equals("sms_scheduler.start")) {
+        long callbackHandle = ((JSONArray) arguments).getLong(0);
+        SmsService.destroy();
+
+        SmsService.setCallbackDispatcher(context, callbackHandle);
+        // SmsService.startBackgroundIsolate(context, callbackHandle);
+        SmsService.startSmsService(context);
+        result.success(true);
+      } else if (method.equals("sms_scheduler.stop")) {
+        SmsService.stopSmsService(context);
+        result.success(true);
+      }
+      else if (method.equals("sms_scheduler.apply")) {
+        SmsService.refreshScheduler(context);
+        result.success(true);
+      }
+      else if (method.equals("sms_scheduler.addTask")) {
+        SmsService.addTask(context,(JSONArray) arguments);
+        result.success(true);
+      } else if(method.equals("sms_scheduler.background_reply")){
+        SmsService.backgroundReply(((JSONArray) arguments).getInt(0));
+        result.success(true);
+      }
+      else if(method.equals("sms_scheduler.request_ignore_battery_optimization")) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+          Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+          intent.setData(Uri.parse("package:" +
+                  activityPluginBinding.getActivity().getPackageName()));
+          activityPluginBinding.getActivity().startActivityForResult(intent, CODE_REQUEST_CHECK_BATTERY);
+//          startActivityForResult(activityPluginBinding.getActivity(), intent, CODE_REQUEST_CHECK_BATTERY, null);
+        }
+      }
+      else {
+
+        result.notImplemented();
+      }
+    } catch (JSONException e) {
+      result.error("error", "JSON error: " + e.getMessage(), null);
     }
   }
 
-  @Override
-  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
+  public static Intent getMainActivityIntent(Context context) {
+    String packageName = context.getPackageName();
+    return context.getPackageManager().getLaunchIntentForPackage(packageName);
   }
+
+
+  @Override
+  public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
+    Log.i(getClass().getSimpleName(), "onViewDestroy: flutterNativeView");
+    return SmsService.setBackgroundFlutterView(flutterNativeView);
+  }
+
+  @Override
+  public void onAttachedToActivity(ActivityPluginBinding binding) {
+    activityPluginBinding = binding;
+//    FlutterLifecycleAdapter.getActivityLifecycle(binding);
+    Log.i(getClass().getSimpleName(), "onAttachedToActivity: ");
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+    activityPluginBinding = null;
+    Log.i(getClass().getSimpleName(), "onDetachedFromActivityForConfigChanges: ");
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
+    activityPluginBinding = binding;
+    Log.i(getClass().getSimpleName(), "onReattachedToActivityForConfigChanges: ");
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+    activityPluginBinding = null;
+    Log.i(getClass().getSimpleName(), "onDetachedFromActivity: ");
+  }
+
+//  @Override
+//  public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+//    Log.i(getClass().getSimpleName(), "onActivityResult: ");
+//    if (requestCode == CODE_REQUEST_CHECK_BATTERY) {
+//        if(mResult != null) {
+//          mResult.success((resultCode == Activity.RESULT_OK));
+//        }
+//      return true;
+//    }
+//    return false;
+//  }
 }
