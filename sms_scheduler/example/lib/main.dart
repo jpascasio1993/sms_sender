@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:sms_scheduler/sms_scheduler.dart';
-import 'package:sms_scheduler_example/tasks.dart';
+import './tasks.dart';
 
 void main() => runApp(MyApp());
 
@@ -49,6 +49,7 @@ class _MyAppState extends State<MyApp> {
   void _addTask() async {
      await SmsScheduler.addTask(PROCESS_INBOX_ID,
         Duration(seconds: 10), testTask);
+    // testTask();
   }
   void _onRequestPermission() async {
     // await PermissionsPlugin.requestPermissions([
@@ -75,7 +76,8 @@ class _MyAppState extends State<MyApp> {
             ),
             RaisedButton(onPressed: _onRequestPermission, child: Text('Request Permission')),
             RaisedButton(onPressed: _onStartService, child: Text('Start Service')),
-            RaisedButton(onPressed: _addTask, child: Text('Add Task'))
+            RaisedButton(onPressed: _addTask, child: Text('Add Task')),
+            // RaisedButton(onPressed: testTask, child: Text('Test Task'))
           ],
         ),
       ),

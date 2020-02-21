@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -60,6 +61,8 @@ public class SmsService extends Service {
     private static BehaviorSubject<JSONObject> tasksBehavior = BehaviorSubject.create();
     private static HashMap<Integer, FunctionReply> functionReplies = new HashMap<>();
     private static boolean isServiceRunning = false;
+    private static Set<Integer> alreadyRunningTasks = new HashSet<>();
+    private static final String TASKID = "id";
 
     // TODO: add wakelock
     public SmsService() {
@@ -92,7 +95,7 @@ public class SmsService extends Service {
         SharedPreferences p = getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
         // p.edit().remove(SMS_SCHEDULER_TASKS_KEY).commit();
         destroy();
-        invokeCallbackDispatcher2(this);
+        invokeCallbackDispatcher(this);
         long callbackHandle = p.getLong(CALLBACK_HANDLE_KEY, 0);
         startBackgroundIsolate(this,callbackHandle);
         startForeground(SERVICE_ID, CustomNotification.createNotification(this));
@@ -201,17 +204,24 @@ public class SmsService extends Service {
 
     }
 
-    private static void invokeCallbackDispatcher2(final Context context) {
+    private static void invokeCallbackDispatcher(final Context context) {
 
         if (disposableTask != null && !disposableTask.isDisposed())
             disposableTask.dispose();
         tasksBehavior = BehaviorSubject.create();
-        disposableTask = tasksBehavior.delay(new Function<JSONObject, ObservableSource<JSONObject>>() {
-            @Override
-            public ObservableSource<JSONObject> apply(JSONObject jsonObject) throws Exception {
-                return Observable.just(jsonObject).delay(jsonObject.getLong("delay"), TimeUnit.MILLISECONDS);
-            }
-        }).observeOn(AndroidSchedulers.mainThread()).flatMap(new Function<JSONObject, ObservableSource<JSONObject>>() {
+        alreadyRunningTasks = new HashSet<>();
+
+        disposableTask = tasksBehavior
+                // .filter(jsonObject -> !alreadyRunningTasks.contains(jsonObject.getInt(TASKID)))
+                .delay(jsonObject -> Observable
+                        .just(jsonObject)
+//                        .doOnNext(jsonObject1 -> {
+//                            alreadyRunningTasks.add(jsonObject.getInt(TASKID));
+//                        })
+//                        .doOnError(throwable ->  {
+//                            alreadyRunningTasks.remove(jsonObject.getInt(TASKID));
+//                        })
+                        .delay(jsonObject.getLong("delay"), TimeUnit.MILLISECONDS)).observeOn(AndroidSchedulers.mainThread()).flatMap(new Function<JSONObject, ObservableSource<JSONObject>>() {
             @Override
             public ObservableSource<JSONObject> apply(final JSONObject jsonObject) throws Exception {
                 return Single.create(new SingleOnSubscribe<JSONObject>() {
@@ -246,6 +256,7 @@ public class SmsService extends Service {
                             public void error(String errorCode, String errorMessage, Object errorDetails) {
                                 System.out.println("invokeMethod error");
                                 emitter.tryOnError(new Throwable(errorMessage));
+                                // emitter.onSuccess(jsonObject);
                             }
 
                             @Override
@@ -256,11 +267,19 @@ public class SmsService extends Service {
                             }
                         });
                     }
-                }).toObservable();
+                })
+                .onErrorReturn(throwable -> jsonObject)
+//                .doOnError(throwable -> {
+//                    alreadyRunningTasks.remove(jsonObject.getInt(TASKID));
+//                })
+                .toObservable();
             }
-        }).subscribe();
-    }
+        })
 
+        .subscribe(jsonObject -> {
+                // alreadyRunningTasks.remove(jsonObject.getInt(TASKID));
+        }, Throwable::printStackTrace);
+    }
 
     public static void setPluginRegistrant(PluginRegistrantCallback callback) {
         sPluginRegistrantCallback = callback;
@@ -333,23 +352,32 @@ public class SmsService extends Service {
         task.put("id", args.getInt(0));
         task.put("delay", args.getLong(1));
         task.put("callbackHandle", args.getLong(2));
-        JSONObject object = new JSONObject(task);
+        JSONObject jsonTask = new JSONObject(task);
         String key = getTaskKey(Integer.toString((int) task.get("id")));
         SharedPreferences p = context.getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
         Set<String> taskIds = p.getStringSet(SMS_SCHEDULER_TASKS_KEY, new HashSet<String>());
 
-//        String id = Integer.toString(((int) task.get("id")));
-//        if(taskIds.contains(id)) {
-//            taskIds.remove(Integer.toString(((int) task.get("id"))));
-//        }
-
+        // taskIds.remove(Integer.toString(((int) task.get("id"))));
         taskIds.add(Integer.toString(((int) task.get("id"))));
 
-        p.edit().putString(key, object.toString())
+        p.edit().putString(key, jsonTask.toString())
                 .putStringSet(SMS_SCHEDULER_TASKS_KEY, taskIds).apply();
 
+        runTask(context, jsonTask);
+    }
+
+    private static void runTask(final Context context, final JSONObject task){
+//        HashMap<String, Object> task = new HashMap<>();
+//        task.put("id", args.getInt(0));
+//        task.put("delay", args.getLong(1));
+//        task.put("callbackHandle", args.getLong(2));
+//        JSONObject object = new JSONObject(task);
+//        String key = getTaskKey(Integer.toString((int) task.get("id")));
+//        SharedPreferences p = context.getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
+//        Set<String> taskIds = p.getStringSet(SMS_SCHEDULER_TASKS_KEY, new HashSet<String>());
+
         if (tasksBehavior != null)
-            tasksBehavior.onNext(object);
+            tasksBehavior.onNext(task);
     }
 
     private static void runQueuedTasks(Context context) throws JSONException {
@@ -368,16 +396,46 @@ public class SmsService extends Service {
             }
             try {
 
+                JSONObject task = new JSONObject(json);
+//                JSONArray array = new JSONArray();
+//                array.put(task.getInt("id"));
+//                array.put(task.getLong("delay"));
+//                array.put(task.getLong("callbackHandle"));
+                runTask(context, task);
+            }catch(JSONException e) {
+                Log.e(TAG, "Data for task id "+taskId+ " is invalid: "+ json);
+            }
+        }
+    }
+
+    private static ArrayList<JSONArray> getQueuedTasks(final Context context) throws JSONException {
+        SharedPreferences p = context.getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
+        Set<String> taskIds = p.getStringSet(SMS_SCHEDULER_TASKS_KEY, new HashSet<String>());
+
+        Iterator<String> it = taskIds.iterator();
+        Log.i(TAG, "getQueuedTasks: "+taskIds.size());
+        ArrayList<JSONArray> queuedTasks = new ArrayList<>();
+        while(it.hasNext()) {
+            int taskId = Integer.parseInt(it.next());
+            String key = getTaskKey(Integer.toString(taskId));
+            String json = p.getString(key, null);
+            if(json == null) {
+                Log.e(TAG, "Data for task id " + Integer.toString(taskId) + " is invalid.");
+                continue;
+            }
+            try {
+
                 JSONObject jsonObject = new JSONObject(json);
                 JSONArray array = new JSONArray();
                 array.put(jsonObject.getInt("id"));
                 array.put(jsonObject.getLong("delay"));
                 array.put(jsonObject.getLong("callbackHandle"));
-                addTask(context, array);
+                queuedTasks.add(array);
             }catch(JSONException e) {
                 Log.e(TAG, "Data for task id "+taskId+ " is invalid: "+ json);
             }
         }
+        return queuedTasks;
     }
 
     public static boolean setBackgroundFlutterView(FlutterNativeView view) {
@@ -403,7 +461,7 @@ public class SmsService extends Service {
     }
 
     public static void refreshScheduler(Context context) {
-        invokeCallbackDispatcher2(context);
+        invokeCallbackDispatcher(context);
     }
 
     private static class FunctionReply {
