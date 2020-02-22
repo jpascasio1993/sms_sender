@@ -8,6 +8,7 @@ import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/core/global/theme.dart' as theme;
 import 'package:edge_alert/edge_alert.dart';
+import 'package:sms_sender/features/permission/presentation/bloc/bloc.dart';
 
 class OutboxPage extends StatefulWidget {
   OutboxPage({Key key}) : super(key: key);
@@ -111,121 +112,132 @@ class _OutboxPageState extends State<OutboxPage>
               gravity: EdgeAlert.TOP);
         }
       },
-      child: BlocBuilder<OutboxBloc, OutboxState>(
-          builder: (BuildContext context, OutboxState state) {
-        // if (state is RetrievedOutboxState || state is OutboxLoadingState) {
-        if (state.outboxList.isEmpty) {
-          return Center(key: UniqueKey(), child: const Text('No Data'));
-        }
+      child: BlocBuilder<PermissionBloc, PermissionState>(
+        builder: (BuildContext context, PermissionState state) {
+            if(state is PermissionGrantedState) {
+                return BlocBuilder<OutboxBloc, OutboxState>(
+                          builder: (BuildContext context, OutboxState state) {
+                        // if (state is RetrievedOutboxState || state is OutboxLoadingState) {
+                        if (state.outboxList.isEmpty) {
+                          return Center(key: UniqueKey(), child: const Text('No Data'));
+                        }
 
-        return ListView.builder(
-            controller: _scrollController,
-            key: storageKey,
-            itemCount: state.outboxList.length,
-            itemBuilder: (BuildContext context, int index) {
-              OutboxModel outbox = state.outboxList[index];
-              Map<String, dynamic> status = getStatus(outbox.status);
-              MaterialAccentColor statusColor = status['color'];
-              String statusLabel = status['label'];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Theme(
-                    data: themeData,
-                    child: ExpansionTile(
-                      key: PageStorageKey('outbox_${outbox.id}'),
-                      title: Padding(
-                        padding: EdgeInsets.only(
-                            top: ScreenUtil().setSp(10),
-                            bottom: ScreenUtil().setSp(10)),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  bottom: ScreenUtil().setSp(10)),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                        return ListView.builder(
+                            controller: _scrollController,
+                            key: storageKey,
+                            itemCount: state.outboxList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              OutboxModel outbox = state.outboxList[index];
+                              Map<String, dynamic> status = getStatus(outbox.status);
+                              MaterialAccentColor statusColor = status['color'];
+                              String statusLabel = status['label'];
+                              return Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
-                                  Flexible(
-                                    child: Text(
-                                      outbox.recipient,
-                                      style: theme.dateStyle,
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: Container(
-                                      padding: EdgeInsets.only(
-                                          left: ScreenUtil().setSp(10),
-                                          right: ScreenUtil().setSp(10)),
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: statusColor),
-                                          borderRadius: BorderRadius.circular(
-                                              ScreenUtil().setSp(2)),
-                                          color: statusColor),
-                                      child: Text(
-                                        statusLabel,
-                                        style: theme.textWhiteStyle,
+                                  Theme(
+                                    data: themeData,
+                                    child: ExpansionTile(
+                                      key: PageStorageKey('outbox_${outbox.id}'),
+                                      title: Padding(
+                                        padding: EdgeInsets.only(
+                                            top: ScreenUtil().setSp(10),
+                                            bottom: ScreenUtil().setSp(10)),
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          children: <Widget>[
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  bottom: ScreenUtil().setSp(10)),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.spaceBetween,
+                                                children: <Widget>[
+                                                  Flexible(
+                                                    child: Text(
+                                                      outbox.recipient,
+                                                      style: theme.dateStyle,
+                                                    ),
+                                                  ),
+                                                  Flexible(
+                                                    child: Container(
+                                                      padding: EdgeInsets.only(
+                                                          left: ScreenUtil().setSp(10),
+                                                          right: ScreenUtil().setSp(10)),
+                                                      decoration: BoxDecoration(
+                                                          border:
+                                                              Border.all(color: statusColor),
+                                                          borderRadius: BorderRadius.circular(
+                                                              ScreenUtil().setSp(2)),
+                                                          color: statusColor),
+                                                      child: Text(
+                                                        statusLabel,
+                                                        style: theme.textWhiteStyle,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Text(outbox.body),
+                                            Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: ScreenUtil().setSp(10)),
+                                                child:
+                                                    Text(outbox.date, style: theme.dateStyle)),
+                                          ],
+                                        ),
                                       ),
+                                      children: <Widget>[
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          children: <Widget>[
+                                            FlatButton.icon(
+                                                icon: Icon(
+                                                  Icons.send,
+                                                  color: Colors.blueAccent,
+                                                ),
+                                                label: Text(
+                                                  'Re-Send',
+                                                  style: theme.positiveStyle,
+                                                ),
+                                                onPressed: () => _onUpdate(
+                                                    outbox: outbox,
+                                                    status: OutboxStatus.resend)),
+                                            Visibility(
+                                              visible: false,
+                                              child: FlatButton.icon(
+                                                icon:
+                                                    Icon(Icons.delete, color: Colors.redAccent),
+                                                label: Text('Delete', style: theme.textStyle),
+                                                onPressed: () {},
+                                              ),
+                                            ),
+                                            // IconButton(
+                                            //   icon: Icon(Icons.launch),
+                                            //   onPressed: () {},
+                                            // )
+                                          ],
+                                        )
+                                      ],
                                     ),
                                   ),
+                                  Divider(
+                                    height: 1,
+                                    key: PageStorageKey('outbox_${outbox.id}_divider'),
+                                  )
                                 ],
-                              ),
-                            ),
-                            Text(outbox.body),
-                            Padding(
-                                padding: EdgeInsets.only(
-                                    top: ScreenUtil().setSp(10)),
-                                child:
-                                    Text(outbox.date, style: theme.dateStyle)),
-                          ],
-                        ),
-                      ),
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            FlatButton.icon(
-                                icon: Icon(
-                                  Icons.send,
-                                  color: Colors.blueAccent,
-                                ),
-                                label: Text(
-                                  'Re-Send',
-                                  style: theme.positiveStyle,
-                                ),
-                                onPressed: () => _onUpdate(
-                                    outbox: outbox,
-                                    status: OutboxStatus.resend)),
-                            Visibility(
-                              visible: false,
-                              child: FlatButton.icon(
-                                icon:
-                                    Icon(Icons.delete, color: Colors.redAccent),
-                                label: Text('Delete', style: theme.textStyle),
-                                onPressed: () {},
-                              ),
-                            ),
-                            // IconButton(
-                            //   icon: Icon(Icons.launch),
-                            //   onPressed: () {},
-                            // )
-                          ],
-                        )
-                      ],
-                    ),
-                  ),
-                  Divider(
-                    height: 1,
-                    key: PageStorageKey('outbox_${outbox.id}_divider'),
-                  )
-                ],
-              );
-            });
-        // }
-      }),
+                              );
+                            });
+                        // }
+                      });
+            }
+            else {
+               return Center(
+                  child: Text("Permission Denied!", style: theme.textStyle),
+                );
+            }
+        },
+      )
     );
   }
 }

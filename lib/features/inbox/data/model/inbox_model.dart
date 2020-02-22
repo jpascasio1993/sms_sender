@@ -32,7 +32,7 @@ class InboxModel extends InboxMessage with EquatableMixin{
     serializer ??= moorRuntimeOptions.defaultSerializer;
     return <String, dynamic> {
       '_id': serializer.toJson<int>(id),
-      'message': serializer.toJson<String>(address),
+      'message': serializer.toJson<String>(body),
       'status': serializer.toJson<int>(status),
       'datetime': serializer.toJson<String>(date),
       'sender_number': serializer.toJson<String>(address),

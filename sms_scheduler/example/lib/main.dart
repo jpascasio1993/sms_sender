@@ -47,8 +47,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _addTask() async {
-     await SmsScheduler.addTask(PROCESS_INBOX_ID,
-        Duration(seconds: 10), testTask);
+     await SmsScheduler.addTask(PROCESS_OUTBOX_ID,
+        Duration(seconds: 10), testTask2);
     // testTask();
   }
   void _onRequestPermission() async {
@@ -58,9 +58,15 @@ class _MyAppState extends State<MyApp> {
     //   Permission.READ_CONTACTS
     // ]);
     // final res =await PermissionsPlugin.requestIgnoreBatteryOptimization;
-    // final res = await SmsScheduler.requestIgonoreBatteryOptimization;
-    // debugPrint('success? $res');
+     final res = await SmsScheduler.requestIgonoreBatteryOptimization;
+     debugPrint('_onRequestPermission? $res');
   }
+
+  void _setAsDefaultSMSApp() async {
+    bool res = await SmsScheduler.setAsDefaultApp;
+    debugPrint('setAsDefaultSMS $res');
+  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +83,8 @@ class _MyAppState extends State<MyApp> {
             RaisedButton(onPressed: _onRequestPermission, child: Text('Request Permission')),
             RaisedButton(onPressed: _onStartService, child: Text('Start Service')),
             RaisedButton(onPressed: _addTask, child: Text('Add Task')),
-            // RaisedButton(onPressed: testTask, child: Text('Test Task'))
+            RaisedButton(onPressed: _setAsDefaultSMSApp, child: Text('SetAsDefault SMS APP')),
+            RaisedButton(onPressed: _onRequestPermission, child: Text('requestIgnoreBatteryOptimization SMS APP'))
           ],
         ),
       ),

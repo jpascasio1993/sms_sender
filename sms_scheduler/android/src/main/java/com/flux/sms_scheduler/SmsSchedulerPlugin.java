@@ -7,9 +7,11 @@ import android.net.Uri;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.provider.Telephony;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,18 +32,19 @@ import io.flutter.view.FlutterNativeView;
 import static androidx.core.app.ActivityCompat.startActivityForResult;
 
 /** SmsSchedulerPlugin */
-public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.ViewDestroyListener, ActivityAware {
+public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, PluginRegistry.ViewDestroyListener, ActivityAware, PluginRegistry.ActivityResultListener {
 
   private Context context;
   private static ActivityPluginBinding activityPluginBinding;
-  private int CODE_REQUEST_CHECK_BATTERY = 3930;
-  private Result mResult;
+  private SmsSchedulerPluginDelegate delegate;
 
   public SmsSchedulerPlugin() {
+    delegate = new SmsSchedulerPluginDelegate();
   }
 
   public SmsSchedulerPlugin(Context context) {
     this.context = context;
+    delegate = new SmsSchedulerPluginDelegate();
   }
 
   @Override
@@ -86,6 +89,7 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
     //SmsService.setBackgroundChannel(smsMutationChannel);
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
 //    if (call.method.equals("getPlatformVersion")) {
@@ -93,13 +97,12 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
 //    } else {
 //      result.notImplemented();
 //    }
-    mResult = result;
     String method = call.method;
     Object arguments = call.arguments;
     System.out.println("method::" + method);
     try {
       if (method.equals("getPlatformVersion")) {
-        result.success("Android " + android.os.Build.VERSION.RELEASE);
+        result.success("Android " + Build.VERSION.RELEASE);
       }
 //      else if(method.equals("sms_scheduler.initialized")){
 //        //SmsService.destroy();
@@ -107,39 +110,31 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
 //        result.success(true);
 //      }
       else if (method.equals("sms_scheduler.start") && !SmsService.isServiceRunning()) {
-        long callbackHandle = ((JSONArray) arguments).getLong(0);
-        SmsService.destroy();
-
-        SmsService.setCallbackDispatcher(context, callbackHandle);
-        // SmsService.startBackgroundIsolate(context, callbackHandle);
-        SmsService.startSmsService(context);
-        result.success(true);
+        delegate.schedulerStart(context, result, arguments);
       } else if (method.equals("sms_scheduler.stop")) {
-        SmsService.stopSmsService(context);
-        result.success(true);
+        delegate.schedulerStop(context, result, arguments);
       }
-      else if (method.equals("sms_scheduler.apply")) {
-        SmsService.refreshScheduler(context);
-        result.success(true);
+      else if (method.equals("sms_scheduler.refreshScheduler")) {
+        delegate.schedulerRefresh(context, result, arguments);
       }
       else if (method.equals("sms_scheduler.addTask")) {
-        SmsService.addTask(context,(JSONArray) arguments);
-        result.success(true);
+        delegate.schedulerAddTask(context, result, arguments);
       } else if(method.equals("sms_scheduler.background_reply")){
-        SmsService.backgroundReply(((JSONArray) arguments).getInt(0));
-        result.success(true);
+        delegate.schedulerBackgroundReply(context, result, arguments);
       }
       else if(method.equals("sms_scheduler.request_ignore_battery_optimization")) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-          Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
-          intent.setData(Uri.parse("package:" +
-                  activityPluginBinding.getActivity().getPackageName()));
-          activityPluginBinding.getActivity().startActivityForResult(intent, CODE_REQUEST_CHECK_BATTERY);
-//          startActivityForResult(activityPluginBinding.getActivity(), intent, CODE_REQUEST_CHECK_BATTERY, null);
+          delegate.requestIgnoreBatteryOptimization(activityPluginBinding.getActivity(), result);
         }
       }
+      else if(method.equals("sms_scheduler.rescheduleTask")) {
+        delegate.schedulerRescheduleTask(context, result, arguments);
+      }
+      else if(method.equals("sms_scheduler.defaultApp")) {
+        Log.i(getClass().getSimpleName(), "sms_scheduler.defaultApp");
+        delegate.setAsDefaultSms(activityPluginBinding.getActivity(), result);
+      }
       else {
-
         result.notImplemented();
       }
     } catch (JSONException e) {
@@ -169,7 +164,8 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
   @Override
   public void onDetachedFromActivityForConfigChanges() {
     activityPluginBinding = null;
-    Log.i(getClass().getSimpleName(), "onDetachedFromActivityForConfigChanges: ");
+    delegate.cleanUp();
+//    Log.i(getClass().getSimpleName(), "onDetachedFromActivityForConfigChanges: ");
   }
 
   @Override
@@ -181,18 +177,12 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
   @Override
   public void onDetachedFromActivity() {
     activityPluginBinding = null;
+    delegate.cleanUp();
     Log.i(getClass().getSimpleName(), "onDetachedFromActivity: ");
   }
 
-//  @Override
-//  public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-//    Log.i(getClass().getSimpleName(), "onActivityResult: ");
-//    if (requestCode == CODE_REQUEST_CHECK_BATTERY) {
-//        if(mResult != null) {
-//          mResult.success((resultCode == Activity.RESULT_OK));
-//        }
-//      return true;
-//    }
-//    return false;
-//  }
+  @Override
+  public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+    return delegate.onActivityResult(requestCode, resultCode, data);
+  }
 }

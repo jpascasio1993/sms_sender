@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
+import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms/sms.dart';
@@ -12,6 +13,7 @@ import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_imp
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/send_sms_to_server.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/update_inbox.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
@@ -30,100 +32,116 @@ import 'package:sms_sender/features/permission/domain/usecases/permission_reques
 import 'package:sms_sender/features/permission/domain/usecases/permission_save_info.dart';
 import 'package:sms_sender/features/permission/presentation/bloc/bloc.dart';
 
-final serviceLocator = GetIt.instance;
+// final serviceLocator = GetIt.instance;
 final String inboxPostRemoteURL = 'http://sms.web99s.com/sms/insert_datas';
 final String outboxGetRemoteURL = 'http://sms.web99s.com/sms/get_outbox';
 final String outboxAPIKey = 'AIzaSyC3N-q-3HMMCRTIdfZLk75AtA_1Zn5SO1A';
 final String inboxAPIKey = 'AIzaSyC3N-q-3HMMCRTIdfZLk75AtA_1Zn5SO1A';
 final bool smsIsRead = false;
 
-Future<void> init() async {
-  final preferences = await SharedPreferences.getInstance();
 
-  //Database
-  serviceLocator.registerSingleton<AppDatabase>(AppDatabase());
+class Injector {
+  GetIt _serviceLocator;
+  Injector({@required GetIt serviceLocator}): _serviceLocator = serviceLocator;
+  
+  Injector.asNewInstance(){
+    _serviceLocator = GetIt.asNewInstance();
+  }
 
-  //usecases
-  serviceLocator.registerLazySingleton<GetInbox>(
-      () => GetInbox(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton<GetSmsAndSaveToDb>(
-      () => GetSmsAndSaveToDb(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton<GetOutbox>(
-      () => GetOutbox(outboxRepository: serviceLocator()));
-  serviceLocator.registerLazySingleton<GetOutboxFromRemote>(
-      () => GetOutboxFromRemote(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton<PermissionSaveInfo>(
-      () => PermissionSaveInfo(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton<PermissionRequest>(
-      () => PermissionRequest(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton<UpdateOutbox>(
-      () => UpdateOutbox(repository: serviceLocator()));
-  serviceLocator.registerLazySingleton<UpdateInbox>(
-      () => UpdateInbox(repository: serviceLocator()));
+  GetIt get serviceLocator => _serviceLocator;
 
-  //Bloc
-  serviceLocator.registerFactory(() => InboxBloc(
-      getInbox: serviceLocator(),
-      getSmsAndSaveToDb: serviceLocator(),
-      updateInbox: serviceLocator()));
-  serviceLocator.registerFactory(() => OutboxBloc(
-      getOutbox: serviceLocator(),
-      getOutboxFromRemote: serviceLocator(),
-      updateOutbox: serviceLocator()));
-  serviceLocator.registerFactory(() => PermissionBloc(
-      preferences: serviceLocator(),
-      permissionRequest: serviceLocator(),
-      permissionSaveInfo: serviceLocator()));
+  Future<bool> init() async {
+    final preferences = await SharedPreferences.getInstance();
 
-  //Sms
-  serviceLocator.registerLazySingleton<SmsQuery>(() => SmsQuery());
-  serviceLocator
-      .registerLazySingleton<List<SmsQueryKind>>(() => [SmsQueryKind.Inbox]);
+    //Database
+    _serviceLocator.registerSingleton<AppDatabase>(AppDatabase());
 
-  // Data sources
-  serviceLocator.registerLazySingleton<RemoteSource>(() => RemoteSourceImpl(
-      client: serviceLocator(),
-      firebaseReference: serviceLocator(),
-      apiKey: outboxAPIKey));
-  serviceLocator.registerLazySingleton<LocalSource>(
-      () => LocalSourceImpl(appDatabase: serviceLocator()));
-  serviceLocator.registerLazySingleton<InboxSource>(() => InboxSourceImpl(
-      appDatabase: serviceLocator(), smsQuery: serviceLocator()));
-  serviceLocator.registerLazySingleton<InboxRemoteSource>(() =>
-      InboxRemoteSourceImpl(
-          firebaseReference: serviceLocator(),
-          apikey: inboxAPIKey,
-          client: serviceLocator()));
-  serviceLocator.registerLazySingleton<PermissionLocalSource>(() =>
-      PermissionLocalSourceImpl(
-          preferences: serviceLocator(), permissionHandler: serviceLocator()));
-  serviceLocator.registerLazySingleton<PermissionRemoteSource>(() =>
-      PermissionRemoteSourceImpl(
-          firebaseDatabase: serviceLocator(), firebaseURLS: serviceLocator()));
+    //usecases
+    _serviceLocator.registerLazySingleton<GetInbox>(
+        () => GetInbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<GetSmsAndSaveToDb>(
+        () => GetSmsAndSaveToDb(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<GetOutbox>(
+        () => GetOutbox(outboxRepository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<GetOutboxFromRemote>(
+        () => GetOutboxFromRemote(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<PermissionSaveInfo>(
+        () => PermissionSaveInfo(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<PermissionRequest>(
+        () => PermissionRequest(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<UpdateOutbox>(
+        () => UpdateOutbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<UpdateInbox>(
+        () => UpdateInbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<SendSmsToServer>(() => SendSmsToServer(repository: _serviceLocator()));
 
-  // Repository
-  serviceLocator.registerLazySingleton<OutboxRepository>(() =>
-      OutboxRepositoryImpl(
-          remoteSource: serviceLocator(), localSource: serviceLocator()));
-  serviceLocator.registerLazySingleton<InboxRepository>(() =>
-      InboxRepositoryImpl(
-          inboxSource: serviceLocator(),
-          inboxRemoteSource: serviceLocator(),
-          queryKinds: serviceLocator()));
-  serviceLocator.registerLazySingleton<PermissionRepository>(() =>
-      PermissionRepositoryImpl(
-          localSource: serviceLocator(), remoteSource: serviceLocator()));
+    //Bloc
+    _serviceLocator.registerFactory(() => InboxBloc(
+        getInbox: _serviceLocator(),
+        getSmsAndSaveToDb: _serviceLocator(),
+        updateInbox: _serviceLocator()));
+    _serviceLocator.registerFactory(() => OutboxBloc(
+        getOutbox: _serviceLocator(),
+        getOutboxFromRemote: _serviceLocator(),
+        updateOutbox: _serviceLocator()));
+    _serviceLocator.registerFactory(() => PermissionBloc(
+        preferences: _serviceLocator(),
+        permissionRequest: _serviceLocator(),
+        permissionSaveInfo: _serviceLocator()));
 
-  //external
-  serviceLocator.registerLazySingleton<Client>(() => Client());
-  serviceLocator.registerLazySingleton<SharedPreferences>(() => preferences);
-  serviceLocator
-      .registerLazySingleton<FirebaseDatabase>(() => FirebaseDatabase());
-  serviceLocator
-      .registerLazySingleton<PermissionHandler>(() => PermissionHandler());
-  serviceLocator.registerLazySingleton<FirebaseURLS>(
-      () => FirebaseURLSImpl(preferences: serviceLocator()));
-  serviceLocator.registerLazySingleton<FirebaseReference>(() =>
-      FirebaseReferenceImpl(
-          firebaseURLS: serviceLocator(), firebaseDatabase: serviceLocator()));
+    //Sms
+    _serviceLocator.registerLazySingleton<SmsQuery>(() => SmsQuery());
+    serviceLocator
+        .registerLazySingleton<List<SmsQueryKind>>(() => [SmsQueryKind.Inbox]);
+
+    // Data sources
+    _serviceLocator.registerLazySingleton<RemoteSource>(() => RemoteSourceImpl(
+        client: _serviceLocator(),
+        firebaseReference: _serviceLocator(),
+        apiKey: outboxAPIKey));
+    _serviceLocator.registerLazySingleton<LocalSource>(
+        () => LocalSourceImpl(appDatabase: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<InboxSource>(() => InboxSourceImpl(
+        appDatabase: _serviceLocator(), smsQuery: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<InboxRemoteSource>(() =>
+        InboxRemoteSourceImpl(
+            firebaseReference: _serviceLocator(),
+            apikey: inboxAPIKey,
+            client: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<PermissionLocalSource>(() =>
+        PermissionLocalSourceImpl(
+            preferences: _serviceLocator(), permissionHandler: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<PermissionRemoteSource>(() =>
+        PermissionRemoteSourceImpl(
+            firebaseDatabase: _serviceLocator(), firebaseURLS: _serviceLocator()));
+
+    // Repository
+    _serviceLocator.registerLazySingleton<OutboxRepository>(() =>
+        OutboxRepositoryImpl(
+            remoteSource: _serviceLocator(), localSource: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<InboxRepository>(() =>
+        InboxRepositoryImpl(
+            inboxSource: _serviceLocator(),
+            inboxRemoteSource: _serviceLocator(),
+            queryKinds: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<PermissionRepository>(() =>
+        PermissionRepositoryImpl(
+            localSource: _serviceLocator(), remoteSource: _serviceLocator()));
+
+    //external
+    _serviceLocator.registerLazySingleton<Client>(() => Client());
+    _serviceLocator.registerLazySingleton<SharedPreferences>(() => preferences);
+    serviceLocator
+        .registerLazySingleton<FirebaseDatabase>(() => FirebaseDatabase());
+    serviceLocator
+        .registerLazySingleton<PermissionHandler>(() => PermissionHandler());
+    _serviceLocator.registerLazySingleton<FirebaseURLS>(
+        () => FirebaseURLSImpl(preferences: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<FirebaseReference>(() =>
+        FirebaseReferenceImpl(
+            firebaseURLS: _serviceLocator(), firebaseDatabase: _serviceLocator()));
+    return true;
+  }
 }
+
+

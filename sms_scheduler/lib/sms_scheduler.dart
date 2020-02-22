@@ -28,7 +28,7 @@ void _smsSchedulerCallbackDispatcher() {
       print('Fatal: could not find callback');
       exit(-1);
     }
-    closure();
+    await closure();
   });
 
   _channel.invokeMethod<void>('sms_scheduler.initialized');
@@ -58,14 +58,13 @@ class SmsScheduler {
     return result == null ? false : result;
   }
 
-  static Future<bool> apply() async {
-    final dynamic result = await _channel.invokeMethod('sms_scheduler.apply');
+  static Future<bool> refreshScheduler() async {
+    final dynamic result = await _channel.invokeMethod('sms_scheduler.refreshScheduler');
     return result == null ? false : result;
   }
 
   static Future<bool> start() async {
-    final dynamic result = await _channel.invokeMethod('sms_scheduler.start');
-    return result == null ? false : result;
+    return await initialize();
   }
 
   static Future<bool> stop() async {
@@ -80,6 +79,17 @@ class SmsScheduler {
       return false;
     }
     final dynamic result = await _channel.invokeMethod('sms_scheduler.addTask',
+        <dynamic>[id, delay.inMilliseconds, handle.toRawHandle()]);
+    return result == null ? false : result;
+  }
+
+  static Future<bool> rescheduleTask(
+      int id, Duration delay, dynamic Function() callback) async {
+    final CallbackHandle handle = PluginUtilities.getCallbackHandle(callback);
+    if (handle == null) {
+      return false;
+    }
+    final dynamic result = await _channel.invokeMethod('sms_scheduler.rescheduleTask',
         <dynamic>[id, delay.inMilliseconds, handle.toRawHandle()]);
     return result == null ? false : result;
   }
@@ -100,4 +110,8 @@ class SmsScheduler {
     return result == null ? false : result;
   }
 
+  static Future<bool> get setAsDefaultApp async {
+    final dynamic result = await _channel.invokeMethod('sms_scheduler.defaultApp');
+    return result == null ? false : result;
+  }
 }

@@ -1,6 +1,4 @@
-import 'package:firebase_database/firebase_database.dart';
 import 'package:meta/meta.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:http/http.dart' as http;
 import 'package:sms_sender/core/datasources/constants.dart';
@@ -42,7 +40,7 @@ class InboxRemoteSourceImpl extends InboxRemoteSource {
                   date: inboxMessage.date,
                   dateSent: inboxMessage.dateSent,
                   status: inboxMessage.status)
-              .toJson())
+              .toPostMap())
           .toList()
           .toString()
     });

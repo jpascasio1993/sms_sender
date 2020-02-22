@@ -372,6 +372,16 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
     };
   }
 
+  Map<String, dynamic> toPostMap({ValueSerializer serializer}) {
+    serializer ??= moorRuntimeOptions.defaultSerializer;
+    return <String, dynamic> {
+      '"_id"': '"${serializer.toJson<int>(id)}"',
+      '"sender_number"': '"${serializer.toJson<String>(address)}"',
+      '"message"': '"${serializer.toJson<String>(body).toString().replaceAll('"', '\\"')}"',
+      '"date_time"': '"${serializer.toJson<String>(date)}"',
+      '"status"': '"${serializer.toJson<int>(status)}"'
+    };
+  }
   @override
   InboxMessagesCompanion createCompanion(bool nullToAbsent) {
     return InboxMessagesCompanion(

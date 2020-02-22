@@ -10,6 +10,7 @@ import 'package:sms_sender/core/global/theme.dart' as theme;
 import 'package:edge_alert/edge_alert.dart';
 import 'package:moor_flutter/moor_flutter.dart' as moor;
 import 'package:sms_sender/core/database/database.dart' as moordb;
+import 'package:sms_sender/tasks.dart';
 
 class InboxPage extends StatefulWidget {
   InboxPage({Key key}) : super(key: key);
@@ -77,6 +78,10 @@ class _InboxPageState extends State<InboxPage>
     });
   }
 
+  void _onPressTest() async {
+    await processInbox();
+  }
+
   Map<String, dynamic> getStatus(int status) {
     if (status == InboxStatus.processed) {
       return {'color': Colors.greenAccent, 'label': 'PROCESSED'};
@@ -125,129 +130,144 @@ class _InboxPageState extends State<InboxPage>
             }
           })
         ],
-        child: BlocBuilder<InboxBloc, InboxState>(
-            builder: (BuildContext context, InboxState state) {
-          // if (state is RetrievedInboxState || state is InboxLoadingState) {
-          if (state.inboxList.isEmpty) {
-            return Center(key: UniqueKey(), child: const Text('No Data'));
-          }
+        child: BlocBuilder<PermissionBloc, PermissionState>(
+          builder: (BuildContext context, PermissionState state) {
+            if(state is PermissionGrantedState) {
+              return BlocBuilder<InboxBloc, InboxState>(
+                        builder: (BuildContext context, InboxState state) {
+                      // if (state is RetrievedInboxState || state is InboxLoadingState) {
+                      if (state.inboxList.isEmpty) {
+                        return Center(key: UniqueKey(), child: const Text('No Data'));
+                      }
 
-          return ListView.builder(
-              controller: _scrollController,
-              key: storageKey,
-              itemCount: state.inboxList.length,
-              itemBuilder: (BuildContext context, int index) {
-                InboxMessage inbox = state.inboxList[index];
-                Map<String, dynamic> status = getStatus(inbox.status);
-                MaterialAccentColor statusColor = status['color'];
-                String statusLabel = status['label'];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Theme(
-                      data: themeData,
-                      child: ExpansionTile(
-                        key: PageStorageKey('inbox_${inbox.id}'),
-                        title: Padding(
-                          padding: EdgeInsets.only(
-                              top: ScreenUtil().setSp(10),
-                              bottom: ScreenUtil().setSp(10)),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: <Widget>[
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    bottom: ScreenUtil().setSp(10)),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: <Widget>[
-                                    Flexible(
-                                      child: Text(
-                                        inbox.address,
-                                        style: theme.dateStyle,
+                      return ListView.builder(
+                          controller: _scrollController,
+                          key: storageKey,
+                          itemCount: state.inboxList.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            InboxMessage inbox = state.inboxList[index];
+                            Map<String, dynamic> status = getStatus(inbox.status);
+                            MaterialAccentColor statusColor = status['color'];
+                            String statusLabel = status['label'];
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Theme(
+                                  data: themeData,
+                                  child: ExpansionTile(
+                                    key: PageStorageKey('inbox_${inbox.id}'),
+                                    title: Padding(
+                                      padding: EdgeInsets.only(
+                                          top: ScreenUtil().setSp(10),
+                                          bottom: ScreenUtil().setSp(10)),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: <Widget>[
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                bottom: ScreenUtil().setSp(10)),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: <Widget>[
+                                                Flexible(
+                                                  child: Text(
+                                                    inbox.address,
+                                                    style: theme.dateStyle,
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: Container(
+                                                    padding: EdgeInsets.only(
+                                                        left: ScreenUtil().setSp(10),
+                                                        right: ScreenUtil().setSp(10)),
+                                                    decoration: BoxDecoration(
+                                                        border:
+                                                            Border.all(color: statusColor),
+                                                        borderRadius: BorderRadius.circular(
+                                                            ScreenUtil().setSp(2)),
+                                                        color: statusColor),
+                                                    child: Text(
+                                                      statusLabel,
+                                                      style: theme.textWhiteStyle,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Text(inbox.body),
+                                          Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: ScreenUtil().setSp(10)),
+                                              child:
+                                                  Text(inbox.date, style: theme.dateStyle)),
+                                        ],
                                       ),
                                     ),
-                                    Flexible(
-                                      child: Container(
-                                        padding: EdgeInsets.only(
-                                            left: ScreenUtil().setSp(10),
-                                            right: ScreenUtil().setSp(10)),
-                                        decoration: BoxDecoration(
-                                            border:
-                                                Border.all(color: statusColor),
-                                            borderRadius: BorderRadius.circular(
-                                                ScreenUtil().setSp(2)),
-                                            color: statusColor),
-                                        child: Text(
-                                          statusLabel,
-                                          style: theme.textWhiteStyle,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Text(inbox.body),
-                              Padding(
-                                  padding: EdgeInsets.only(
-                                      top: ScreenUtil().setSp(10)),
-                                  child:
-                                      Text(inbox.date, style: theme.dateStyle)),
-                            ],
-                          ),
-                        ),
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              FlatButton.icon(
-                                  icon: Icon(
-                                    Icons.send,
-                                    color: Colors.blueAccent,
+                                    children: <Widget>[
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        children: <Widget>[
+                                          FlatButton.icon(
+                                              icon: Icon(
+                                                Icons.send,
+                                                color: Colors.blueAccent,
+                                              ),
+                                              label: Text(
+                                                'Reprocess',
+                                                style: theme.positiveStyle,
+                                              ),
+                                              onPressed: () => _onUpdate(
+                                                  inbox: inbox,
+                                                  status: InboxStatus.reprocess)),
+                                          Visibility(
+                                            visible: true,
+                                            child: FlatButton.icon(
+                                              icon: Icon(Icons.delete,
+                                                  color: Colors.redAccent),
+                                              label: Text('Delete', style: theme.textStyle),
+                                              onPressed: _onPressTest,
+                                            ),
+                                          ),
+                                          // IconButton(
+                                          //   icon: Icon(Icons.launch),
+                                          //   onPressed: () {},
+                                          // )
+                                        ],
+                                      )
+                                    ],
                                   ),
-                                  label: Text(
-                                    'Reprocess',
-                                    style: theme.positiveStyle,
-                                  ),
-                                  onPressed: () => _onUpdate(
-                                      inbox: inbox,
-                                      status: InboxStatus.reprocess)),
-                              Visibility(
-                                visible: false,
-                                child: FlatButton.icon(
-                                  icon: Icon(Icons.delete,
-                                      color: Colors.redAccent),
-                                  label: Text('Delete', style: theme.textStyle),
-                                  onPressed: () {},
                                 ),
-                              ),
-                              // IconButton(
-                              //   icon: Icon(Icons.launch),
-                              //   onPressed: () {},
-                              // )
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                    Divider(
-                      height: 1,
-                      key: PageStorageKey('inbox_${inbox.id}_divider'),
-                    )
-                  ],
-                );
-              });
-        }
-            // else if (state is InboxErrorState) {
-            //   return Center(
-            //       key: UniqueKey(),
-            //       child: const Text(
-            //           'Failed to retrieve data. Something went wrong'));
-            // } else {
-            //   return Center(key: UniqueKey(), child: const Text('No Data'));
-            // }
-            //}
-            ));
+                                Divider(
+                                  height: 1,
+                                  key: PageStorageKey('inbox_${inbox.id}_divider'),
+                                )
+                              ],
+                            );
+                          });
+                    }
+                        // else if (state is InboxErrorState) {
+                        //   return Center(
+                        //       key: UniqueKey(),
+                        //       child: const Text(
+                        //           'Failed to retrieve data. Something went wrong'));
+                        // } else {
+                        //   return Center(key: UniqueKey(), child: const Text('No Data'));
+                        // }
+                        //}
+                  );
+            }
+            else {
+              return Center(
+                child: Text("Permission Denied!", style: theme.textStyle),
+              );
+            }
+          }
+        )
+      );
   }
 }
+
+
+

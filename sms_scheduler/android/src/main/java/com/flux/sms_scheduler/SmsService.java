@@ -347,7 +347,7 @@ public class SmsService extends Service {
 
     public static boolean isServiceRunning() { return isServiceRunning; }
 
-    public static void addTask(Context context, JSONArray args) throws JSONException {
+    public static JSONObject addTask(Context context, JSONArray args) throws JSONException {
         HashMap<String, Object> task = new HashMap<>();
         task.put("id", args.getInt(0));
         task.put("delay", args.getLong(1));
@@ -357,13 +357,17 @@ public class SmsService extends Service {
         SharedPreferences p = context.getSharedPreferences(SHARED_PREFERENCES_KEY, 0);
         Set<String> taskIds = p.getStringSet(SMS_SCHEDULER_TASKS_KEY, new HashSet<String>());
 
-        // taskIds.remove(Integer.toString(((int) task.get("id"))));
+        taskIds.remove(Integer.toString(((int) task.get("id"))));
         taskIds.add(Integer.toString(((int) task.get("id"))));
 
         p.edit().putString(key, jsonTask.toString())
                 .putStringSet(SMS_SCHEDULER_TASKS_KEY, taskIds).apply();
+        return jsonTask;
+    }
 
-        runTask(context, jsonTask);
+    public static void rescheduleTask(Context context, JSONArray args) throws JSONException {
+        JSONObject task = addTask(context, args);
+        runTask(context, task);
     }
 
     private static void runTask(final Context context, final JSONObject task){

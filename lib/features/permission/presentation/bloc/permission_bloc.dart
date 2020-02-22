@@ -4,12 +4,14 @@ import 'package:get_version/get_version.dart';
 import 'package:imei_plugin/imei_plugin.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sms_scheduler/sms_scheduler.dart';
 import 'package:sms_sender/features/permission/domain/usecases/permission_no_params.dart';
 import 'package:sms_sender/features/permission/domain/usecases/permission_params.dart';
 import 'package:sms_sender/features/permission/domain/usecases/permission_request.dart';
 import 'package:sms_sender/features/permission/domain/usecases/permission_save_info.dart';
 import 'package:sms_sender/features/permission/presentation/bloc/permission_event.dart';
 import 'package:sms_sender/features/permission/presentation/bloc/permission_state.dart';
+import 'package:sms_sender/tasks.dart';
 
 class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
   final SharedPreferences preferences;
@@ -38,7 +40,17 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
         }, (success) async* {
           await setUpAppInfo();
           await setUpImei();
-          yield PermissionGrantedState();
+          final ignoreBattOptimization = await ignoreBatteryOptimization();
+          final defaultSms = await setAsDefaultSMS();
+          debugPrint('ignoreBattOptimization $ignoreBattOptimization');
+          debugPrint('defaultSms $defaultSms');
+          if(!ignoreBattOptimization || !defaultSms) {
+            yield PermissionDeniedState();
+          }else {
+            // await setupTasks();
+            // await startScheduler();
+            yield PermissionGrantedState();
+          }
         });
       });
     }
@@ -65,5 +77,22 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
     if (imei != null || imei != '') {
       await prefs.setString('imei', imei);
     }
+  }
+
+  Future<bool> ignoreBatteryOptimization() async {
+    return await SmsScheduler.requestIgonoreBatteryOptimization;
+  }
+
+  Future<bool> setAsDefaultSMS() async {
+    return await SmsScheduler.setAsDefaultApp;
+  }
+
+  Future<void> setupTasks() async {
+      await SmsScheduler.addTask(PROCESS_INBOX_ID,
+        Duration(seconds: 10), processInbox);
+  }
+
+  Future<bool> startScheduler() async {
+    return await SmsScheduler.start();
   }
 }
