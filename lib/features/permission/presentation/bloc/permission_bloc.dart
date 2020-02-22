@@ -47,8 +47,8 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
           if(!ignoreBattOptimization || !defaultSms) {
             yield PermissionDeniedState();
           }else {
-            // await setupTasks();
-            // await startScheduler();
+            await setupTasks();
+            await startScheduler();
             yield PermissionGrantedState();
           }
         });
