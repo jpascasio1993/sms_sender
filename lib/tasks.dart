@@ -8,6 +8,7 @@ import './injectors.dart';
 
 const int PROCESS_INBOX_ID = 4001;
 const int PROCESS_OUTBOX_ID = 4002;
+final Injector injector = Injector.asNewInstance();
 // Future<void> processInbox() async {
 //   try {
 //     // final stringify = InboxModel()
@@ -59,7 +60,8 @@ Future<void> processInbox() async {
     //   'body': stringify
     // };
     // debugPrint('testInboxMOdel $data');
-    final Injector injector = Injector.asNewInstance();
+    
+    await injector.init();
     InboxMessage inboxMessage = InboxMessage(
       id: 0, 
       dateSent: '2020-02-22 16:22:00', 

@@ -42,8 +42,9 @@ final bool smsIsRead = false;
 
 class Injector {
   GetIt _serviceLocator;
+  bool initialized = false;
   Injector({@required GetIt serviceLocator}): _serviceLocator = serviceLocator;
-  
+
   Injector.asNewInstance(){
     _serviceLocator = GetIt.asNewInstance();
   }
@@ -51,6 +52,10 @@ class Injector {
   GetIt get serviceLocator => _serviceLocator;
 
   Future<bool> init() async {
+    if(initialized) {
+      return false;
+    }
+    
     final preferences = await SharedPreferences.getInstance();
 
     //Database
@@ -140,6 +145,7 @@ class Injector {
     _serviceLocator.registerLazySingleton<FirebaseReference>(() =>
         FirebaseReferenceImpl(
             firebaseURLS: _serviceLocator(), firebaseDatabase: _serviceLocator()));
+    initialized = true;
     return true;
   }
 }
