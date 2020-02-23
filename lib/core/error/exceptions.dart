@@ -6,9 +6,14 @@ final String inboxRemoteErrorServer =
     'Failed to post data. Check server response';
 final String inboxSmsInsertErrorMessage = 'SMS Insert Error';
 final String inboxSmsRetrieveErrorMessage = 'Inbox failed to retrieve';
+final String inboxSmsEmptyList = 'No unread sms';
+final String inboxLocalEmptyListUpdateErrorMessage = 'No data to be updated';
+final String inboxEmptyListErrorMessage = 'No inbox data to be sent';
+final String inboxSmsUpdateReadStatus = 'Failed to update sms read status. Set the app as default sms app.';
 
 final String localErrorMessage = 'Local Failure';
 final String outboxLocalErrorMessageUpdate = 'Failed to update outbox.';
+final String outboxLocalNoOutboxToBeSentAsSMSError = 'No messages to be sent as sms';
 final String remoteErrorMessage = 'Remote Error';
 final String permissionRequestErrorMessage = 'Failed to request permission.';
 final String permissionFailedToSaveInfo = 'Failed to save info';

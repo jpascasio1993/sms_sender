@@ -1,10 +1,12 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms/sms.dart';
+import 'package:sms_scheduler/sms_scheduler.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/datasources/constants.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_remote_source.dart';
@@ -22,6 +24,7 @@ import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_i
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/send_outbox_sms.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/update_outbox.dart';
 import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/permission/data/datasources/permission_local_source.dart';
@@ -52,6 +55,8 @@ class Injector {
   GetIt get serviceLocator => _serviceLocator;
 
   Future<bool> init() async {
+    debugPrint = (String message, {int wrapWidth}) {};
+    debugPrint('Injector Initialized $initialized');
     if(initialized) {
       return false;
     }
@@ -79,6 +84,7 @@ class Injector {
     _serviceLocator.registerLazySingleton<UpdateInbox>(
         () => UpdateInbox(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<SendSmsToServer>(() => SendSmsToServer(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<SendOutboxSms>(() => SendOutboxSms(repository: _serviceLocator()));
 
     //Bloc
     _serviceLocator.registerFactory(() => InboxBloc(
@@ -92,7 +98,8 @@ class Injector {
     _serviceLocator.registerFactory(() => PermissionBloc(
         preferences: _serviceLocator(),
         permissionRequest: _serviceLocator(),
-        permissionSaveInfo: _serviceLocator()));
+        permissionSaveInfo: _serviceLocator(),
+        smsScheduler: _serviceLocator()));
 
     //Sms
     _serviceLocator.registerLazySingleton<SmsQuery>(() => SmsQuery());
@@ -105,9 +112,9 @@ class Injector {
         firebaseReference: _serviceLocator(),
         apiKey: outboxAPIKey));
     _serviceLocator.registerLazySingleton<LocalSource>(
-        () => LocalSourceImpl(appDatabase: _serviceLocator()));
+        () => LocalSourceImpl(appDatabase: _serviceLocator(), smsSender: _serviceLocator()));
     _serviceLocator.registerLazySingleton<InboxSource>(() => InboxSourceImpl(
-        appDatabase: _serviceLocator(), smsQuery: _serviceLocator()));
+        appDatabase: _serviceLocator(), smsQuery: _serviceLocator(), smsScheduler: _serviceLocator()));
     _serviceLocator.registerLazySingleton<InboxRemoteSource>(() =>
         InboxRemoteSourceImpl(
             firebaseReference: _serviceLocator(),
@@ -145,6 +152,8 @@ class Injector {
     _serviceLocator.registerLazySingleton<FirebaseReference>(() =>
         FirebaseReferenceImpl(
             firebaseURLS: _serviceLocator(), firebaseDatabase: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<SmsScheduler>(() => SmsSchedulerImpl());
+    _serviceLocator.registerLazySingleton<SmsSender>(() => SmsSender());
     initialized = true;
     return true;
   }

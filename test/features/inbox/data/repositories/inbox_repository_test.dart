@@ -22,12 +22,12 @@ void main() {
   int limit = -1;
   int offset = 0;
   List<SmsQueryKind> querykinds;
-  int status;
+  List<int> status;
   setUp((){
     messages = [];
     querykinds = [SmsQueryKind.Inbox];
     mockInboxSource = MockInboxSource();
-    status = 0;
+    status = [0];
     mockAppDatabase = MockAppDatabase();
     mockInboxMessageDao = MockInboxMessageDao();
     inboxRepository = InboxRepositoryImpl(inboxSource: mockInboxSource, inboxRemoteSource: mockInboxRemoteSource, queryKinds: querykinds);

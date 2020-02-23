@@ -29,12 +29,14 @@ class InboxRemoteSourceImpl extends InboxRemoteSource {
         (apikey != null && apikey.isEmpty))
       throw ServerException(message: inboxRemoteErrorMissingApiUrlKey);
 
+    if(messages.isEmpty) {
+       throw ServerException(message: inboxEmptyListErrorMessage);
+    }
+
     final response = await client.post('$url', body: {
       'api': apikey,
       'data': messages
-          .map((inboxMessage) => InboxModel()
-              .copyWith(
-                  address: inboxMessage.address,
+          .map((inboxMessage) => InboxModel(address: inboxMessage.address,
                   id: inboxMessage.id,
                   body: inboxMessage.body,
                   date: inboxMessage.date,

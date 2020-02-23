@@ -27,7 +27,7 @@ void main() {
       when(mockInboxRepository.getSmsAndSaveToDb(0, 0, false)).thenAnswer((_) async => Right(true));
 
       // act 
-      final res = await getSmsAndSaveToDb(InboxParams(limit: 0, offset: 0, read: false, status: 0));
+      final res = await getSmsAndSaveToDb(InboxParams(limit: 0, offset: 0, read: false, status: [0]));
 
       // assert 
       expect(res, Right(true));
@@ -41,7 +41,7 @@ void main() {
       when(mockInboxRepository.getSmsAndSaveToDb(0, 0, false)).thenAnswer((_) async => Left(SMSFailure(message: inboxSmsInsertErrorMessage)));
 
       // act 
-      final res = await getSmsAndSaveToDb(InboxParams(limit: 0, offset: 0, read: false, status: 0));
+      final res = await getSmsAndSaveToDb(InboxParams(limit: 0, offset: 0, read: false, status: [0]));
 
       // assert 
       expect(res, Left(SMSFailure(message: inboxSmsInsertErrorMessage)));

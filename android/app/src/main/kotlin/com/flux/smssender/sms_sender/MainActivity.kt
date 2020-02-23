@@ -16,4 +16,8 @@ class MainActivity: FlutterActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         (flutterEngine!!.plugins.get(SmsSchedulerPlugin::class.java) as SmsSchedulerPlugin).onActivityResult(requestCode, resultCode, data)
     }
+
+    override fun onBackPressed() {
+        moveTaskToBack(true)
+    }
 }

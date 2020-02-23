@@ -1,19 +1,26 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
 import 'package:moor_flutter/moor_flutter.dart';
+import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
+import 'package:sms_sender/core/global/constants.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 
 abstract class LocalSource {
   Future<bool> bulkInsertOutbox(List<OutboxModel> remoteSourceOutbox);
-  Future<List<OutboxModel>> getOutbox(int limit, int offset, int status);
+  Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status);
   Future<bool> bulkUpdateOutbox(List<OutboxMessagesCompanion> messages);
+  Future<List<OutboxModel>> sendBulkSms(List<OutboxModel> messages);
 }
 
 class LocalSourceImpl implements LocalSource {
   final AppDatabase appDatabase;
+  final SmsSender smsSender;
 
-  LocalSourceImpl({@required this.appDatabase});
+  LocalSourceImpl({@required this.appDatabase, @required this.smsSender});
 
   @override
   Future<bool> bulkInsertOutbox(List<OutboxModel> remoteSourceOutbox) async {
@@ -31,7 +38,7 @@ class LocalSourceImpl implements LocalSource {
   }
 
   @override
-  Future<List<OutboxModel>> getOutbox(int limit, int offset, int status) async {
+  Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status) async {
     final res = await appDatabase.outboxMessageDao
         .getOutboxMessages(limit: limit, offset: offset, status: status)
         .catchError(
@@ -54,5 +61,47 @@ class LocalSourceImpl implements LocalSource {
         .catchError((error) =>
             throw LocalException(message: outboxLocalErrorMessageUpdate));
     return res;
+  }
+
+  @override
+  Future<List<OutboxModel>> sendBulkSms(List<OutboxModel> messages) async {
+    if(messages.isEmpty) {
+      throw LocalException(message: outboxLocalNoOutboxToBeSentAsSMSError);
+    }
+    List<Future<OutboxModel>> msgFutures = messages.map((msg) => createSmsFuture(msg, smsSender)).toList();
+    return await Future.wait(msgFutures);
+  }
+
+  Future<OutboxModel> createSmsFuture(OutboxModel outbox, SmsSender sender) async {
+    Completer<OutboxModel> completer = Completer();
+    SmsMessage msg = SmsMessage(outbox.recipient, outbox.body);
+    msg.onStateChanged.listen((SmsMessageState state) {
+        debugPrint('SmsMessageState $state');
+        if(state == SmsMessageState.Sent) {
+          final resOutbox = OutboxModel(
+            body: outbox.body,
+            date: outbox.date,
+            recipient: outbox.recipient,
+            status: OutboxStatus.sent,
+            title: outbox.title,
+            id: outbox.id
+          );  
+          completer.complete(resOutbox);
+        }
+        else if(state == SmsMessageState.Fail) {
+          final resOutbox = OutboxModel(
+            body: outbox.body,
+            date: outbox.date,
+            recipient: outbox.recipient,
+            status: OutboxStatus.failed,
+            title: outbox.title,
+            id: outbox.id
+          );  
+          completer.complete(resOutbox);
+        }
+    });
+
+    await sender.sendSms(msg);
+    return completer.future;
   }
 }

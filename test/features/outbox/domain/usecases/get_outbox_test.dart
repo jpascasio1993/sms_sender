@@ -13,13 +13,14 @@ void main() {
   MockOutboxRepository mockOutboxRepository;
   int offset = 0;
   int limit = 0;
-  int status;
+  List<int> status;
   List<OutboxModel> outboxRes;
   OutboxParams params;
   
   setUp(() {
     offset = 0;
     limit = 0;
+    status = [0];
     outboxRes = [
       OutboxModel(
           id: 0,

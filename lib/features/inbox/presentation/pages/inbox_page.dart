@@ -1,3 +1,6 @@
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -24,6 +27,7 @@ class _InboxPageState extends State<InboxPage>
   InboxBloc inboxBloc;
   PermissionBloc permissionBloc;
   final ScrollController _scrollController = ScrollController();
+  final ReceivePort _foregroundPort = ReceivePort();
   final PageStorageKey storageKey = PageStorageKey('sms_list_view');
   final limit = 30;
   final offset = 0;
@@ -33,6 +37,7 @@ class _InboxPageState extends State<InboxPage>
   @override
   void initState() {
     super.initState();
+    initPlatformState();
     inboxBloc = BlocProvider.of<InboxBloc>(context);
     permissionBloc = BlocProvider.of<PermissionBloc>(context);
     _initScrolLListener();
@@ -42,15 +47,55 @@ class _InboxPageState extends State<InboxPage>
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    debugPrint('OutboxPage didChangeDependencies');
+    debugPrint('InboxPage didChangeDependencies');
     themeData = Theme.of(context).copyWith(dividerColor: Colors.transparent);
   }
 
   @override
   bool get wantKeepAlive => true;
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+    // Remove the port mapping just in case the UI is shutting down but
+    // background isolate is continuing to run.
+    IsolateNameServer.removePortNameMapping(PROCESS_INBOX_PORT_NAME);
+  }
+
+  void initPlatformState() {
+    IsolateNameServer.removePortNameMapping(PROCESS_INBOX_PORT_NAME);
+    // The IsolateNameServer allows for us to create a mapping between a String
+    // and a SendPort that is managed by the Flutter engine. A SendPort can
+    // then be looked up elsewhere, like a background callback, to establish
+    // communication channels between isolates that were not spawned by one
+    // another.
+    if (!IsolateNameServer.registerPortWithName(
+        _foregroundPort.sendPort, PROCESS_INBOX_PORT_NAME)) {
+      //name entry already exists
+      debugPrint('Unable to register inbox port!');
+    }
+
+    _foregroundPort.listen((dynamic message) {
+      final Map<String, dynamic> data = message;
+      switch (data['action']) {
+       
+        case SUCCESS_REFETCH_INBOX:
+            _refetchInbox();
+          break;
+        default:
+          break;
+      }
+    }, onDone: () {});
+  }
+  
   void _onGetInbox() {
     inboxBloc.add(GetInboxEvent(limit: limit, offset: offset));
+  }
+
+  void _refetchInbox() {
+    final currentLimit = inboxBloc.state.inboxList.length > 0 ? inboxBloc.state.inboxList.length : limit;
+     inboxBloc.add(GetInboxEvent(limit: currentLimit, offset: offset));
   }
 
   void _onPressSaveSms() {
@@ -71,7 +116,6 @@ class _InboxPageState extends State<InboxPage>
       final maxScroll = _scrollController.position.maxScrollExtent;
       final currentScroll = _scrollController.position.pixels;
       if (maxScroll - currentScroll <= _scrollThreshold) {
-        //appManager.outboxMessagesFromDb();
         inboxBloc.add(GetMoreInboxEvent(
             limit: limit, offset: inboxBloc.state.inboxList.length));
       }
@@ -222,12 +266,12 @@ class _InboxPageState extends State<InboxPage>
                                                   inbox: inbox,
                                                   status: InboxStatus.reprocess)),
                                           Visibility(
-                                            visible: true,
+                                            visible: false,
                                             child: FlatButton.icon(
                                               icon: Icon(Icons.delete,
                                                   color: Colors.redAccent),
                                               label: Text('Delete', style: theme.textStyle),
-                                              onPressed: _onPressTest,
+                                              onPressed: () {}
                                             ),
                                           ),
                                           // IconButton(

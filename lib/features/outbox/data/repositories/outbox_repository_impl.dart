@@ -17,7 +17,7 @@ class OutboxRepositoryImpl implements OutboxRepository {
 
   @override
   Future<Either<Failure, List<OutboxModel>>> getOutbox(
-      int limit, int offset, int status) async {
+      int limit, int offset, List<int> status) async {
     try {
       final res = await localSource.getOutbox(limit, offset, status);
       return Right(res);
@@ -48,5 +48,15 @@ class OutboxRepositoryImpl implements OutboxRepository {
     } on LocalException catch (error) {
       return Left(LocalFailure(message: error.message));
     }
+  }
+
+  @override
+  Future<Either<Failure, List<OutboxModel>>> sendBulkSms(List<OutboxModel> messages) async {
+      try {
+        final res = await localSource.sendBulkSms(messages);
+        return Right(res);
+      } on LocalException catch(error) {
+        return Left(LocalFailure(message: error.message));
+      }
   }
 }

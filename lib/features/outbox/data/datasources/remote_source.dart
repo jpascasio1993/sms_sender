@@ -26,7 +26,7 @@ class RemoteSourceImpl extends RemoteSource {
     if (url == null || (url != null && url.isEmpty)) return [];
     final response = await client.post('$url', body: {'api': apiKey});
     if (response.statusCode == 200) {
-      print('response.body ${response.body}');
+      // debugPrint('response.body ${response.body}');
       List<OutboxModel> items = [];
       List fetchedData = response.body.toLowerCase() == 'no available data!'
           ? []

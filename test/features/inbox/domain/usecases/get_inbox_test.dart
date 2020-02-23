@@ -21,7 +21,7 @@ void main() {
   InboxParams params;
   int limit = 0;
   int offset = 0;
-  int status = 0;
+  List<int> status = [0];
   setUp(() {
     // SmsQueryKind kind = SmsQueryKind.Sent; 
     mockInboxRepository = MockInboxRepository();

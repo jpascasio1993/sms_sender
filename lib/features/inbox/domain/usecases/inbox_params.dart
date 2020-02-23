@@ -5,7 +5,7 @@ class InboxParams extends Equatable {
   final int limit;
   final int offset;
   final bool read;
-  final int status;
+  final List<int> status;
   final List<InboxMessagesCompanion> messages;
 
   InboxParams(

@@ -1,3 +1,6 @@
+import 'dart:isolate';
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +12,7 @@ import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/core/global/theme.dart' as theme;
 import 'package:edge_alert/edge_alert.dart';
 import 'package:sms_sender/features/permission/presentation/bloc/bloc.dart';
+import 'package:sms_sender/tasks.dart';
 
 class OutboxPage extends StatefulWidget {
   OutboxPage({Key key}) : super(key: key);
@@ -24,12 +28,14 @@ class _OutboxPageState extends State<OutboxPage>
   final offset = 0;
   final ScrollController _scrollController = ScrollController();
   final PageStorageKey storageKey = PageStorageKey('outbox_list_view');
+  final ReceivePort _foregroundPort = ReceivePort();
   final _scrollThreshold = 200.0;
   ThemeData themeData;
 
   @override
   void initState() {
     super.initState();
+    initPlatformState();
     outboxBloc = BlocProvider.of<OutboxBloc>(context);
     _initScrolLListener();
     WidgetsBinding.instance.addPostFrameCallback((_) => _onPress());
@@ -49,6 +55,35 @@ class _OutboxPageState extends State<OutboxPage>
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+     // Remove the port mapping just in case the UI is shutting down but
+    // background isolate is continuing to run.
+    IsolateNameServer.removePortNameMapping(PROCESS_OUTBOX_PORT_NAME);
+  }
+
+  void initPlatformState() {
+    IsolateNameServer.removePortNameMapping(PROCESS_OUTBOX_PORT_NAME);
+    // The IsolateNameServer allows for us to create a mapping between a String
+    // and a SendPort that is managed by the Flutter engine. A SendPort can
+    // then be looked up elsewhere, like a background callback, to establish
+    // communication channels between isolates that were not spawned by one
+    // another.
+    if (!IsolateNameServer.registerPortWithName(
+        _foregroundPort.sendPort, PROCESS_OUTBOX_PORT_NAME)) {
+      //name entry already exists
+      debugPrint('Unable to register outbox port!');
+    }
+
+    _foregroundPort.listen((dynamic message) {
+      final Map<String, dynamic> data = message;
+      switch (data['action']) {
+       
+        case SUCCESS_REFETCH_OUTBOX:
+            _refetchOutbox();
+          break;
+        default:
+          break;
+      }
+    }, onDone: () {});
   }
 
   void _onPress() {
@@ -59,6 +94,11 @@ class _OutboxPageState extends State<OutboxPage>
   void _onPressSaveRemoteOutboxData() {
     outboxBloc.add(
         GetOutboxFromRemoteAndSaveToLocalEvent(limit: limit, offset: offset));
+  }
+
+  void _refetchOutbox() {
+     final currentLimit = outboxBloc.state.outboxList.length > 0 ? outboxBloc.state.outboxList.length : limit;
+     outboxBloc.add(GetOutboxEvent(limit: currentLimit, offset: offset));
   }
 
   void _onUpdate({@required OutboxModel outbox, @required int status}) {
@@ -81,7 +121,7 @@ class _OutboxPageState extends State<OutboxPage>
     } else if (status == OutboxStatus.resend) {
       return {'color': Colors.purpleAccent, 'label': 'RESENDING'};
     } else {
-      return {'color': Colors.redAccent, 'label': 'PENDING'};
+      return {'color': Colors.orangeAccent, 'label': 'PENDING'};
     }
   }
 

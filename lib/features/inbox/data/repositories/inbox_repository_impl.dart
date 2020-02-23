@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:moor_flutter/moor_flutter.dart';
@@ -11,10 +12,10 @@ import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
 
 class InboxRepositoryImpl extends InboxRepository {
-  InboxSource inboxSource;
-  InboxRemoteSource inboxRemoteSource;
+  final InboxSource inboxSource;
+  final InboxRemoteSource inboxRemoteSource;
 
-  List<SmsQueryKind> queryKinds;
+  final List<SmsQueryKind> queryKinds;
 
   InboxRepositoryImpl(
       {@required this.inboxSource,
@@ -23,7 +24,7 @@ class InboxRepositoryImpl extends InboxRepository {
 
   @override
   Future<Either<Failure, List<InboxMessage>>> getInbox(
-      int limit, int offset, int status) async {
+      int limit, int offset, List<int> status) async {
     try {
       final res = await inboxSource.getInbox(limit, offset, status);
       return Right(res);
@@ -37,7 +38,7 @@ class InboxRepositoryImpl extends InboxRepository {
       int limit, int offset, bool read) async {
     try {
       final res = await inboxSource.getSms(limit, offset, queryKinds, read);
-      print('res ${res.length}');
+      debugPrint('getSms ${res.map((val) => val.id).toList()}');
 
       final inboxMessages = res
           .map((message) => InboxMessagesCompanion.insert(
@@ -48,7 +49,9 @@ class InboxRepositoryImpl extends InboxRepository {
               dateSent: Value(DateFormat('yyyy-MM-dd hh:mm:ss a')
                   .format(message.dateSent.toLocal()))))
           .toList();
-      final insertRes = await inboxSource.insertInbox(inboxMessages);
+      final insertRes = await inboxSource
+      .insertInbox(inboxMessages)
+      .then((success) => inboxSource.updateSmsReadStatus(res.map((val) => val.id).toList()));
       return Right(insertRes);
     } on SMSException catch (error) {
       return Left(SMSFailure(message: error.message));

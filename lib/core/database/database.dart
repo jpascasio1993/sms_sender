@@ -8,7 +8,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
-            path: 'sender.db', logStatements: true));
+            path: 'sender.db', logStatements: false));
 
   @override
   int get schemaVersion => 1;
@@ -32,7 +32,7 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
   OutboxMessageDao(this.db) : super(db);
 
   Future<List<OutboxMessage>> getOutboxMessages(
-      {int limit = -1, int offset = 0, int status}) {
+      {int limit = -1, int offset = 0, List<int> status}) {
     final query = (select(outboxMessages)
       ..orderBy([
         (outbox) =>
@@ -40,7 +40,7 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
       ])
       ..limit(limit, offset: offset));
     if (status != null) {
-      query..where((outbox) => outbox.status.equals(status));
+      query..where((outbox) => outbox.status.isIn(status));
     }
     return query.get();
   }
@@ -57,6 +57,8 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
           .watch();
 
   Future<bool> updateOutbox(List<OutboxMessagesCompanion> messages) {
+    if(messages.isEmpty) return Future.value(false);
+
     return transaction(() async {
       await batch((batch) {
         messages.forEach((message) {
@@ -83,14 +85,14 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
   InboxMessageDao(this.db) : super(db);
 
   Future<List<InboxMessage>> getInboxMessages(
-      {int limit = -1, int offset = 0, int status}) {
+      {int limit = -1, int offset = 0, List<int> status}) {
     final query = (select(inboxMessages)
       ..orderBy([
         (inbox) => OrderingTerm(expression: inbox.date, mode: OrderingMode.desc)
       ])
       ..limit(limit, offset: offset));
     if (status != null) {
-      query..where((inbox) => inbox.status.equals(status));
+      query..where((inbox) => inbox.status.isIn(status));
     }
     return query.get();
   }

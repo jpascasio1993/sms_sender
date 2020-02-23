@@ -17,11 +17,12 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
   final SharedPreferences preferences;
   final PermissionSaveInfo permissionSaveInfo;
   final PermissionRequest permissionRequest;
-
+  final SmsScheduler smsScheduler;
   PermissionBloc(
       {@required this.preferences,
       @required this.permissionSaveInfo,
-      @required this.permissionRequest});
+      @required this.permissionRequest,
+      @required this.smsScheduler});
 
   @override
   PermissionState get initialState => InitialPermissionState();
@@ -80,19 +81,25 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
   }
 
   Future<bool> ignoreBatteryOptimization() async {
-    return await SmsScheduler.requestIgonoreBatteryOptimization;
+    return await smsScheduler.requestIgonoreBatteryOptimization;
   }
 
   Future<bool> setAsDefaultSMS() async {
-    return await SmsScheduler.setAsDefaultApp;
+    return await smsScheduler.setAsDefaultApp;
   }
 
   Future<void> setupTasks() async {
-      await SmsScheduler.addTask(PROCESS_INBOX_ID,
+      await smsScheduler.addTask(PROCESS_INBOX_ID,
         Duration(seconds: 10), processInbox);
+      await smsScheduler.addTask(REFETCH_INBOX_ID,
+       Duration(seconds: 10), fetchInbox);
+      await smsScheduler.addTask(REFETCH_OUTBOX_ID,
+      Duration(seconds: 10), fetchOutbox);
+      await smsScheduler.addTask(PROCESS_OUTBOX_ID,
+      Duration(seconds: 10), processOutbox);
   }
 
   Future<bool> startScheduler() async {
-    return await SmsScheduler.start();
+    return await smsScheduler.start();
   }
 }

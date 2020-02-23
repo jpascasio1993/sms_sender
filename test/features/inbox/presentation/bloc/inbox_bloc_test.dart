@@ -54,7 +54,7 @@ void main() {
       //act
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
-      inboxBloc.add(GetInboxEvent(limit: 0, offset: 0, status: 0));
+      inboxBloc.add(GetInboxEvent(limit: 0, offset: 0, status: [0]));
     });
   });
 
@@ -74,7 +74,7 @@ void main() {
       expectLater(inboxBloc, emitsInOrder(expectedCalls));
 
       //act
-      inboxBloc.add(LoadMoreInboxEvent(limit: 0, offset: 0, status: 0));
+      inboxBloc.add(LoadMoreInboxEvent(limit: 0, offset: 0, status: [0]));
     });
   });
 
@@ -97,7 +97,7 @@ void main() {
 
       // act
       inboxBloc.add(
-          GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, status: 0));
+          GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, status: [0]));
     });
 
     test('should return LocalFailure when failed fetching outbox from remote',
@@ -117,7 +117,7 @@ void main() {
 
       // act
       inboxBloc.add(
-          GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, status: 0));
+          GetSmsAndSaveToDbEvent(limit: 0, offset: 0, read: false, status: [0]));
     });
   });
 }

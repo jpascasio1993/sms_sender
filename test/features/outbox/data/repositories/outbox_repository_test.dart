@@ -26,7 +26,7 @@ void main() {
   List sampleData;
   int limit = -1;
   int offset = 0;
-  int status = 0;
+  List<int> status = [0];
   setUp(() {
     sampleData = json.decode(fixture('outbox.json'));
     remoteSource = MockRemoteSource();

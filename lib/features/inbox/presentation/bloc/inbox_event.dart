@@ -6,7 +6,7 @@ import 'package:sms_sender/core/database/database.dart';
 abstract class InboxEvent extends Equatable {
   final int limit;
   final int offset;
-  final int status;
+  final List<int> status;
 
   InboxEvent({@required this.limit, @required this.offset, this.status});
 
@@ -15,7 +15,7 @@ abstract class InboxEvent extends Equatable {
 }
 
 class GetInboxEvent extends InboxEvent {
-  GetInboxEvent({@required int limit, @required int offset, int status})
+  GetInboxEvent({@required int limit, @required int offset, List<int> status})
       : super(limit: limit, offset: offset, status: status);
 
   @override
@@ -25,7 +25,7 @@ class GetInboxEvent extends InboxEvent {
 }
 
 class LoadMoreInboxEvent extends InboxEvent {
-  LoadMoreInboxEvent({@required int limit, @required int offset, int status})
+  LoadMoreInboxEvent({@required int limit, @required int offset, List<int> status})
       : super(limit: limit, offset: offset, status: status);
 
   @override
@@ -37,7 +37,7 @@ class LoadMoreInboxEvent extends InboxEvent {
 class GetSmsAndSaveToDbEvent extends InboxEvent {
   final bool read;
   GetSmsAndSaveToDbEvent(
-      {@required int limit, @required int offset, int status, this.read})
+      {@required int limit, @required int offset, List<int> status, this.read = false})
       : super(limit: limit, offset: offset, status: status);
 
   @override
@@ -50,7 +50,7 @@ class GetSmsAndSaveToDbEvent extends InboxEvent {
 }
 
 class GetMoreInboxEvent extends InboxEvent {
-  GetMoreInboxEvent({@required int limit, @required int offset, int status})
+  GetMoreInboxEvent({@required int limit, @required int offset, List<int> status})
       : super(limit: limit, offset: offset, status: status);
 
   @override

@@ -14,6 +14,7 @@ import 'features/permission/presentation/bloc/bloc.dart';
 // void main() => runApp(MyApp());
 
 void main() async {
+  debugPrint = (String message, {int wrapWidth}) {};
   WidgetsFlutterBinding.ensureInitialized();
   // final imei = await ImeiPlugin.getId();
   // final version = await GetVersion.appID;
