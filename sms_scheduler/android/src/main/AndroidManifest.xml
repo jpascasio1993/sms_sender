@@ -18,9 +18,14 @@
     <!-- BroadcastReceiver that listens for incoming SMS messages -->
    <application>
        <receiver android:name=".SmsReceiver"
+           android:exported="true"
+           android:enabled="true"
            android:permission="android.permission.BROADCAST_SMS">
-           <intent-filter>
+           <intent-filter android:priority="999" >
+               <action android:name="android.provider.Telephony.SMS_RECEIVED" />
                <action android:name="android.provider.Telephony.SMS_DELIVER" />
+               <action android:name="android.provider.Telephony.SMS_DELIVER_ACTION" />
+               <action android:name="android.intent.action.BOOT_COMPLETED"/>
            </intent-filter>
        </receiver>
 
