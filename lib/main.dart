@@ -9,7 +9,6 @@ import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
 import './injectors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'features/permission/presentation/bloc/bloc.dart';
 // void main() => runApp(MyApp());
 
@@ -53,6 +52,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    
   }
 
   @override

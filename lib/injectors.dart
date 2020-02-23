@@ -55,7 +55,7 @@ class Injector {
   GetIt get serviceLocator => _serviceLocator;
 
   Future<bool> init() async {
-    debugPrint = (String message, {int wrapWidth}) {};
+    // debugPrint = (String message, {int wrapWidth}) {};
     debugPrint('Injector Initialized $initialized');
     if(initialized) {
       return false;

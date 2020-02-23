@@ -62,6 +62,9 @@ android {
             // Signing with the debug keys for now, so `flutter run --release` works.
             applicationIdSuffix ".release"
             signingConfig signingConfigs.release
+            // minifyEnabled false
+            // shrinkResources false
+            // zipAlignEnabled false
         }
 
         debug {

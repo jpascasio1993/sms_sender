@@ -21,6 +21,7 @@ class PermissionLocalSourceImpl extends PermissionLocalSource {
   Future<bool> saveInfo() async {
     try {
       await setUpAppInfo();
+      await setUpImei();
       return true;
     }catch(error) {
       throw PermissionException(message: permissionFailedToSaveInfo);

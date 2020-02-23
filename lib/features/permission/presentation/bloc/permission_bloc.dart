@@ -29,31 +29,55 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
 
   @override
   Stream<PermissionState> mapEventToState(PermissionEvent event) async* {
+    // if (event is RequestPermissionEvent) {
+    //   final res = await permissionSaveInfo(PermissionNoParams());
+    //   yield* res.fold((failure) async* {
+    //     yield PermissionErrorState(message: failure.message);
+    //   }, (success) async* {
+    //     final res2 = await permissionRequest(
+    //         PermissionParams(permissionGroups: event.permissions));
+    //     yield* res2.fold((failure) async* {
+    //       yield PermissionErrorState(message: failure.message);
+    //     }, (success) async* {
+    //       // await setUpAppInfo();
+    //       // await setUpImei();
+    //       final ignoreBattOptimization = await ignoreBatteryOptimization();
+    //       final defaultSms = await setAsDefaultSMS();
+    //       debugPrint('ignoreBattOptimization $ignoreBattOptimization');
+    //       debugPrint('defaultSms $defaultSms');
+    //       if(!ignoreBattOptimization || !defaultSms) {
+    //         yield PermissionDeniedState();
+    //       }else {
+    //         await setupTasks();
+    //         await startScheduler();
+    //         yield PermissionGrantedState();
+    //       }
+    //     });
+    //   });
+    // }
+
     if (event is RequestPermissionEvent) {
-      final res = await permissionSaveInfo(PermissionNoParams());
-      yield* res.fold((failure) async* {
-        yield PermissionErrorState(message: failure.message);
-      }, (success) async* {
-        final res2 = await permissionRequest(
+        final res = await permissionRequest(
             PermissionParams(permissionGroups: event.permissions));
-        yield* res2.fold((failure) async* {
-          yield PermissionErrorState(message: failure.message);
-        }, (success) async* {
-          await setUpAppInfo();
-          await setUpImei();
-          final ignoreBattOptimization = await ignoreBatteryOptimization();
-          final defaultSms = await setAsDefaultSMS();
-          debugPrint('ignoreBattOptimization $ignoreBattOptimization');
-          debugPrint('defaultSms $defaultSms');
-          if(!ignoreBattOptimization || !defaultSms) {
+        yield* res.fold((failure) async* {
             yield PermissionDeniedState();
-          }else {
-            await setupTasks();
-            await startScheduler();
-            yield PermissionGrantedState();
-          }
+        },(success)async *{
+            final res2 = await permissionSaveInfo(PermissionNoParams());
+            yield* res2.fold(
+              (failure) async* { yield PermissionErrorState(message: failure.message); }, 
+              (success) async* {
+                final ignoreBattOptimization = await ignoreBatteryOptimization();
+                final defaultSms = await setAsDefaultSMS();
+                if(!ignoreBattOptimization || !defaultSms) {
+                    yield PermissionDeniedState();
+                }else {
+                    await setupTasks();
+                    await startScheduler();
+                    yield  PermissionGrantedState();
+                }
+               
+              });
         });
-      });
     }
   }
 
@@ -63,22 +87,22 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
     return prefs.clear();
   }
 
-  Future<void> setUpAppInfo() async {
-    SharedPreferences prefs = preferences;
-    String projectAppID = await GetVersion.appID;
-    await prefs.setString('appId', projectAppID);
-  }
+  // Future<void> setUpAppInfo() async {
+  //   SharedPreferences prefs = preferences;
+  //   String projectAppID = await GetVersion.appID;
+  //   await prefs.setString('appId', projectAppID);
+  // }
 
-  Future<void> setUpImei() async {
-    SharedPreferences prefs = preferences;
-    // prefs.refreshCache();
-    String imei =
-        await ImeiPlugin.getImei(shouldShowRequestPermissionRationale: true);
-    debugPrint('imei $imei');
-    if (imei != null || imei != '') {
-      await prefs.setString('imei', imei);
-    }
-  }
+  // Future<void> setUpImei() async {
+  //   SharedPreferences prefs = preferences;
+  //   // prefs.refreshCache();
+  //   String imei =
+  //       await ImeiPlugin.getImei(shouldShowRequestPermissionRationale: true);
+  //   debugPrint('imei $imei');
+  //   if (imei != null || imei != '') {
+  //     await prefs.setString('imei', imei);
+  //   }
+  // }
 
   Future<bool> ignoreBatteryOptimization() async {
     return await smsScheduler.requestIgonoreBatteryOptimization;
@@ -100,6 +124,6 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
   }
 
   Future<bool> startScheduler() async {
-    return await smsScheduler.start();
+    return await smsScheduler.initialize();
   }
 }

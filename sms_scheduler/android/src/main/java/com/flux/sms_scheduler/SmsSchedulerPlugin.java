@@ -53,6 +53,12 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
     final MethodChannel smsMutationChannel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "plugins.flutter.io/sms_mutation", JSONMethodCodec.INSTANCE);
     channel.setMethodCallHandler(new SmsSchedulerPlugin(flutterPluginBinding.getApplicationContext()));
     smsMutationChannel.setMethodCallHandler(new SmsMutationHandler(flutterPluginBinding.getApplicationContext()));
+
+//    final MethodChannel backgroundChannel = new MethodChannel(flutterPluginBinding.getFlutterEngine().getDartExecutor(), "plugins.flutter.io/sms_scheduler_background",
+//            JSONMethodCodec.INSTANCE);
+//    backgroundChannel.setMethodCallHandler(new SmsSchedulerBackgroundHandler());
+//    SmsService.setBackgroundChannel(backgroundChannel);
+
     Log.i(getClass().getSimpleName(), "onAttachedToEngine: SMSSCHEDULERPLUGIN");
   }
 

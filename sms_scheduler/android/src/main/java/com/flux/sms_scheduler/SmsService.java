@@ -6,6 +6,7 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -52,7 +53,7 @@ public class SmsService extends Service {
     private static final String SHARED_PREFERENCES_KEY = "io.flutter.android_alarm_manager_plugin";
     // static Intent intent;
     private static MethodChannel sBackgroundChannel;
-
+    private final IBinder mBinder = new LocalBinder();
     private static FlutterNativeView sBackgroundFlutterView;
     private static AtomicBoolean sIsIsolateRunning = new AtomicBoolean(false);
     private static PluginRegistrantCallback sPluginRegistrantCallback;
@@ -64,14 +65,21 @@ public class SmsService extends Service {
     private static Set<Integer> alreadyRunningTasks = new HashSet<>();
     private static final String TASKID = "id";
 
-    // TODO: add wakelock
+
     public SmsService() {
     }
 
 
+    public class LocalBinder extends Binder {
+        public SmsService getInstance()
+        {
+            return SmsService.this;
+        }
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
 
 
@@ -80,9 +88,9 @@ public class SmsService extends Service {
         super.onCreate();
         System.out.println("Service => OnCreate");
         System.out.println("Service => OnCreate => sBackgroundChannel started? " + sIsIsolateRunning.get());
-        Settings.System.putInt(getContentResolver(),
-                Settings.System.WIFI_SLEEP_POLICY,
-                Settings.System.WIFI_SLEEP_POLICY_NEVER);
+//        Settings.System.putInt(getContentResolver(),
+//                Settings.System.WIFI_SLEEP_POLICY,
+//                Settings.System.WIFI_SLEEP_POLICY_NEVER);
         acquireWakeLock();
 
     }
@@ -98,7 +106,7 @@ public class SmsService extends Service {
         invokeCallbackDispatcher(this);
         long callbackHandle = p.getLong(CALLBACK_HANDLE_KEY, 0);
         startBackgroundIsolate(this,callbackHandle);
-        startForeground(SERVICE_ID, CustomNotification.createNotification(this));
+
         try {
             runQueuedTasks(this);
         } catch (JSONException e) {
@@ -107,6 +115,7 @@ public class SmsService extends Service {
 //        startForeground(SERVICE_ID, CustomNotification.createNotification(context));
 //        return super.onStartCommand(intent, flags, startId);
         isServiceRunning = true;
+        startForeground(SERVICE_ID, CustomNotification.createNotification(this));
         return START_STICKY;
     }
 
@@ -116,6 +125,7 @@ public class SmsService extends Service {
     @Override
     public void onDestroy() {
         Log.d("Service", "OnDestroy");
+        super.onDestroy();
         if (disposableTask != null && !disposableTask.isDisposed())
             disposableTask.dispose();
         stopForeground(true);
@@ -123,7 +133,6 @@ public class SmsService extends Service {
         destroy();
         releaseWakeLock();
         isServiceRunning = false;
-        super.onDestroy();
         startSmsService(getApplicationContext());
     }
 
@@ -132,11 +141,12 @@ public class SmsService extends Service {
 //        if (disposableTask != null && !disposableTask.isDisposed())
 //            disposableTask.dispose();
         //stopForeground(true);
+        super.onTaskRemoved(rootIntent);
         sIsIsolateRunning.set(false);
         destroy();
         releaseWakeLock();
-        super.onTaskRemoved(rootIntent);
         isServiceRunning = false;
+        stopForeground(true);
         startSmsService(getApplicationContext());
 
 
@@ -148,7 +158,7 @@ public class SmsService extends Service {
         //Acquire new wake lock
         PowerManager.WakeLock mWakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK_TAG);
         mWakeLock.setReferenceCounted(false);
-        mWakeLock.acquire(5000);
+        mWakeLock.acquire(10);
     }
     public void releaseWakeLock() {
         final PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);

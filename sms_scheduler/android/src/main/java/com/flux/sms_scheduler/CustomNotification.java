@@ -47,11 +47,11 @@ public class CustomNotification {
 //            {
 //                notificationManager.createNotificationChannel(serviceChannel);
 //            }
-//        }
-        int iconResourceId = context.getResources().getIdentifier("ic_launcher","mipmap",context.getPackageName());
+//        }q
+        // int iconResourceId = context.getResources().getIdentifier("ic_launcher","mipmap",context.getPackageName());
         Notification mNotification =
                 new NotificationCompat.Builder(context, channelID)
-                        .setSmallIcon(iconResourceId)
+                        .setSmallIcon(R.mipmap.ic_launcher)
                         .setContentTitle("SMS Scheduler")
                         .setContentText("SMS Scheduler has started")
                         .setOngoing(true)
@@ -65,7 +65,7 @@ public class CustomNotification {
     @RequiresApi(Build.VERSION_CODES.O)
     private static String createNotificationChannel(Context context, String channelID, String channelName){
         NotificationChannel chan = new NotificationChannel(channelID,
-                channelName, NotificationManager.IMPORTANCE_NONE);
+                channelName, NotificationManager.IMPORTANCE_HIGH);
         chan.setLightColor(Color.BLUE);
         chan.setLockscreenVisibility( Notification.VISIBILITY_PRIVATE);
         NotificationManager service = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);

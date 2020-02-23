@@ -10,6 +10,9 @@ public class SmsSchedulerBackgroundHandler implements MethodChannel.MethodCallHa
 
     private PluginRegistry.Registrar registrar;
 
+    public SmsSchedulerBackgroundHandler() {
+    }
+
     public SmsSchedulerBackgroundHandler(PluginRegistry.Registrar registrar) {
         this.registrar = registrar;
     }
