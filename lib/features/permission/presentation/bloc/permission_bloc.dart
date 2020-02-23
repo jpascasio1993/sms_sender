@@ -1,7 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_version/get_version.dart';
-import 'package:imei_plugin/imei_plugin.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sms_scheduler/sms_scheduler.dart';
@@ -55,7 +55,6 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
     //     });
     //   });
     // }
-
     if (event is RequestPermissionEvent) {
         final res = await permissionRequest(
             PermissionParams(permissionGroups: event.permissions));
@@ -68,6 +67,7 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
               (success) async* {
                 final ignoreBattOptimization = await ignoreBatteryOptimization();
                 final defaultSms = await setAsDefaultSMS();
+                print('RequestPermissionEventz $ignoreBattOptimization || $defaultSms');
                 if(!ignoreBattOptimization || !defaultSms) {
                     yield PermissionDeniedState();
                 }else {

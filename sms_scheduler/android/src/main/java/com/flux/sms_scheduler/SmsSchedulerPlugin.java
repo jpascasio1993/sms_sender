@@ -115,7 +115,7 @@ public class SmsSchedulerPlugin implements FlutterPlugin, MethodCallHandler, Plu
 //        SmsService.onInitialized();
 //        result.success(true);
 //      }
-      else if (method.equals("sms_scheduler.start") && !SmsService.isServiceRunning()) {
+      else if (method.equals("sms_scheduler.start")) {
         delegate.schedulerStart(context, result, arguments);
       } else if (method.equals("sms_scheduler.stop")) {
         delegate.schedulerStop(context, result, arguments);

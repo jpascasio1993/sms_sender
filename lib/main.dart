@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:sms_sender/core/bloc/bloc_delegate.dart';
 import 'package:sms_sender/core/widget/inherited_dependency.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/inbox/presentation/pages/inbox_page.dart';
@@ -33,7 +32,7 @@ class Routes {
   };
   final Injector injector;
   Routes({@required this.injector}) {
-    BlocSupervisor.delegate = SimpleBlocDelegate();
+    // BlocSupervisor.delegate = SimpleBlocDelegate();
     runApp(MyApp(routes: routes, injector: injector));
   }
 }

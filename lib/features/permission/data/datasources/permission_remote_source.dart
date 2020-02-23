@@ -11,7 +11,10 @@ class PermissionRemoteSourceImpl implements PermissionRemoteSource {
   final FirebaseURLS firebaseURLS;
 
   PermissionRemoteSourceImpl(
-      {@required this.firebaseDatabase, @required this.firebaseURLS});
+      {@required this.firebaseDatabase, @required this.firebaseURLS}) {
+         firebaseDatabase.setPersistenceEnabled(true);
+      }
+     
 
   @override
   Future<bool> setUpFirebase() async {

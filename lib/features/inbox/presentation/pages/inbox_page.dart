@@ -37,6 +37,7 @@ class _InboxPageState extends State<InboxPage>
   @override
   void initState() {
     super.initState();
+    print('inbox initState');
     initPlatformState();
     inboxBloc = BlocProvider.of<InboxBloc>(context);
     permissionBloc = BlocProvider.of<PermissionBloc>(context);
@@ -94,7 +95,7 @@ class _InboxPageState extends State<InboxPage>
   }
 
   void _refetchInbox() {
-    final currentLimit = inboxBloc.state.inboxList.length > 0 ? inboxBloc.state.inboxList.length : limit;
+    final currentLimit = inboxBloc.state.inboxList.length > 25 ? inboxBloc.state.inboxList.length : limit;
      inboxBloc.add(GetInboxEvent(limit: currentLimit, offset: offset));
   }
 
@@ -115,7 +116,8 @@ class _InboxPageState extends State<InboxPage>
     _scrollController.addListener(() {
       final maxScroll = _scrollController.position.maxScrollExtent;
       final currentScroll = _scrollController.position.pixels;
-      if (maxScroll - currentScroll <= _scrollThreshold) {
+      if(currentScroll == maxScroll) {
+      // if (maxScroll - currentScroll <= _scrollThreshold) {
         inboxBloc.add(GetMoreInboxEvent(
             limit: limit, offset: inboxBloc.state.inboxList.length));
       }
@@ -163,6 +165,7 @@ class _InboxPageState extends State<InboxPage>
           BlocListener<InboxBloc, InboxState>(
               listener: (BuildContext context, InboxState state) {
             if (state is RetrievedInboxState) {
+              print('permission ${permissionBloc.state}');
               debugPrint('inboxList size ${state.inboxList.length}');
             } else if (state is InboxErrorUpdateState) {
               EdgeAlert.show(context,

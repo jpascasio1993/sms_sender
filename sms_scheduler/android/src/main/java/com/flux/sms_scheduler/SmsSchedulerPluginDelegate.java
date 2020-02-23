@@ -26,6 +26,10 @@ public class SmsSchedulerPluginDelegate implements PluginRegistry.ActivityResult
 
 
     void schedulerStart(final Context context,  final MethodChannel.Result result, Object args) throws JSONException {
+        if(SmsService.isServiceRunning()) {
+            result.success(true);
+            return;
+        }
         long callbackHandle = ((JSONArray) args).getLong(0);
         SmsService.destroy();
 
@@ -62,7 +66,7 @@ public class SmsSchedulerPluginDelegate implements PluginRegistry.ActivityResult
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     void setAsDefaultSms(final Activity activity, final MethodChannel.Result result) {
-        this.mResult = result;
+        mResult = result;
 //        Log.i(getClass().getSimpleName(), "setAsDefaultSms: "+Thread.currentThread());
         if(!Telephony.Sms.getDefaultSmsPackage(activity).equals(activity.getPackageName())) {
             Intent intent = new Intent(Telephony.Sms.Intents.ACTION_CHANGE_DEFAULT);
@@ -70,13 +74,13 @@ public class SmsSchedulerPluginDelegate implements PluginRegistry.ActivityResult
             activity.startActivityForResult(intent, CODE_SMS_DEFAULT_APP);
         }else {
             result.success(true);
-            this.mResult = null;
+            mResult = null;
         }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     void requestIgnoreBatteryOptimization(final Activity activity, final MethodChannel.Result result) {
-        this.mResult = result;
+        mResult = result;
         PowerManager pm = (PowerManager) activity.getSystemService(Context.POWER_SERVICE);
 
         if(!pm.isIgnoringBatteryOptimizations(activity.getPackageName())){
@@ -86,30 +90,30 @@ public class SmsSchedulerPluginDelegate implements PluginRegistry.ActivityResult
             activity.startActivityForResult(intent, CODE_REQUEST_CHECK_BATTERY);
         }
         else {
-            this.mResult = null;
+            mResult = null;
             result.success(true);
         }
     }
 
     void cleanUp() {
-        this.mResult = null;
+        mResult = null;
     }
 
     @Override
     public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
 //        Log.i(getClass().getSimpleName(), "setAsDefaultSms: "+Thread.currentThread());
         Log.i(getClass().getSimpleName(), "onActivityResult: resultCode:: requestCode "+ resultCode+":: "+requestCode);
-//        Log.i(getClass().getSimpleName(), "onActivityResult: mResult:: "+(this.mResult != null));
+//        Log.i(getClass().getSimpleName(), "onActivityResult: mResult:: "+(mResult != null));
 //        Log.i(getClass().getSimpleName(), "onActivityResult: "+(resultCode == Activity.RESULT_OK));
         if (requestCode == CODE_REQUEST_CHECK_BATTERY) {
-            if(this.mResult != null) {
-                this.mResult.success((resultCode == Activity.RESULT_OK));
+            if(mResult != null) {
+                mResult.success((resultCode == Activity.RESULT_OK));
             }
             return true;
         }
         else if(requestCode == CODE_SMS_DEFAULT_APP) {
-            if (this.mResult != null) {
-                this.mResult.success((resultCode == Activity.RESULT_OK));
+            if (mResult != null) {
+                mResult.success((resultCode == Activity.RESULT_OK));
             }
             return true;
         }

@@ -97,7 +97,7 @@ class _OutboxPageState extends State<OutboxPage>
   }
 
   void _refetchOutbox() {
-     final currentLimit = outboxBloc.state.outboxList.length > 0 ? outboxBloc.state.outboxList.length : limit;
+     final currentLimit = outboxBloc.state.outboxList.length > 25 ? outboxBloc.state.outboxList.length : limit;
      outboxBloc.add(GetOutboxEvent(limit: currentLimit, offset: offset));
   }
 
@@ -129,7 +129,8 @@ class _OutboxPageState extends State<OutboxPage>
     _scrollController.addListener(() {
       final maxScroll = _scrollController.position.maxScrollExtent;
       final currentScroll = _scrollController.position.pixels;
-      if (maxScroll - currentScroll <= _scrollThreshold) {
+      if(currentScroll == maxScroll) {
+      // if (maxScroll - currentScroll <= _scrollThreshold) {
         //appManager.outboxMessagesFromDb();
         outboxBloc.add(GetMoreOutboxEvent(
             limit: limit, offset: outboxBloc.state.outboxList.length));

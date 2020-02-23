@@ -6,6 +6,7 @@ import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/update_inbox.dart';
 import 'package:sms_sender/features/inbox/presentation/bloc/bloc.dart';
 import './bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 class InboxBloc extends Bloc<InboxEvent, InboxState> {
   final GetInbox getInbox;
@@ -18,6 +19,11 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
       @required this.updateInbox})
       : assert(getInbox != null),
         assert(getSmsAndSaveToDb != null);
+
+  @override
+  Stream<InboxState> transformEvents(Stream<InboxEvent> events, Stream<InboxState> Function(InboxEvent) next) {
+    return super.transformEvents(events.debounceTime(Duration(milliseconds: 250)), next);
+  }
 
   @override
   InboxState get initialState => InitialInboxState(inboxList: []);

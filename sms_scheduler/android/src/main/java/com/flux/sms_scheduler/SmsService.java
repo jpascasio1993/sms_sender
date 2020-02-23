@@ -88,9 +88,9 @@ public class SmsService extends Service {
         super.onCreate();
         System.out.println("Service => OnCreate");
         System.out.println("Service => OnCreate => sBackgroundChannel started? " + sIsIsolateRunning.get());
-//        Settings.System.putInt(getContentResolver(),
-//                Settings.System.WIFI_SLEEP_POLICY,
-//                Settings.System.WIFI_SLEEP_POLICY_NEVER);
+        Settings.System.putInt(getContentResolver(),
+                Settings.System.WIFI_SLEEP_POLICY,
+                Settings.System.WIFI_SLEEP_POLICY_NEVER);
         acquireWakeLock();
 
     }
@@ -307,7 +307,7 @@ public class SmsService extends Service {
     }
 
     public static void startSmsService(Context context) {
-//        intent = new Intent(context, SmsService.class);
+//        Intent intent = new Intent(context, SmsService.class);
 //        ContextCompat.startForegroundService(context, intent);
 ////        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 ////            Intent intent = new Intent();

@@ -12,7 +12,6 @@ import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db
 import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/send_sms_to_server.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
-import 'package:sms_sender/features/outbox/domain/usecases/outbox_no_params.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/send_outbox_sms.dart';
 import 'package:synchronized/synchronized.dart';
