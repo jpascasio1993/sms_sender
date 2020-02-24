@@ -7,6 +7,7 @@ import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/update_outbox.dart';
 import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import './bloc.dart';
+import 'package:rxdart/rxdart.dart';
 
 class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
   final GetOutbox getOutbox;
@@ -22,7 +23,7 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
   @override
   Stream<OutboxState> transformEvents(Stream<OutboxEvent> events,
       Stream<OutboxState> Function(OutboxEvent) next) {
-    return super.transformEvents(events, next);
+    return super.transformEvents(events.debounceTime(Duration(milliseconds: 250)), next);
   }
 
   @override
