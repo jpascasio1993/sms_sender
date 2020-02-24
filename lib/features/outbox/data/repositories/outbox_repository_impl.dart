@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:meta/meta.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
@@ -17,9 +18,9 @@ class OutboxRepositoryImpl implements OutboxRepository {
 
   @override
   Future<Either<Failure, List<OutboxModel>>> getOutbox(
-      int limit, int offset, List<int> status) async {
+      int limit, int offset, List<int> status, OrderingMode orderingMode) async {
     try {
-      final res = await localSource.getOutbox(limit, offset, status);
+      final res = await localSource.getOutbox(limit, offset, status, orderingMode);
       return Right(res);
     } on LocalException catch (error) {
       return Left(LocalFailure(message: error.message));

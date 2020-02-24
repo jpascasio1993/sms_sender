@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/features/inbox/data/datasources/inbox_remote_source.dart';
@@ -39,10 +40,10 @@ void main() {
     //arrange
     // when(mockInboxSource.getSms(any, any, any, any)).thenAnswer((_) async => messages);
     // when(mockAppDatabase.inboxMessageDao).thenReturn(mockInboxMessageDao);
-    when(mockInboxSource.getInbox(any, any, any)).thenAnswer((_) async => messages);
+    when(mockInboxSource.getInbox(any, any, any, any)).thenAnswer((_) async => messages);
 
     //act
-      final res = await inboxRepository.getInbox(limit, offset, status);
+      final res = await inboxRepository.getInbox(limit, offset, status, OrderingMode.desc);
     //assert 
       expect(res, Right(messages));
     });

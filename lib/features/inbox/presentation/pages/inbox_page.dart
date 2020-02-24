@@ -165,7 +165,6 @@ class _InboxPageState extends State<InboxPage>
           BlocListener<InboxBloc, InboxState>(
               listener: (BuildContext context, InboxState state) {
             if (state is RetrievedInboxState) {
-              print('permission ${permissionBloc.state}');
               debugPrint('inboxList size ${state.inboxList.length}');
             } else if (state is InboxErrorUpdateState) {
               EdgeAlert.show(context,

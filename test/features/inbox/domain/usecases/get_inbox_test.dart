@@ -2,6 +2,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
@@ -36,28 +37,28 @@ void main() {
     test('should retrieve sms messages', () async { 
   
     // arrange 
-    when(mockInboxRepository.getInbox(limit, offset, status)).thenAnswer((_) async => Right(smsMessages));
+    when(mockInboxRepository.getInbox(limit, offset, status, OrderingMode.desc)).thenAnswer((_) async => Right(smsMessages));
     
     // act 
     final res = await getInbox(params);
     
     // assert 
     expect(res, Right(smsMessages));
-    verify(mockInboxRepository.getInbox(any, any, any));
+    verify(mockInboxRepository.getInbox(any, any, any, OrderingMode.desc));
 
     });
 
     test('should return SMSFailure when retrieving sms messages', () async { 
   
     // arrange 
-    when(mockInboxRepository.getInbox(limit, offset, status)).thenAnswer((_) async => Left(SMSFailure(message: inboxSmsRetrieveErrorMessage)));
+    when(mockInboxRepository.getInbox(any, any, any, any)).thenAnswer((_) async => Left(SMSFailure(message: inboxSmsRetrieveErrorMessage)));
     
     // act 
     final res = await getInbox(params);
     
     // assert 
     expect(res, Left(SMSFailure(message: inboxSmsRetrieveErrorMessage)));
-    verify(mockInboxRepository.getInbox(any, any, any));
+    verify(mockInboxRepository.getInbox(any, any, any, any));
 
     });
   });

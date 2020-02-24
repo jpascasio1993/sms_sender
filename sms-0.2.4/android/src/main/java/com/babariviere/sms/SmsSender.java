@@ -91,7 +91,8 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
         PendingIntent deliveredPendingIntent = PendingIntent.getBroadcast(registrar.context(),
                 UUID.randomUUID().hashCode(), deliveredIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        SmsManager sms;  
+        SmsManager sms;
+        Log.i(getClass().getSimpleName(), "sendSmsMessage: "+subId);
         if (this.subId == null) {
             sms = SmsManager.getDefault();
         } else {

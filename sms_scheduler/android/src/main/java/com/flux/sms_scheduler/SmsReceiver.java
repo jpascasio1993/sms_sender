@@ -25,17 +25,13 @@ public class SmsReceiver extends BroadcastReceiver{
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // TODO Auto-generated method stub
+
+        if(intent.getAction() != null && !intent.getAction().equals("android.provider.Telephony.SMS_RECEIVED")) {
+            return;
+        }
         try{
-//            if(!MyApplication.getInstance().isMyServiceRunning(SMSDispatcher.class))
-//            {
-//                Intent i= new Intent(context, SMSDispatcher.class);
-//                i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                context.startService(i);
-//            }
+
             SmsMessage[] msgs = readMessages(intent);
-
-
             String phoneNumber = msgs[0].getDisplayOriginatingAddress();
             Long timeDate = (new Date()).getTime();
             // String body = msgs[0].getDisplayMessageBody();
@@ -52,6 +48,7 @@ public class SmsReceiver extends BroadcastReceiver{
             values.put("body", body);
             values.put("type", 1);
             values.put("read", 0);
+
             Uri mUri = context.getContentResolver().insert(Uri.parse("content://sms"), values);
         }catch (Exception e)
         {

@@ -15,7 +15,7 @@ class SendOutboxSms extends UseCase<bool, OutboxParams> {
 
   @override
   Future<Either<Failure, bool>> call(OutboxParams params) async {
-    final resMessages = await repository.getOutbox(params.limit, params.offset, params.status);
+    final resMessages = await repository.getOutbox(params.limit, params.offset, params.status, params.orderingMode);
 
     return resMessages.fold(
       (failure) => Left(failure), 

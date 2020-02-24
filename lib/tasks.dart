@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 import 'package:intl/intl.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_scheduler/sms_scheduler.dart';
 import 'package:sms_sender/core/datasources/constants.dart';
 import 'package:sms_sender/core/global/constants.dart';
@@ -41,14 +42,7 @@ Future<void> processInbox() async {
   
   try {
     DateTime date = DateTime.now();
-    final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
-    final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-    await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
-      'inbox': {
-        'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
-        'server_timestamp': ServerValue.timestamp
-      }
-    });
+    
 
     final SendPort mainSendPort =
         IsolateNameServer.lookupPortByName(PROCESS_INBOX_PORT_NAME);
@@ -62,6 +56,14 @@ Future<void> processInbox() async {
     mainSendPort?.send(
             {'action': SUCCESS_REFETCH_INBOX, 'data': success});
 
+    final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
+    final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
+    await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+      'inbox': {
+        'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
+        'server_timestamp': ServerValue.timestamp
+      }
+    });
     debugPrint('inbox sent to server? $success');
   }catch(error) {
     debugPrint('processInbox error task $error');
@@ -87,18 +89,19 @@ Future<void> fetchInbox() async {
 
         final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
         final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-        await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
-          'inbox_refetch': {
-            'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
-            'server_timestamp': ServerValue.timestamp
-          }
-        });
+       
 
         GetSmsAndSaveToDb getSmsAndSaveToDb = injector.serviceLocator.get<GetSmsAndSaveToDb>();
         final result = await getSmsAndSaveToDb(InboxParams(limit: 30, offset: 0, read: false ));
 
         bool success = await result.fold((failure) => false, (success) => success);
         mainSendPort?.send({'action': SUCCESS_REFETCH_INBOX, 'data': success});
+        await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+          'inbox_refetch': {
+            'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
+            'server_timestamp': ServerValue.timestamp
+          }
+        });
         debugPrint('fetched unread inbox? $success');
     }catch(error) {
         debugPrint('fetchInbox error task $error');
@@ -120,7 +123,11 @@ Future<void> fetchOutbox() async {
         DateTime date = DateTime.now();
         final SendPort mainSendPort =
             IsolateNameServer.lookupPortByName(PROCESS_OUTBOX_PORT_NAME);
-        final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
+       
+        final result = await getOutboxFromRemote(null);
+        bool success = await result.fold((failure) => false, (success) => true);
+        mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
+         final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
         final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
         await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
           'outbox_refetch': {
@@ -128,9 +135,6 @@ Future<void> fetchOutbox() async {
             'server_timestamp': ServerValue.timestamp
           }
         });
-        final result = await getOutboxFromRemote(null);
-        bool success = await result.fold((failure) => false, (success) => true);
-        mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
         debugPrint('fetched outbox? $success');
     }catch(error) {
         debugPrint('fetchOutbox error: $error');
@@ -153,23 +157,24 @@ Future<void> processOutbox() async {
       DateTime date = DateTime.now();
         final SendPort mainSendPort =
             IsolateNameServer.lookupPortByName(PROCESS_OUTBOX_PORT_NAME);
-        final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
-        final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-        await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
-          'outbox': {
-            'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
-            'server_timestamp': ServerValue.timestamp
-          }
-        });
-      final result = await sendOutboxSms(OutboxParams(limit: 3, offset: 0, status: [OutboxStatus.unsent, OutboxStatus.failed, OutboxStatus.resend]));
+       
+      final result = await sendOutboxSms(OutboxParams(limit: 1, offset: 0, status: [OutboxStatus.unsent, OutboxStatus.failed, OutboxStatus.resend], orderingMode: OrderingMode.asc));
       bool success = await result.fold((failure) => false, (success) => success);
       mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
+      final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
+      final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
+      await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+        'outbox': {
+          'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
+          'server_timestamp': ServerValue.timestamp
+        }
+      });
       debugPrint('outbox sent as sms message? $success');
     }catch(error) {
       debugPrint('processOutbox error: $error');
     }finally {
       await scheduler.rescheduleTask(PROCESS_OUTBOX_ID,
-      Duration(seconds: 10), processOutbox);
+      Duration(seconds: 20), processOutbox);
     }
 }
 

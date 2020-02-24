@@ -11,7 +11,7 @@ import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 
 abstract class LocalSource {
   Future<bool> bulkInsertOutbox(List<OutboxModel> remoteSourceOutbox);
-  Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status);
+  Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status, OrderingMode mode);
   Future<bool> bulkUpdateOutbox(List<OutboxMessagesCompanion> messages);
   Future<List<OutboxModel>> sendBulkSms(List<OutboxModel> messages);
 }
@@ -38,9 +38,9 @@ class LocalSourceImpl implements LocalSource {
   }
 
   @override
-  Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status) async {
+  Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status, OrderingMode orderingMode) async {
     final res = await appDatabase.outboxMessageDao
-        .getOutboxMessages(limit: limit, offset: offset, status: status)
+        .getOutboxMessages(limit: limit, offset: offset, status: status, orderingMode: orderingMode)
         .catchError(
             (error) => throw LocalException(message: localErrorMessage));
     return res
@@ -100,7 +100,10 @@ class LocalSourceImpl implements LocalSource {
           completer.complete(resOutbox);
         }
     });
-
+    debugPrint('createSmsFuture: $outbox');
+    // final provider = await SimCardsProvider().getSimCards();
+    // await sender.sendSms(msg, simCard: provider.last);
+    
     await sender.sendSms(msg);
     return completer.future;
   }

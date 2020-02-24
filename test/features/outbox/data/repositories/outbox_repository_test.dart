@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_sender/core/error/exceptions.dart';
 import 'package:sms_sender/core/error/failures.dart';
 import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
@@ -40,10 +41,10 @@ void main() {
   group('[OUTBOX] data/repositories OutboxRepository :: ', () {
     test('should get outbox list from local source', () async {
       // arrange
-      when(localSource.getOutbox(any, any, any)).thenAnswer((_) async => listOutbox);
+      when(localSource.getOutbox(any, any, any, any)).thenAnswer((_) async => listOutbox);
 
       // act
-      final res = await outboxRepositoryImpl.getOutbox(limit, offset, status);
+      final res = await outboxRepositoryImpl.getOutbox(limit, offset, status, OrderingMode.desc);
 
       // assert
       expect(res, Right(listOutbox));

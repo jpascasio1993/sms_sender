@@ -24,9 +24,9 @@ class InboxRepositoryImpl extends InboxRepository {
 
   @override
   Future<Either<Failure, List<InboxMessage>>> getInbox(
-      int limit, int offset, List<int> status) async {
+      int limit, int offset, List<int> status, OrderingMode orderingMode) async {
     try {
-      final res = await inboxSource.getInbox(limit, offset, status);
+      final res = await inboxSource.getInbox(limit, offset, status, orderingMode);
       return Right(res);
     } on SMSException catch (error) {
       return Left(SMSFailure(message: error.message));

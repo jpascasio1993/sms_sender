@@ -88,9 +88,9 @@ public class SmsService extends Service {
         super.onCreate();
         System.out.println("Service => OnCreate");
         System.out.println("Service => OnCreate => sBackgroundChannel started? " + sIsIsolateRunning.get());
-        Settings.System.putInt(getContentResolver(),
-                Settings.System.WIFI_SLEEP_POLICY,
-                Settings.System.WIFI_SLEEP_POLICY_NEVER);
+//        Settings.Global.putInt(getContentResolver(),
+//                Settings.Global.WIFI_SLEEP_POLICY,
+//                Settings.Global.WIFI_SLEEP_POLICY_NEVER);
         acquireWakeLock();
 
     }

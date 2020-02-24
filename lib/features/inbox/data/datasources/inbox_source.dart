@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:meta/meta.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms/sms.dart';
 import 'package:sms_scheduler/sms_scheduler.dart';
 import 'package:sms_sender/core/database/database.dart';
@@ -8,7 +9,7 @@ import 'package:sms_sender/core/error/exceptions.dart';
 abstract class InboxSource {
   Future<List<SmsMessage>> getSms(
       int limit, int offset, List<SmsQueryKind> kinds, bool read);
-  Future<List<InboxMessage>> getInbox(int limit, int offset, List<int> status);
+  Future<List<InboxMessage>> getInbox(int limit, int offset, List<int> status, OrderingMode orderingMode);
   Future<bool> insertInbox(List<InboxMessagesCompanion> messages);
   Future<bool> bulkUpdateInbox(List<InboxMessagesCompanion> messages);
   Future<bool> updateSmsReadStatus(List<int> ids);
@@ -38,9 +39,9 @@ class InboxSourceImpl extends InboxSource {
   }
 
   @override
-  Future<List<InboxMessage>> getInbox(int limit, int offset, List<int> status) async {
+  Future<List<InboxMessage>> getInbox(int limit, int offset, List<int> status, OrderingMode orderingMode) async {
     final res = await appDatabase.inboxMessageDao
-        .getInboxMessages(limit: limit, offset: offset, status: status)
+        .getInboxMessages(limit: limit, offset: offset, status: status, orderingMode: orderingMode)
         .catchError((error) =>
             throw SMSException(message: inboxSmsRetrieveErrorMessage));
     return res;

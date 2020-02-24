@@ -16,7 +16,7 @@ class SendSmsToServer implements UseCase<bool, InboxParams> {
   
   @override
   Future<Either<Failure, bool>> call(InboxParams params) async {
-    final messages = await repository.getInbox(params.limit, params.offset, params.status);
+    final messages = await repository.getInbox(params.limit, params.offset, params.status, params.orderingMode);
     return messages.fold(
       (failure) => Left(failure), 
       (msgs) => repository.sendSmsToServer(msgs).then((res) async {

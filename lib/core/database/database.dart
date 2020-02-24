@@ -32,11 +32,11 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
   OutboxMessageDao(this.db) : super(db);
 
   Future<List<OutboxMessage>> getOutboxMessages(
-      {int limit = -1, int offset = 0, List<int> status}) {
+      {int limit = -1, int offset = 0, List<int> status, OrderingMode orderingMode = OrderingMode.desc}) {
     final query = (select(outboxMessages)
       ..orderBy([
         (outbox) =>
-            OrderingTerm(expression: outbox.date, mode: OrderingMode.desc)
+            OrderingTerm(expression: outbox.id, mode: orderingMode)
       ])
       ..limit(limit, offset: offset));
     if (status != null) {
@@ -46,11 +46,11 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
   }
 
   Stream<List<OutboxMessage>> watchOutboxMessages(
-          {int limit = -1, int offset = 0, int status = 0}) =>
+          {int limit = -1, int offset = 0, int status = 0, OrderingMode orderingMode = OrderingMode.desc}) =>
       (select(outboxMessages)
             ..orderBy([
               (outbox) =>
-                  OrderingTerm(expression: outbox.date, mode: OrderingMode.desc)
+                  OrderingTerm(expression: outbox.id, mode: orderingMode)
             ])
             ..where((outbox) => outbox.status.equals(status))
             ..limit(limit, offset: offset))
@@ -85,10 +85,10 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
   InboxMessageDao(this.db) : super(db);
 
   Future<List<InboxMessage>> getInboxMessages(
-      {int limit = -1, int offset = 0, List<int> status}) {
+      {int limit = -1, int offset = 0, List<int> status, OrderingMode orderingMode = OrderingMode.desc}) {
     final query = (select(inboxMessages)
       ..orderBy([
-        (inbox) => OrderingTerm(expression: inbox.date, mode: OrderingMode.desc)
+        (inbox) => OrderingTerm(expression: inbox.id, mode: orderingMode)
       ])
       ..limit(limit, offset: offset));
     if (status != null) {
@@ -98,11 +98,11 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
   }
 
   Stream<List<InboxMessage>> watchInboxMessages(
-          {int limit = -1, int offset = 0, int status = 0}) =>
+          {int limit = -1, int offset = 0, int status = 0, OrderingMode orderingMode = OrderingMode.desc}) =>
       (select(inboxMessages)
             ..orderBy([
               (inbox) =>
-                  OrderingTerm(expression: inbox.date, mode: OrderingMode.desc)
+                  OrderingTerm(expression: inbox.id, mode: orderingMode)
             ])
             ..where((inbox) => inbox.status.equals(status))
             ..limit(limit, offset: offset))

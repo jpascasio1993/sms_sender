@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
+import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_sender/features/outbox/data/model/outbox_model.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
@@ -38,7 +39,7 @@ void main() {
   group('[OUTBOX] domain/usecases GetOutboxUseCase :: ', (){
     test('Should get outbox list', () async {
         // arrange
-      when(mockOutboxRepository.getOutbox(limit, offset, status))
+      when(mockOutboxRepository.getOutbox(limit, offset, status, OrderingMode.desc))
           .thenAnswer((_) async => Right(outboxRes));
 
       // act
@@ -47,7 +48,7 @@ void main() {
       // assert
       expect(result, Right(outboxRes));
 
-      verify(mockOutboxRepository.getOutbox(limit, offset, status));
+      verify(mockOutboxRepository.getOutbox(limit, offset, status, OrderingMode.desc));
     });
   });
   
