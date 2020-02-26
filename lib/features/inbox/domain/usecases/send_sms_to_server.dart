@@ -22,10 +22,14 @@ class SendSmsToServer implements UseCase<bool, InboxParams> {
       (msgs) => repository.sendSmsToServer(msgs).then((res) async {
         
         final updateSuccess = await repository.bulkUpdateInbox(
-          msgs.map((msg) => InboxMessagesCompanion(
-            id: Value(msg.id),
-            status: Value(res.isRight() ? InboxStatus.processed: InboxStatus.failed)
-          )).toList()
+          msgs.map((msg) {
+            int status = res.isRight() ? InboxStatus.processed: InboxStatus.failed;
+             return InboxMessagesCompanion(
+                id: Value(msg.id),
+                status: Value(status),
+                priority: Value(status != InboxStatus.processed ? msg.priority+1 : msg.priority)
+              );
+          }).toList()
         );
         return await updateSuccess.fold((failure) => Right(false), (success) => Right(success));
       }));

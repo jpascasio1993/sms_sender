@@ -6,6 +6,7 @@ class Outbox extends BaseEntity {
   final String body;
   final String recipient;
   final String date;
+  final int priority;
 
   Outbox(
       {@required int id,
@@ -13,9 +14,10 @@ class Outbox extends BaseEntity {
       @required this.body,
       @required this.recipient,
       @required this.date,
-      @required int status})
+      @required int status,
+      @required this.priority})
       : super(id: id, status: status);
 
   @override
-  List<Object> get props => [id, title, body, recipient, date, status];
+  List<Object> get props => [id, title, body, recipient, date, status, priority];
 }

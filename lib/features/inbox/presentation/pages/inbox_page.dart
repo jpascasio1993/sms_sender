@@ -23,7 +23,7 @@ class InboxPage extends StatefulWidget {
 }
 
 class _InboxPageState extends State<InboxPage>
-    with AutomaticKeepAliveClientMixin<InboxPage> {
+    with AutomaticKeepAliveClientMixin<InboxPage>, WidgetsBindingObserver{
   InboxBloc inboxBloc;
   PermissionBloc permissionBloc;
   final ScrollController _scrollController = ScrollController();
@@ -38,7 +38,8 @@ class _InboxPageState extends State<InboxPage>
   void initState() {
     super.initState();
     print('inbox initState');
-    initPlatformState();
+    WidgetsBinding.instance.addObserver(this);
+    _initPlatformState();
     inboxBloc = BlocProvider.of<InboxBloc>(context);
     permissionBloc = BlocProvider.of<PermissionBloc>(context);
     _initScrolLListener();
@@ -58,13 +59,21 @@ class _InboxPageState extends State<InboxPage>
   @override
   void dispose() {
     _scrollController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
     // Remove the port mapping just in case the UI is shutting down but
     // background isolate is continuing to run.
     IsolateNameServer.removePortNameMapping(PROCESS_INBOX_PORT_NAME);
   }
 
-  void initPlatformState() {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if(state == AppLifecycleState.resumed) {
+      _initPermission();
+    }
+  }
+
+  void _initPlatformState() {
     IsolateNameServer.removePortNameMapping(PROCESS_INBOX_PORT_NAME);
     // The IsolateNameServer allows for us to create a mapping between a String
     // and a SendPort that is managed by the Flutter engine. A SendPort can

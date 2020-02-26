@@ -50,7 +50,8 @@ class LocalSourceImpl implements LocalSource {
             body: outboxMessage.body,
             recipient: outboxMessage.recipient,
             date: outboxMessage.date,
-            status: outboxMessage.status))
+            status: outboxMessage.status,
+            priority: outboxMessage.priority))
         .toList();
   }
 
@@ -79,6 +80,7 @@ class LocalSourceImpl implements LocalSource {
         debugPrint('SmsMessageState $state');
         if(state == SmsMessageState.Sent) {
           final resOutbox = OutboxModel(
+            priority: outbox.priority,
             body: outbox.body,
             date: outbox.date,
             recipient: outbox.recipient,
@@ -90,6 +92,7 @@ class LocalSourceImpl implements LocalSource {
         }
         else if(state == SmsMessageState.Fail) {
           final resOutbox = OutboxModel(
+            priority: outbox.priority,
             body: outbox.body,
             date: outbox.date,
             recipient: outbox.recipient,

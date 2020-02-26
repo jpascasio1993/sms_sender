@@ -11,14 +11,16 @@ class OutboxModel extends Outbox {
       @required String body,
       @required String recipient,
       @required String date,
-      @required int status})
+      @required int status,
+      @required int priority})
       : super(
             id: id,
             title: title,
             body: body,
             recipient: recipient,
             date: date,
-            status: status);
+            status: status,
+            priority: priority);
 
   factory OutboxModel.fromJson(Map<String, dynamic> json) {
     RegExp regex =

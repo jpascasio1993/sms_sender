@@ -22,7 +22,7 @@ class InboxModel extends InboxMessage with EquatableMixin{
     );
 
   @override
-  List<Object> get props => [id, address, body, date, dateSent, status];
+  List<Object> get props => [id, address, body, date, dateSent, status, priority];
   
   @override
   InboxMessage copyWith({int id, String address, String body, String date, String dateSent, int status, int priority}) {

@@ -35,7 +35,7 @@ class _OutboxPageState extends State<OutboxPage>
   @override
   void initState() {
     super.initState();
-    initPlatformState();
+    _initPlatformState();
     outboxBloc = BlocProvider.of<OutboxBloc>(context);
     _initScrolLListener();
     WidgetsBinding.instance.addPostFrameCallback((_) => _onPress());
@@ -60,7 +60,7 @@ class _OutboxPageState extends State<OutboxPage>
     IsolateNameServer.removePortNameMapping(PROCESS_OUTBOX_PORT_NAME);
   }
 
-  void initPlatformState() {
+  void _initPlatformState() {
     IsolateNameServer.removePortNameMapping(PROCESS_OUTBOX_PORT_NAME);
     // The IsolateNameServer allows for us to create a mapping between a String
     // and a SendPort that is managed by the Flutter engine. A SendPort can

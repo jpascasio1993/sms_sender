@@ -4,6 +4,7 @@ import 'package:meta/meta.dart';
 import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_sender/core/database/database.dart';
 import 'package:sms_sender/core/error/failures.dart';
+import 'package:sms_sender/core/global/constants.dart';
 import 'package:sms_sender/core/usecase/outbox/usecase.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
@@ -24,7 +25,8 @@ class SendOutboxSms extends UseCase<bool, OutboxParams> {
         (failure) => Left(failure), 
         (updatedMessages) => repository.bulkUpdateOutbox(updatedMessages.map((val) => OutboxMessagesCompanion(
               id: Value(val.id),
-              status: Value(val.status)
+              status: Value(val.status),
+              priority: Value(val.status != OutboxStatus.sent ? val.priority+1 : val.priority)
             )).toList()
           )
         )

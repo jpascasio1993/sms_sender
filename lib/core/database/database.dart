@@ -8,7 +8,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
-            path: 'sender.db', logStatements: false));
+            path: 'sender.db', logStatements: true));
 
   @override
   int get schemaVersion => 2;
@@ -54,6 +54,7 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
           {int limit = -1, int offset = 0, int status = 0, OrderingMode orderingMode = OrderingMode.desc}) =>
       (select(outboxMessages)
             ..orderBy([
+              (outbox) => OrderingTerm(expression: outbox.priority, mode: OrderingMode.asc),
               (outbox) =>
                   OrderingTerm(expression: outbox.id, mode: orderingMode)
             ])
@@ -107,6 +108,7 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
           {int limit = -1, int offset = 0, int status = 0, OrderingMode orderingMode = OrderingMode.desc}) =>
       (select(inboxMessages)
             ..orderBy([
+              (inbox) => OrderingTerm(expression: inbox.priority, mode: OrderingMode.asc),
               (inbox) =>
                   OrderingTerm(expression: inbox.id, mode: orderingMode)
             ])
