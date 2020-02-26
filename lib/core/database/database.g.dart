@@ -14,13 +14,15 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
   final String recipient;
   final String date;
   final int status;
+  final int priority;
   OutboxMessage(
       {@required this.id,
       this.title,
       this.body,
       this.recipient,
       this.date,
-      @required this.status});
+      @required this.status,
+      @required this.priority});
   factory OutboxMessage.fromData(
       Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
@@ -36,6 +38,8 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
           .mapFromDatabaseResponse(data['${effectivePrefix}recipient']),
       date: stringType.mapFromDatabaseResponse(data['${effectivePrefix}date']),
       status: intType.mapFromDatabaseResponse(data['${effectivePrefix}status']),
+      priority:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}priority']),
     );
   }
   factory OutboxMessage.fromJson(Map<String, dynamic> json,
@@ -48,6 +52,7 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
       recipient: serializer.fromJson<String>(json['recipient']),
       date: serializer.fromJson<String>(json['date']),
       status: serializer.fromJson<int>(json['status']),
+      priority: serializer.fromJson<int>(json['priority']),
     );
   }
   @override
@@ -60,6 +65,7 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
       'recipient': serializer.toJson<String>(recipient),
       'date': serializer.toJson<String>(date),
       'status': serializer.toJson<int>(status),
+      'priority': serializer.toJson<int>(priority),
     };
   }
 
@@ -76,6 +82,9 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
       date: date == null && nullToAbsent ? const Value.absent() : Value(date),
       status:
           status == null && nullToAbsent ? const Value.absent() : Value(status),
+      priority: priority == null && nullToAbsent
+          ? const Value.absent()
+          : Value(priority),
     );
   }
 
@@ -85,7 +94,8 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
           String body,
           String recipient,
           String date,
-          int status}) =>
+          int status,
+          int priority}) =>
       OutboxMessage(
         id: id ?? this.id,
         title: title ?? this.title,
@@ -93,6 +103,7 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
         recipient: recipient ?? this.recipient,
         date: date ?? this.date,
         status: status ?? this.status,
+        priority: priority ?? this.priority,
       );
   @override
   String toString() {
@@ -102,7 +113,8 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
           ..write('body: $body, ')
           ..write('recipient: $recipient, ')
           ..write('date: $date, ')
-          ..write('status: $status')
+          ..write('status: $status, ')
+          ..write('priority: $priority')
           ..write(')'))
         .toString();
   }
@@ -114,8 +126,10 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
           title.hashCode,
           $mrjc(
               body.hashCode,
-              $mrjc(recipient.hashCode,
-                  $mrjc(date.hashCode, status.hashCode))))));
+              $mrjc(
+                  recipient.hashCode,
+                  $mrjc(date.hashCode,
+                      $mrjc(status.hashCode, priority.hashCode)))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -125,7 +139,8 @@ class OutboxMessage extends DataClass implements Insertable<OutboxMessage> {
           other.body == this.body &&
           other.recipient == this.recipient &&
           other.date == this.date &&
-          other.status == this.status);
+          other.status == this.status &&
+          other.priority == this.priority);
 }
 
 class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
@@ -135,6 +150,7 @@ class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
   final Value<String> recipient;
   final Value<String> date;
   final Value<int> status;
+  final Value<int> priority;
   const OutboxMessagesCompanion({
     this.id = const Value.absent(),
     this.title = const Value.absent(),
@@ -142,6 +158,7 @@ class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
     this.recipient = const Value.absent(),
     this.date = const Value.absent(),
     this.status = const Value.absent(),
+    this.priority = const Value.absent(),
   });
   OutboxMessagesCompanion.insert({
     this.id = const Value.absent(),
@@ -150,6 +167,7 @@ class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
     this.recipient = const Value.absent(),
     this.date = const Value.absent(),
     this.status = const Value.absent(),
+    this.priority = const Value.absent(),
   });
   OutboxMessagesCompanion copyWith(
       {Value<int> id,
@@ -157,7 +175,8 @@ class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
       Value<String> body,
       Value<String> recipient,
       Value<String> date,
-      Value<int> status}) {
+      Value<int> status,
+      Value<int> priority}) {
     return OutboxMessagesCompanion(
       id: id ?? this.id,
       title: title ?? this.title,
@@ -165,6 +184,7 @@ class OutboxMessagesCompanion extends UpdateCompanion<OutboxMessage> {
       recipient: recipient ?? this.recipient,
       date: date ?? this.date,
       status: status ?? this.status,
+      priority: priority ?? this.priority,
     );
   }
 }
@@ -240,9 +260,18 @@ class $OutboxMessagesTable extends OutboxMessages
         defaultValue: Constant(0));
   }
 
+  final VerificationMeta _priorityMeta = const VerificationMeta('priority');
+  GeneratedIntColumn _priority;
+  @override
+  GeneratedIntColumn get priority => _priority ??= _constructPriority();
+  GeneratedIntColumn _constructPriority() {
+    return GeneratedIntColumn('priority', $tableName, false,
+        defaultValue: Constant(0));
+  }
+
   @override
   List<GeneratedColumn> get $columns =>
-      [id, title, body, recipient, date, status];
+      [id, title, body, recipient, date, status, priority];
   @override
   $OutboxMessagesTable get asDslTable => this;
   @override
@@ -276,6 +305,10 @@ class $OutboxMessagesTable extends OutboxMessages
       context.handle(
           _statusMeta, status.isAcceptableValue(d.status.value, _statusMeta));
     }
+    if (d.priority.present) {
+      context.handle(_priorityMeta,
+          priority.isAcceptableValue(d.priority.value, _priorityMeta));
+    }
     return context;
   }
 
@@ -308,6 +341,9 @@ class $OutboxMessagesTable extends OutboxMessages
     if (d.status.present) {
       map['status'] = Variable<int, IntType>(d.status.value);
     }
+    if (d.priority.present) {
+      map['priority'] = Variable<int, IntType>(d.priority.value);
+    }
     return map;
   }
 
@@ -324,13 +360,15 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
   final String date;
   final String dateSent;
   final int status;
+  final int priority;
   InboxMessage(
       {@required this.id,
       this.address,
       this.body,
       this.date,
       this.dateSent,
-      @required this.status});
+      @required this.status,
+      @required this.priority});
   factory InboxMessage.fromData(Map<String, dynamic> data, GeneratedDatabase db,
       {String prefix}) {
     final effectivePrefix = prefix ?? '';
@@ -345,6 +383,8 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
       dateSent: stringType
           .mapFromDatabaseResponse(data['${effectivePrefix}date_sent']),
       status: intType.mapFromDatabaseResponse(data['${effectivePrefix}status']),
+      priority:
+          intType.mapFromDatabaseResponse(data['${effectivePrefix}priority']),
     );
   }
   factory InboxMessage.fromJson(Map<String, dynamic> json,
@@ -357,6 +397,7 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
       date: serializer.fromJson<String>(json['date']),
       dateSent: serializer.fromJson<String>(json['dateSent']),
       status: serializer.fromJson<int>(json['status']),
+      priority: serializer.fromJson<int>(json['priority']),
     );
   }
   @override
@@ -369,6 +410,7 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
       'date': serializer.toJson<String>(date),
       'dateSent': serializer.toJson<String>(dateSent),
       'status': serializer.toJson<int>(status),
+      'priority': serializer.toJson<int>(priority),
     };
   }
 
@@ -386,6 +428,9 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
           : Value(dateSent),
       status:
           status == null && nullToAbsent ? const Value.absent() : Value(status),
+      priority: priority == null && nullToAbsent
+          ? const Value.absent()
+          : Value(priority),
     );
   }
 
@@ -395,7 +440,8 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
           String body,
           String date,
           String dateSent,
-          int status}) =>
+          int status,
+          int priority}) =>
       InboxMessage(
         id: id ?? this.id,
         address: address ?? this.address,
@@ -403,6 +449,7 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
         date: date ?? this.date,
         dateSent: dateSent ?? this.dateSent,
         status: status ?? this.status,
+        priority: priority ?? this.priority,
       );
   @override
   String toString() {
@@ -412,7 +459,8 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
           ..write('body: $body, ')
           ..write('date: $date, ')
           ..write('dateSent: $dateSent, ')
-          ..write('status: $status')
+          ..write('status: $status, ')
+          ..write('priority: $priority')
           ..write(')'))
         .toString();
   }
@@ -425,7 +473,9 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
           $mrjc(
               body.hashCode,
               $mrjc(
-                  date.hashCode, $mrjc(dateSent.hashCode, status.hashCode))))));
+                  date.hashCode,
+                  $mrjc(dateSent.hashCode,
+                      $mrjc(status.hashCode, priority.hashCode)))))));
   @override
   bool operator ==(dynamic other) =>
       identical(this, other) ||
@@ -435,7 +485,8 @@ class InboxMessage extends DataClass implements Insertable<InboxMessage> {
           other.body == this.body &&
           other.date == this.date &&
           other.dateSent == this.dateSent &&
-          other.status == this.status);
+          other.status == this.status &&
+          other.priority == this.priority);
 }
 
 class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
@@ -445,6 +496,7 @@ class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
   final Value<String> date;
   final Value<String> dateSent;
   final Value<int> status;
+  final Value<int> priority;
   const InboxMessagesCompanion({
     this.id = const Value.absent(),
     this.address = const Value.absent(),
@@ -452,6 +504,7 @@ class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
     this.date = const Value.absent(),
     this.dateSent = const Value.absent(),
     this.status = const Value.absent(),
+    this.priority = const Value.absent(),
   });
   InboxMessagesCompanion.insert({
     this.id = const Value.absent(),
@@ -460,6 +513,7 @@ class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
     this.date = const Value.absent(),
     this.dateSent = const Value.absent(),
     this.status = const Value.absent(),
+    this.priority = const Value.absent(),
   });
   InboxMessagesCompanion copyWith(
       {Value<int> id,
@@ -467,7 +521,8 @@ class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
       Value<String> body,
       Value<String> date,
       Value<String> dateSent,
-      Value<int> status}) {
+      Value<int> status,
+      Value<int> priority}) {
     return InboxMessagesCompanion(
       id: id ?? this.id,
       address: address ?? this.address,
@@ -475,6 +530,7 @@ class InboxMessagesCompanion extends UpdateCompanion<InboxMessage> {
       date: date ?? this.date,
       dateSent: dateSent ?? this.dateSent,
       status: status ?? this.status,
+      priority: priority ?? this.priority,
     );
   }
 }
@@ -550,9 +606,18 @@ class $InboxMessagesTable extends InboxMessages
         defaultValue: Constant(0));
   }
 
+  final VerificationMeta _priorityMeta = const VerificationMeta('priority');
+  GeneratedIntColumn _priority;
+  @override
+  GeneratedIntColumn get priority => _priority ??= _constructPriority();
+  GeneratedIntColumn _constructPriority() {
+    return GeneratedIntColumn('priority', $tableName, false,
+        defaultValue: Constant(0));
+  }
+
   @override
   List<GeneratedColumn> get $columns =>
-      [id, address, body, date, dateSent, status];
+      [id, address, body, date, dateSent, status, priority];
   @override
   $InboxMessagesTable get asDslTable => this;
   @override
@@ -586,6 +651,10 @@ class $InboxMessagesTable extends InboxMessages
       context.handle(
           _statusMeta, status.isAcceptableValue(d.status.value, _statusMeta));
     }
+    if (d.priority.present) {
+      context.handle(_priorityMeta,
+          priority.isAcceptableValue(d.priority.value, _priorityMeta));
+    }
     return context;
   }
 
@@ -617,6 +686,9 @@ class $InboxMessagesTable extends InboxMessages
     }
     if (d.status.present) {
       map['status'] = Variable<int, IntType>(d.status.value);
+    }
+    if (d.priority.present) {
+      map['priority'] = Variable<int, IntType>(d.priority.value);
     }
     return map;
   }

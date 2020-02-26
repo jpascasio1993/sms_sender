@@ -11,15 +11,20 @@ class AppDatabase extends _$AppDatabase {
             path: 'sender.db', logStatements: false));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration =>
       MigrationStrategy(onUpgrade: (migrator, from, to) async {
         // this is just for test, comment on production
-        if (from == 1) {
-          await migrator.deleteTable(outboxMessages.tableName);
-          await migrator.deleteTable(inboxMessages.tableName);
+        // if (from == 1) {
+        //   await migrator.deleteTable(outboxMessages.tableName);
+        //   await migrator.deleteTable(inboxMessages.tableName);
+        // }
+
+        if(to == 2) {
+          await migrator.addColumn(outboxMessages, outboxMessages.priority);
+          await migrator.addColumn(inboxMessages, inboxMessages.priority);
         }
       });
 }
@@ -35,8 +40,8 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
       {int limit = -1, int offset = 0, List<int> status, OrderingMode orderingMode = OrderingMode.desc}) {
     final query = (select(outboxMessages)
       ..orderBy([
-        (outbox) =>
-            OrderingTerm(expression: outbox.id, mode: orderingMode)
+        (outbox) => OrderingTerm(expression: outbox.priority, mode: OrderingMode.asc),
+        (outbox) => OrderingTerm(expression: outbox.id, mode: orderingMode)
       ])
       ..limit(limit, offset: offset));
     if (status != null) {
@@ -88,6 +93,7 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
       {int limit = -1, int offset = 0, List<int> status, OrderingMode orderingMode = OrderingMode.desc}) {
     final query = (select(inboxMessages)
       ..orderBy([
+        (inbox) => OrderingTerm(expression: inbox.priority, mode: OrderingMode.asc),
         (inbox) => OrderingTerm(expression: inbox.id, mode: orderingMode)
       ])
       ..limit(limit, offset: offset));

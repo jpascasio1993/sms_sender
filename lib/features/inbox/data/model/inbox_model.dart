@@ -10,21 +10,23 @@ class InboxModel extends InboxMessage with EquatableMixin{
     String body, 
     String date, 
     String dateSent, 
-    int status}): super(
+    int status,
+    int priority}): super(
       id: id, 
       address: address, 
       body: body, 
       date: date, 
       dateSent: dateSent, 
-      status: status
+      status: status,
+      priority: priority
     );
 
   @override
   List<Object> get props => [id, address, body, date, dateSent, status];
   
   @override
-  InboxMessage copyWith({int id, String address, String body, String date, String dateSent, int status}) {
-    return InboxModel(id: id, address: address, body: body, date: date, dateSent: dateSent, status: status);
+  InboxMessage copyWith({int id, String address, String body, String date, String dateSent, int status, int priority}) {
+    return InboxModel(id: id, address: address, body: body, date: date, dateSent: dateSent, status: status, priority: priority);
   }
 
   @override

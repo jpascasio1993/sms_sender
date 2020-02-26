@@ -8,6 +8,7 @@ class OutboxMessages extends Table {
   TextColumn get date => text().nullable()();
   // BoolColumn get sent => boolean().withDefault(Constant(false))(); 
   IntColumn get status => integer().withDefault(Constant(0))();
+  IntColumn get priority => integer().withDefault(Constant(0))();
 }
 
 class InboxMessages extends Table {
@@ -18,4 +19,5 @@ class InboxMessages extends Table {
   TextColumn get dateSent => text().nullable()();
   // BoolColumn get sent => boolean().withDefault(Constant(false))();
   IntColumn get status => integer().withDefault(Constant(0))();
+  IntColumn get priority => integer().withDefault(Constant(0))();
 }
