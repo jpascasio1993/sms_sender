@@ -113,6 +113,14 @@ class _OutboxPageState extends State<OutboxPage>
     ], limit: outboxBloc.state.outboxList.length, offset: 0));
   }
 
+  void _onDelete({@required OutboxModel outbox}) {
+    outboxBloc.add(OutboxDeleteEvent(messages: [
+      moordb.OutboxMessagesCompanion.insert(
+        id: moor.Value(outbox.id)
+      )
+    ], limit: outboxBloc.state.outboxList.length, offset: 0));
+  }
+
   Map<String, dynamic> getStatus(int status) {
     if (status == OutboxStatus.sent) {
       return {'color': Colors.greenAccent, 'label': 'SENT'};
@@ -238,19 +246,19 @@ class _OutboxPageState extends State<OutboxPage>
                                                   color: Colors.blueAccent,
                                                 ),
                                                 label: Text(
-                                                  'Re-Send',
+                                                  'Resend',
                                                   style: theme.positiveStyle,
                                                 ),
                                                 onPressed: () => _onUpdate(
                                                     outbox: outbox,
                                                     status: OutboxStatus.resend)),
                                             Visibility(
-                                              visible: false,
+                                              visible: true,
                                               child: FlatButton.icon(
                                                 icon:
                                                     Icon(Icons.delete, color: Colors.redAccent),
                                                 label: Text('Delete', style: theme.textStyle),
-                                                onPressed: () {},
+                                                onPressed: () => _onDelete(outbox: outbox),
                                               ),
                                             ),
                                             // IconButton(

@@ -81,6 +81,23 @@ class OutboxErrorUpdateState extends OutboxState {
   }
 }
 
+class OutboxErrorDeleteState extends OutboxState {
+  final String message;
+  OutboxErrorDeleteState._({@required OutboxState state, this.message}): super.fromState(state: state);
+
+  factory OutboxErrorDeleteState.copyWith({@required OutboxState state, String message}) {
+    return OutboxErrorDeleteState._(state: state, message: message);
+  }
+
+  @override
+  List<Object> get props => [outboxList, message];
+
+  @override
+  String toString() {
+    return 'OutboxErrorDeleteState';
+  }
+}
+
 class OutboxLoadingState extends OutboxState {
   OutboxLoadingState._({@required OutboxState state})
       : super.fromState(state: state);

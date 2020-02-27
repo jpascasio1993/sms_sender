@@ -11,4 +11,5 @@ abstract class InboxRepository {
   Future<Either<Failure, bool>> sendSmsToServer(List<InboxMessage> messages);
   Future<Either<Failure, bool>> bulkUpdateInbox(
       List<InboxMessagesCompanion> messages);
+  Future<Either<Failure, bool>> bulkDeleteInbox(List<InboxMessagesCompanion> messages);
 }

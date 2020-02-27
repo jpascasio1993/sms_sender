@@ -13,6 +13,7 @@ abstract class InboxSource {
   Future<bool> insertInbox(List<InboxMessagesCompanion> messages);
   Future<bool> bulkUpdateInbox(List<InboxMessagesCompanion> messages);
   Future<bool> updateSmsReadStatus(List<int> ids);
+  Future<bool> bulkDeleteInbox(List<InboxMessagesCompanion> messages);
 }
 
 class InboxSourceImpl extends InboxSource {
@@ -71,5 +72,17 @@ class InboxSourceImpl extends InboxSource {
   @override
   Future<bool> updateSmsReadStatus(List<int> ids) async {
     return await smsScheduler.smsRead(ids).catchError((error) => throw SMSException(message: inboxSmsUpdateReadStatus));
+  }
+
+  @override
+  Future<bool> bulkDeleteInbox(List<InboxMessagesCompanion> messages) async {
+    if(messages.isEmpty) {
+      throw SMSException(message: inboxLocalEmptyListDeleteErrorMessage);
+    }
+    final res = await appDatabase.inboxMessageDao
+    .batchDeleteInbox(messages)
+    .catchError((error) => throw SMSException(message: inboxLocalErrorMessageDelete));
+
+    return res;
   }
 }

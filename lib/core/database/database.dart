@@ -8,7 +8,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
-            path: 'sender.db', logStatements: true));
+            path: 'sender.db', logStatements: false));
 
   @override
   int get schemaVersion => 2;
@@ -43,9 +43,11 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
         (outbox) => OrderingTerm(expression: outbox.priority, mode: OrderingMode.asc),
         (outbox) => OrderingTerm(expression: outbox.id, mode: orderingMode)
       ])
+      ..where((outbox) => outbox.recipient.isNotIn(['']))
       ..limit(limit, offset: offset));
     if (status != null) {
-      query..where((outbox) => outbox.status.isIn(status));
+      query
+      ..where((outbox) => outbox.status.isIn(status));
     }
     return query.get();
   }
@@ -59,6 +61,7 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
                   OrderingTerm(expression: outbox.id, mode: orderingMode)
             ])
             ..where((outbox) => outbox.status.equals(status))
+            ..where((outbox) => outbox.recipient.isNotIn(['']))
             ..limit(limit, offset: offset))
           .watch();
 
@@ -82,6 +85,20 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
       });
     }).then((_) => true);
   }
+
+  Future<bool> deleteOutbox(OutboxMessagesCompanion message) {
+    return transaction(() => delete(outboxMessages).delete(message).then((res) => res > 1));
+  }
+
+  Future<bool> batchDeleteOutbox(List<OutboxMessagesCompanion> messages) {
+    return transaction(() async {
+      await batch((batch) {
+        messages.forEach((message) {
+          batch.delete(outboxMessages, message);
+        });
+      });
+    }).then((_) => true);
+  }
 }
 
 @UseDao(tables: [InboxMessages])
@@ -99,7 +116,8 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
       ])
       ..limit(limit, offset: offset));
     if (status != null) {
-      query..where((inbox) => inbox.status.isIn(status));
+      query
+      ..where((inbox) => inbox.status.isIn(status));
     }
     return query.get();
   }
@@ -131,6 +149,20 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
     return transaction(() async {
       await batch((batch) {
         batch.insertAll(inboxMessages, messages);
+      });
+    }).then((_) => true);
+  }
+
+  Future<bool> deleteInbox(InboxMessagesCompanion message) {
+    return transaction(() => delete(inboxMessages).delete(message).then((res) => res > 1));
+  }
+
+  Future<bool> batchDeleteInbox(List<InboxMessagesCompanion> messages) {
+    return transaction(() async {
+      await batch((batch) {
+        messages.forEach((message) {
+          batch.delete(inboxMessages, message);
+        });
       });
     }).then((_) => true);
   }

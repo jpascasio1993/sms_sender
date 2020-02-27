@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/delete_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
@@ -13,11 +14,13 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
   final GetOutbox getOutbox;
   final GetOutboxFromRemote getOutboxFromRemote;
   final UpdateOutbox updateOutbox;
+  final DeleteOutbox deleteOutbox;
 
   OutboxBloc(
       {@required this.getOutbox,
       @required this.getOutboxFromRemote,
-      @required this.updateOutbox})
+      @required this.updateOutbox,
+      @required this.deleteOutbox})
       : assert(getOutbox != null);
 
   @override
@@ -82,6 +85,22 @@ class OutboxBloc extends Bloc<OutboxEvent, OutboxState> {
     } else if (event is OutboxUpdateEvent) {
       yield OutboxLoadingState.copyWith(state: state);
       final res = await updateOutbox(OutboxParams(messages: event.messages));
+      yield* res.fold((failure) async* {
+        yield OutboxErrorUpdateState.copyWith(
+            state: state, message: failure.message);
+      }, (success) async* {
+        final res2 = await getOutbox(
+            OutboxParams(limit: event.limit, offset: event.offset));
+        yield res2.fold(
+            (failure) => OutboxErrorUpdateState.copyWith(
+                state: state, message: failure.message), (outboxList) {
+          return RetrievedOutboxState.copyWith(
+              state: state, outboxList: outboxList);
+        });
+      });
+    } else if (event is OutboxDeleteEvent) {
+      yield OutboxLoadingState.copyWith(state: state);
+      final res = await deleteOutbox(OutboxParams(messages: event.messages));
       yield* res.fold((failure) async* {
         yield OutboxErrorUpdateState.copyWith(
             state: state, message: failure.message);

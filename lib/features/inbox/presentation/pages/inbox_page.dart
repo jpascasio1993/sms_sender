@@ -161,6 +161,14 @@ class _InboxPageState extends State<InboxPage>
     ], limit: inboxBloc.state.inboxList.length, offset: 0));
   }
 
+  void _onDelete({@required InboxMessage inbox}) {
+    inboxBloc.add(InboxDeleteEvent(messages: [
+      moordb.InboxMessagesCompanion.insert(
+        id: moor.Value(inbox.id),
+      )
+    ], limit: inboxBloc.state.inboxList.length, offset: 0));
+  }
+
   @override
   Widget build(BuildContext context) {
     return MultiBlocListener(
@@ -282,7 +290,7 @@ class _InboxPageState extends State<InboxPage>
                                               icon: Icon(Icons.delete,
                                                   color: Colors.redAccent),
                                               label: Text('Delete', style: theme.textStyle),
-                                              onPressed: () {}
+                                              onPressed: () => _onDelete(inbox: inbox)
                                             ),
                                           ),
                                           // IconButton(

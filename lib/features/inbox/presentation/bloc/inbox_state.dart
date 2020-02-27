@@ -96,3 +96,20 @@ class InboxErrorUpdateState extends InboxState {
     return 'InboxErrorUpdateState';
   }
 }
+
+class InboxErrorDeleteState extends InboxState {
+  final String message;
+  InboxErrorDeleteState._({@required InboxState state, this.message}): super.fromState(state: state);
+
+  factory InboxErrorDeleteState.copyWith({@required InboxState state, String message}) {
+    return InboxErrorDeleteState._(state: state, message: message);
+  }
+
+  @override
+  List<Object> get props => [inboxList, message];
+
+  @override
+  String toString() {
+    return 'InboxErrorDeleteState';
+  }
+}

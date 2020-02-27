@@ -13,6 +13,7 @@ abstract class LocalSource {
   Future<bool> bulkInsertOutbox(List<OutboxModel> remoteSourceOutbox);
   Future<List<OutboxModel>> getOutbox(int limit, int offset, List<int> status, OrderingMode mode);
   Future<bool> bulkUpdateOutbox(List<OutboxMessagesCompanion> messages);
+  Future<bool> bulkDeleteOutbox(List<OutboxMessagesCompanion> messages);
   Future<List<OutboxModel>> sendBulkSms(List<OutboxModel> messages);
 }
 
@@ -107,7 +108,32 @@ class LocalSourceImpl implements LocalSource {
     // final provider = await SimCardsProvider().getSimCards();
     // await sender.sendSms(msg, simCard: provider.last);
     
-    await sender.sendSms(msg);
+    await sender.sendSms(msg).catchError((error) {
+            final resOutbox = OutboxModel(
+            priority: outbox.priority,
+            body: outbox.body,
+            date: outbox.date,
+            recipient: outbox.recipient,
+            status: OutboxStatus.failed,
+            title: outbox.title,
+            id: outbox.id
+          );  
+          completer.complete(resOutbox);
+    });
+    
     return completer.future;
+  }
+
+  @override
+  Future<bool> bulkDeleteOutbox(List<OutboxMessagesCompanion> messages) async {
+    if(messages.isEmpty) {
+      throw LocalException(message: outboxLocalEmptyListDeleteErrorMessage);
+    }
+    final res = await appDatabase
+    .outboxMessageDao
+    .batchDeleteOutbox(messages)
+    .catchError((error) => throw LocalException(message: outboxLocalErrorMessageDelete));
+
+    return res;
   }
 }

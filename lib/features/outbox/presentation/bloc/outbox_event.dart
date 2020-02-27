@@ -75,3 +75,14 @@ class OutboxUpdateEvent extends OutboxEvent {
     return 'OutboxUpdateEvent';
   }
 }
+
+class OutboxDeleteEvent extends OutboxEvent {
+  final List<OutboxMessagesCompanion> messages;
+
+  OutboxDeleteEvent({@required this.messages, @required int limit, @required int offset}): super(limit: limit, offset: offset);
+
+  @override
+  String toString() {
+    return 'OutboxDeleteEvent';
+  }
+}

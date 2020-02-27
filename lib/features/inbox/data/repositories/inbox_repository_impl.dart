@@ -79,4 +79,14 @@ class InboxRepositoryImpl extends InboxRepository {
       return Left(SMSFailure(message: error.message));
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> bulkDeleteInbox(List<InboxMessagesCompanion> messages) async {
+    try {
+      final res = await inboxSource.bulkDeleteInbox(messages);
+      return Right(res);
+    } on SMSException catch(error) {
+      return Left(SMSFailure(message: error.message));
+    }
+  }
 }

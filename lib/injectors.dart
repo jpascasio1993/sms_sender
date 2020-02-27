@@ -13,6 +13,7 @@ import 'package:sms_sender/features/inbox/data/datasources/inbox_remote_source.d
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/delete_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/send_sms_to_server.dart';
@@ -22,6 +23,7 @@ import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_impl.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/delete_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/send_outbox_sms.dart';
@@ -85,16 +87,20 @@ class Injector {
         () => UpdateInbox(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<SendSmsToServer>(() => SendSmsToServer(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<SendOutboxSms>(() => SendOutboxSms(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<DeleteInbox>(() => DeleteInbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<DeleteOutbox>(() => DeleteOutbox(repository: _serviceLocator()));
 
     //Bloc
     _serviceLocator.registerFactory(() => InboxBloc(
         getInbox: _serviceLocator(),
         getSmsAndSaveToDb: _serviceLocator(),
-        updateInbox: _serviceLocator()));
+        updateInbox: _serviceLocator(),
+        deleteInbox: _serviceLocator()));
     _serviceLocator.registerFactory(() => OutboxBloc(
         getOutbox: _serviceLocator(),
         getOutboxFromRemote: _serviceLocator(),
-        updateOutbox: _serviceLocator()));
+        updateOutbox: _serviceLocator(),
+        deleteOutbox: _serviceLocator()));
     _serviceLocator.registerFactory(() => PermissionBloc(
         preferences: _serviceLocator(),
         permissionRequest: _serviceLocator(),

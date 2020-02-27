@@ -30,20 +30,23 @@ class OutboxModel extends Outbox {
     // int id = int.tryParse(json['_id']) ?? -1;
     String title = json['title'] ?? '';
     String body = json['message'] ?? '';
-    String sendTo = json['recipient'] ?? '+639162507727';
+    String sendTo = json['recipient'] ?? '09162507727';
+
     if (regex.hasMatch(sendTo)) {
       sendTo = sendTo.replaceRange(0, sendTo.length - 10, "+63");
     } else {
       sendTo = '';
     }
 
-    String date = DateFormat('yyyy-MM-dd hh:mm:ss a').format(
-        json['date_time'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(
-                int.tryParse(json['date_time']) ??
-                    DateTime.now().toLocal().millisecondsSinceEpoch)
-            // .toLocal()
-            : DateTime.now().toLocal());
+    String date = json['date_time'] ?? DateTime.now().toLocal();
+
+    // String date = DateFormat('yyyy-MM-dd hh:mm:ss a').format(
+    //     json['date_time'] != null
+    //         ? DateTime.fromMillisecondsSinceEpoch(
+    //             int.tryParse(json['date_time']) ??
+    //                 DateTime.now().toLocal().millisecondsSinceEpoch)
+    //         // .toLocal()
+    //         : DateTime.now().toLocal());
 
     // int status = json['status'];
 
@@ -58,7 +61,8 @@ class OutboxModel extends Outbox {
         body: body,
         recipient: sendTo,
         date: date,
-        status: status);
+        status: status,
+        priority: 0);
   }
 
   factory OutboxModel.fromJsonWeb(Map<String, dynamic> json) {
@@ -69,20 +73,22 @@ class OutboxModel extends Outbox {
     // int id = int.tryParse(json['_id']) ?? -1;
     String title = json['title'] ?? '';
     String body = json['message'] ?? '';
-    String sendTo = json['recipient'] ?? '+639162507727';
+    String sendTo = json['recipient'] ?? '09162507727';
+   
     if (regex.hasMatch(sendTo)) {
       sendTo = sendTo.replaceRange(0, sendTo.length - 10, "+63");
     } else {
       sendTo = '';
     }
-
-    String date = DateFormat('yyyy-MM-dd hh:mm:ss a').format(
-        json['date_time'] != null
-            ? DateTime.fromMillisecondsSinceEpoch(
-                int.tryParse(json['date_time']) ??
-                    DateTime.now().toLocal().millisecondsSinceEpoch)
-            // .toLocal()
-            : DateTime.now().toLocal());
+    
+    String date = json['date_time'] ?? DateTime.now().toLocal();
+    // String date = DateFormat('yyyy-MM-dd hh:mm:ss a').format(
+    //     json['date_time'] != null
+    //         ? DateTime.fromMillisecondsSinceEpoch(
+    //             int.tryParse(json['date_time']) ??
+    //                 DateTime.now().toLocal().millisecondsSinceEpoch)
+    //         // .toLocal()
+    //         : DateTime.now().toLocal());
 
     // int status = json['status'];
 
@@ -97,7 +103,8 @@ class OutboxModel extends Outbox {
         body: body,
         recipient: sendTo,
         date: date,
-        status: status);
+        status: status,
+        priority: 0);
   }
 
   @override

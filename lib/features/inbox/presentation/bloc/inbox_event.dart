@@ -72,6 +72,17 @@ class InboxUpdateEvent extends InboxEvent {
   }
 }
 
+class InboxDeleteEvent extends InboxEvent {
+  final List<InboxMessagesCompanion> messages;
+
+  InboxDeleteEvent({@required this.messages, @required int limit, @required int offset}): super(limit: limit, offset: offset);
+
+  @override
+  String toString() {
+    return 'InboxDeleteEvent';
+  }
+}
+
 class AddInboxEvent extends InboxEvent {
   final Map<String, dynamic> data;
 

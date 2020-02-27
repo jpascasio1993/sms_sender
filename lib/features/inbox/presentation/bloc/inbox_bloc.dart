@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/delete_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';
@@ -12,11 +13,13 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
   final GetInbox getInbox;
   final GetSmsAndSaveToDb getSmsAndSaveToDb;
   final UpdateInbox updateInbox;
+  final DeleteInbox deleteInbox;
 
   InboxBloc(
       {@required this.getInbox,
       @required this.getSmsAndSaveToDb,
-      @required this.updateInbox})
+      @required this.updateInbox,
+      @required this.deleteInbox})
       : assert(getInbox != null),
         assert(getSmsAndSaveToDb != null);
 
@@ -102,6 +105,17 @@ class InboxBloc extends Bloc<InboxEvent, InboxState> {
           return RetrievedInboxState.copyWith(
               state: state, inboxList: inboxList);
         });
+      });
+    } else if(event is InboxDeleteEvent) {
+      yield InboxLoadingState.copyWith(state: state);
+      final res = await deleteInbox(InboxParams(messages: event.messages));
+      yield* res.fold((failure) async* {
+        yield InboxErrorDeleteState.copyWith(state: state, message: failure.message);
+      },(success) async* {
+          final res2 = await getInbox(InboxParams(limit: event.limit, offset: event.offset));
+          yield res2.fold(
+            (failure) => InboxErrorDeleteState.copyWith(state: state, message: failure.message), 
+            (inboxList) => RetrievedInboxState.copyWith(state: state, inboxList: inboxList));
       });
     }
   }
