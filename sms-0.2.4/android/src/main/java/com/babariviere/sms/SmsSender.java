@@ -3,25 +3,20 @@ package com.babariviere.sms;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.provider.Telephony;
 import android.telephony.SmsManager;
 import android.util.Log;
 
 import com.babariviere.sms.permisions.Permissions;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.UUID;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import java.util.ArrayList;
 
 import static io.flutter.plugin.common.PluginRegistry.Registrar;
 import static io.flutter.plugin.common.PluginRegistry.RequestPermissionsResultListener;
@@ -92,7 +87,15 @@ class SmsSenderMethodHandler implements RequestPermissionsResultListener {
                 UUID.randomUUID().hashCode(), deliveredIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         SmsManager sms;
-        Log.i(getClass().getSimpleName(), "sendSmsMessage: "+subId);
+        Log.i(getClass().getSimpleName(), "sendSmsMessage: subId"+subId);
+//        Log.i(getClass().getSimpleName(), "sendSmsMessage: address"+ address);
+//        try {
+//            Log.i(getClass().getSimpleName(), "sendSmsMessage: SMS_OUTGOING_CHECK_MAX_COUNT "+Settings.Global.getInt(registrar.context().getContentResolver(), "SMS_OUTGOING_CHECK_MAX_COUNT".toLowerCase()));
+//            Log.i(getClass().getSimpleName(), "sendSmsMessage: SMS_OUTGOING_CHECK_INTERVAL_MS "+Settings.Global.getInt(registrar.context().getContentResolver(), "SMS_OUTGOING_CHECK_INTERVAL_MS".toLowerCase()));
+//        }catch(Exception exp) {
+//            Log.i(getClass().getSimpleName(), "sendSmsMessage: exp "+exp.getMessage());
+//        }
+//        Log.i(getClass().getSimpleName(), "sendSmsMessage: body: "+body);
         if (this.subId == null) {
             sms = SmsManager.getDefault();
         } else {

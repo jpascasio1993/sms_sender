@@ -18,6 +18,7 @@
 
 
     <application
+        android:allowBackup="false"
         android:name=".MyApplication"
         android:label="SMS Sender 2.0"
         android:icon="@mipmap/ic_launcher">
