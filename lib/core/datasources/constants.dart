@@ -10,6 +10,7 @@ abstract class FirebaseURLS {
   String inboxUrl();
   String inboxPostDelay();
   String deviceStatus();
+  String outboxProcessDelay();
 }
 
 class FirebaseURLSImpl extends FirebaseURLS {
@@ -64,6 +65,16 @@ class FirebaseURLSImpl extends FirebaseURLS {
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/url';
+  }
+
+  @override
+  String outboxProcessDelay() {
+    SharedPreferences prefs = preferences;
+    prefs.reload();
+    String imei = prefs.getString('imei');
+    String projectAppID = prefs.getString('appId');
+    bool debug = projectAppID.contains('debug');
+    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/outbox_process_delay';
   }
 
   // static String outboxUrl(SharedPreferences preferences) {
@@ -123,6 +134,7 @@ abstract class FirebaseReference {
   Future<String> inboxUrl();
   Future<int> inboxPostDelay();
   Future<String> deviceStatus();
+  Future<int> outboxProcessDelay();
 }
 
 class FirebaseReferenceImpl extends FirebaseReference {
@@ -172,6 +184,15 @@ class FirebaseReferenceImpl extends FirebaseReference {
     return firebaseDatabase
         .reference()
         .child(firebaseURLS.outboxUrl())
+        .once()
+        .then((DataSnapshot snapshot) => snapshot.value);
+  }
+
+  @override
+  Future<int> outboxProcessDelay() {
+    return firebaseDatabase
+        .reference()
+        .child(firebaseURLS.outboxProcessUrl())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
