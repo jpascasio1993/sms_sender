@@ -174,7 +174,7 @@ Future<void> processOutbox() async {
     }catch(error) {
       debugPrint('processOutbox error: $error');
     }finally {
-      int delay = await firebaseReference.inboxPostDelay().catchError((error) => 20);
+      int delay = await firebaseReference.outboxProcessDelay().catchError((error) => 20);
       await scheduler.rescheduleTask(PROCESS_OUTBOX_ID,
       Duration(seconds: delay), processOutbox);
     }

@@ -74,7 +74,7 @@ class FirebaseURLSImpl extends FirebaseURLS {
     String imei = prefs.getString('imei');
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
-    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/outbox_process_delay';
+    return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/process_delay';
   }
 
   // static String outboxUrl(SharedPreferences preferences) {
@@ -192,7 +192,7 @@ class FirebaseReferenceImpl extends FirebaseReference {
   Future<int> outboxProcessDelay() {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.outboxProcessUrl())
+        .child(firebaseURLS.outboxProcessDelay())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
