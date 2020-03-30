@@ -15,6 +15,7 @@ abstract class LocalSource {
   Future<bool> bulkUpdateOutbox(List<OutboxMessagesCompanion> messages);
   Future<bool> bulkDeleteOutbox(List<OutboxMessagesCompanion> messages);
   Future<List<OutboxModel>> sendBulkSms(List<OutboxModel> messages);
+  Future<int> bulkDeleteOldOutbox(String date);
 }
 
 class LocalSourceImpl implements LocalSource {
@@ -134,6 +135,18 @@ class LocalSourceImpl implements LocalSource {
     .batchDeleteOutbox(messages)
     .catchError((error) => throw LocalException(message: outboxLocalErrorMessageDelete));
 
+    return res;
+  }
+
+  @override
+  Future<int> bulkDeleteOldOutbox(String date) async {
+    if(date == null || date.isEmpty) {
+      throw LocalException(message: outboxLocalDeleteOldOutboxNoDateMessage);
+    }
+    final res = await appDatabase
+    .outboxMessageDao
+    .batchDeleteOldOutbox(date)
+    .catchError((error) => throw LocalException(message: outboxLocalDeleteOldOutboxMessage));
     return res;
   }
 }

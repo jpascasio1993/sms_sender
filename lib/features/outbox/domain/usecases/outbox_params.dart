@@ -8,9 +8,10 @@ class OutboxParams extends Equatable {
   final OrderingMode orderingMode;
   final List<int> status;
   final List<OutboxMessagesCompanion> messages;
+  final String date;
 
-  OutboxParams({this.limit = -1, this.offset = 0, this.orderingMode = OrderingMode.desc, this.status, this.messages});
+  OutboxParams({this.limit = -1, this.offset = 0, this.orderingMode = OrderingMode.desc, this.status, this.messages, this.date});
 
   @override
-  List<Object> get props => [limit, offset, orderingMode, status, messages];
+  List<Object> get props => [limit, offset, orderingMode, status, messages, date];
 }

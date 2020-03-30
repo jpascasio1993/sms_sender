@@ -1,4 +1,5 @@
 import 'package:moor_flutter/moor_flutter.dart';
+import 'package:sms_sender/core/global/constants.dart';
 import './tables.dart';
 part 'database.g.dart';
 
@@ -8,7 +9,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
-            path: 'sender.db', logStatements: false));
+            path: 'sender.db', logStatements: true));
 
   @override
   int get schemaVersion => 2;
@@ -98,6 +99,12 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
         });
       });
     }).then((_) => true);
+  }
+
+  // returns affected rows
+  Future<int> batchDeleteOldOutbox(String date) {
+    return (delete(outboxMessages)
+    ..where((outbox) => CustomExpression('date <= "$date" and status = ${OutboxStatus.sent}'))).go();
   }
 }
 

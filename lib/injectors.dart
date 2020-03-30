@@ -23,6 +23,7 @@ import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_impl.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/delete_old_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/delete_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox_from_remote.dart';
@@ -57,7 +58,7 @@ class Injector {
   GetIt get serviceLocator => _serviceLocator;
 
   Future<bool> init() async {
-    debugPrint = (String message, {int wrapWidth}) {};
+    // debugPrint = (String message, {int wrapWidth}) {};
     debugPrint('Injector Initialized $initialized');
     if(initialized) {
       return false;
@@ -85,6 +86,9 @@ class Injector {
         () => UpdateOutbox(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<UpdateInbox>(
         () => UpdateInbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<DeleteOldOutbox>(
+        () => DeleteOldOutbox(repository: _serviceLocator()));
+    
     _serviceLocator.registerLazySingleton<SendSmsToServer>(() => SendSmsToServer(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<SendOutboxSms>(() => SendOutboxSms(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<DeleteInbox>(() => DeleteInbox(repository: _serviceLocator()));

@@ -70,4 +70,16 @@ class OutboxRepositoryImpl implements OutboxRepository {
         return Left(LocalFailure(message: error.message));
       }
   }
+
+  @override
+  Future<Either<Failure, int>> bulkDeleteOldOutbox(String date) async{
+    try {
+      final res = await localSource.bulkDeleteOldOutbox(date);
+      return Right(res);
+    } on LocalException catch(error) {
+      return Left(LocalFailure(message: error.message));
+    }
+  }
+
+  
 }

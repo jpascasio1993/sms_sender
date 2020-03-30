@@ -51,7 +51,7 @@ android {
         release {
             keyAlias 'sms'
             keyPassword 'xP66002168'
-            storeFile file('/keystore/sms_release.jks')
+            storeFile file('./keystore/sms_release.jks')
             storePassword 'xP66002168'
         }
     }
