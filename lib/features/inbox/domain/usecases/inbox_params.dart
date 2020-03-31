@@ -9,6 +9,7 @@ class InboxParams extends Equatable {
   final bool read;
   final List<int> status;
   final List<InboxMessagesCompanion> messages;
+  final String date;
 
   InboxParams(
       {this.limit = 20,
@@ -16,7 +17,8 @@ class InboxParams extends Equatable {
       this.orderingMode = OrderingMode.desc,
       this.read,
       this.status,
-      this.messages});
+      this.messages,
+      this.date});
 
   @override
   List<Object> get props => [limit, offset, orderingMode, read, status, messages];

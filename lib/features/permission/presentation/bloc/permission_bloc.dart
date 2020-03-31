@@ -123,6 +123,8 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
       Duration(seconds: 10), processOutbox);
       await smsScheduler.addTask(PROCESS_DELETE_OLD_OUTBOX,
       Duration(seconds: 30), processDeleteOldOutbox);
+      await smsScheduler.addTask(PROCESS_DELETE_OLD_INBOX,
+      Duration(seconds: 30), processDeleteOldInbox);
   }
 
   Future<bool> startScheduler() async {

@@ -12,4 +12,5 @@ abstract class InboxRepository {
   Future<Either<Failure, bool>> bulkUpdateInbox(
       List<InboxMessagesCompanion> messages);
   Future<Either<Failure, bool>> bulkDeleteInbox(List<InboxMessagesCompanion> messages);
+  Future<Either<Failure, int>> bulkDeleteOldInbox(String date);
 }

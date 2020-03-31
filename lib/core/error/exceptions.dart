@@ -12,6 +12,8 @@ final String inboxLocalEmptyListUpdateErrorMessage = 'No inbox data to be update
 final String inboxLocalEmptyListDeleteErrorMessage = 'No inbox data to be deleted';
 final String inboxEmptyListErrorMessage = 'No inbox data to be sent';
 final String inboxSmsUpdateReadStatus = 'Failed to update sms read status. Set the app as default sms app.';
+final String inboxLocalDeleteOldInboxNoDateMessage = 'No date provided';
+final String inboxLocalDeleteOldInboxMessage = 'Failed to delete old inbox messages';
 
 final String localErrorMessage = 'Local Failure';
 final String outboxLocalErrorMessageUpdate = 'Failed to update outbox.';

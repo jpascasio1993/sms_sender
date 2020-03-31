@@ -9,7 +9,7 @@ part 'database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase()
       : super(FlutterQueryExecutor.inDatabaseFolder(
-            path: 'sender.db', logStatements: true));
+            path: 'sender.db', logStatements: false));
 
   @override
   int get schemaVersion => 2;
@@ -172,5 +172,11 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
         });
       });
     }).then((_) => true);
+  }
+
+  // returns affected rows
+  Future<int> batchDeleteOldInbox(String date) {
+    return (delete(inboxMessages)
+    ..where((outbox) => CustomExpression('date <= "$date" and status = ${InboxStatus.processed}'))).go();
   }
 }

@@ -9,6 +9,7 @@ import 'package:moor_flutter/moor_flutter.dart';
 import 'package:sms_scheduler/sms_scheduler.dart';
 import 'package:sms_sender/core/datasources/constants.dart';
 import 'package:sms_sender/core/global/constants.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/delete_old_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_sms_and_save_to_db.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/inbox_params.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/send_sms_to_server.dart';
@@ -26,6 +27,7 @@ const int PROCESS_OUTBOX_ID = 4002;
 const int REFETCH_INBOX_ID = 5001;
 const int REFETCH_OUTBOX_ID = 5002;
 const int PROCESS_DELETE_OLD_OUTBOX = 5003;
+const int PROCESS_DELETE_OLD_INBOX = 5004;
 const String PROCESS_INBOX_PORT_NAME = 'process_inbox';
 const String PROCESS_OUTBOX_PORT_NAME = 'process_outbox';
 const String SUCCESS_BATCH_UPDATE_REFETCH_INBOX =
@@ -115,38 +117,37 @@ Future<void> fetchInbox() async {
 }
 
 Future<void> fetchOutbox() async {
-    return;
-    // await lock.synchronized(() async {
-    //   await injector.init();
-    // });
+    await lock.synchronized(() async {
+      await injector.init();
+    });
     
-    // SmsScheduler scheduler = injector.serviceLocator.get<SmsScheduler>();
-    // final firebaseReference = injector.serviceLocator.get<FirebaseReference>();
-    // final GetOutboxFromRemote getOutboxFromRemote  = injector.serviceLocator.get<GetOutboxFromRemote>();
-    // try{
-    //     DateTime date = DateTime.now();
-    //     final SendPort mainSendPort =
-    //         IsolateNameServer.lookupPortByName(PROCESS_OUTBOX_PORT_NAME);
+    SmsScheduler scheduler = injector.serviceLocator.get<SmsScheduler>();
+    final firebaseReference = injector.serviceLocator.get<FirebaseReference>();
+    final GetOutboxFromRemote getOutboxFromRemote  = injector.serviceLocator.get<GetOutboxFromRemote>();
+    try{
+        DateTime date = DateTime.now();
+        final SendPort mainSendPort =
+            IsolateNameServer.lookupPortByName(PROCESS_OUTBOX_PORT_NAME);
        
-    //     final result = await getOutboxFromRemote(null);
-    //     bool success = await result.fold((failure) => false, (success) => true);
-    //     mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
-    //      final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
-    //     final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-    //     await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
-    //       'outbox_refetch': {
-    //         'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
-    //         'server_timestamp': ServerValue.timestamp
-    //       }
-    //     });
-    //     debugPrint('fetched outbox? $success');
-    // }catch(error) {
-    //     debugPrint('fetchOutbox error: $error');
-    // }finally {
-    //   int delay = await firebaseReference.outboxFetchDelay().catchError((error) => 30);
-    //   await scheduler.rescheduleTask(REFETCH_OUTBOX_ID,
-    //   Duration(seconds: delay), fetchOutbox);
-    // }
+        final result = await getOutboxFromRemote(null);
+        bool success = await result.fold((failure) => false, (success) => true);
+        mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
+         final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
+        final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
+        await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+          'outbox_refetch': {
+            'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
+            'server_timestamp': ServerValue.timestamp
+          }
+        });
+        debugPrint('fetched outbox? $success');
+    }catch(error) {
+        debugPrint('fetchOutbox error: $error');
+    }finally {
+      int delay = await firebaseReference.outboxFetchDelay().catchError((error) => 30);
+      await scheduler.rescheduleTask(REFETCH_OUTBOX_ID,
+      Duration(seconds: delay), fetchOutbox);
+    }
 }
 
 
@@ -202,9 +203,9 @@ Future<void> processDeleteOldOutbox() async {
       final months = await firebaseReference.deleteOldOutbox()
         .timeout(new Duration(minutes: 1))
         .catchError((error) => 3);
-      final DateTime finalDate = DateTime(date.year, date.month+months, date.day, 23, 59, 59);
+      final DateTime finalDate = DateTime(date.year, date.month-months, date.day, 23, 59, 59);
       await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
-        'outbox_delete_old': {
+        'outbox_delete_months_old_ago': {
           'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
           'server_timestamp': ServerValue.timestamp
         }
@@ -223,5 +224,47 @@ Future<void> processDeleteOldOutbox() async {
     }finally {
       await scheduler.rescheduleTask(PROCESS_DELETE_OLD_OUTBOX,
       Duration(seconds: 30), processDeleteOldOutbox);
+    }
+}
+
+Future<void> processDeleteOldInbox() async {
+    await lock.synchronized(() async {
+      await injector.init();
+    });
+
+    SmsScheduler scheduler = injector.serviceLocator.get<SmsScheduler>();
+    final deleteOldInbox = injector.serviceLocator.get<DeleteOldInbox>();
+    final firebaseReference = injector.serviceLocator.get<FirebaseReference>();
+
+    try {
+      DateTime date = DateTime.now();
+      final SendPort mainSendPort =
+            IsolateNameServer.lookupPortByName(PROCESS_INBOX_PORT_NAME);
+      final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
+      final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
+      final months = await firebaseReference.deleteOldInbox()
+        .timeout(new Duration(minutes: 1))
+        .catchError((error) => 3);
+      final DateTime finalDate = DateTime(date.year, date.month-months, date.day, 23, 59, 59);
+      await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+        'inbox_delete_old_months_ago': {
+          'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
+          'server_timestamp': ServerValue.timestamp
+        }
+      });
+      
+      final result = await deleteOldInbox(InboxParams(date: finalDate.toStringEx()));
+      bool success = await result.fold((failure) => false, (rows) {
+        debugPrint('delete affected rows: $rows');
+        return true;
+      });
+      mainSendPort?.send({'action': SUCCESS_REFETCH_INBOX, 'data': success});
+      // debugPrint('Old outbox delete ${finalDate.toStringEx()}');
+      debugPrint('Old inbox delete? $success');
+    }catch(error) {
+      debugPrint('processDeleteOldInbox error: $error');
+    }finally {
+      await scheduler.rescheduleTask(PROCESS_DELETE_OLD_INBOX,
+      Duration(seconds: 30), processDeleteOldInbox);
     }
 }

@@ -89,4 +89,14 @@ class InboxRepositoryImpl extends InboxRepository {
       return Left(SMSFailure(message: error.message));
     }
   }
+
+  @override
+  Future<Either<Failure, int>> bulkDeleteOldInbox(String date) async {
+    try {
+      final res = await inboxSource.bulkDeleteOldInbox(date);
+      return Right(res);
+    } on LocalException catch(error) {
+      return Left(LocalFailure(message: error.message));
+    }
+  }
 }
