@@ -89,6 +89,7 @@ class _OutboxPageState extends State<OutboxPage>
   void _onPress() {
     outboxBloc.add(GetOutboxEvent(
         limit: limit, offset: outboxBloc.state.outboxList.length));
+    debugPrint('outbox initOutbox');
   }
 
   void _onPressSaveRemoteOutboxData() {

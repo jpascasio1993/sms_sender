@@ -29,7 +29,7 @@ dependencies:
       path: ./sms-0.2.4
   get_it: ^3.1.0
   flutter_screenutil: ^1.0.2
-  moor_flutter: ^2.1.0
+  moor_flutter: ^2.1.1
   firebase_core: ^0.4.0+9
   firebase_database: ^3.1.1
   imei_plugin: ^1.1.6
@@ -51,7 +51,7 @@ dev_dependencies:
     sdk: flutter
   mockito: ^4.1.1
   build_runner: ^1.7.4
-  moor_generator: ^2.3.1
+  moor_generator: ^2.4.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

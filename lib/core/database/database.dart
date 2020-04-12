@@ -106,6 +106,15 @@ class OutboxMessageDao extends DatabaseAccessor<AppDatabase>
     return (delete(outboxMessages)
     ..where((outbox) => CustomExpression('date <= "$date" and status = ${OutboxStatus.sent}'))).go();
   }
+
+  Future<int> countOutbox(List<int> status) {
+    final exp = outboxMessages.id.count(distinct: false);
+    return (selectOnly(outboxMessages)
+    ..addColumns([exp])
+    ..where(CustomExpression('status in (${status.join(",")})'))
+    )
+    .map((row) => row.read(exp)).getSingle();
+  }
 }
 
 @UseDao(tables: [InboxMessages])
@@ -178,5 +187,14 @@ class InboxMessageDao extends DatabaseAccessor<AppDatabase>
   Future<int> batchDeleteOldInbox(String date) {
     return (delete(inboxMessages)
     ..where((outbox) => CustomExpression('date <= "$date" and status = ${InboxStatus.processed}'))).go();
+  }
+
+  Future<int> countInbox(List<int> status) {
+    final exp = inboxMessages.id.count(distinct: false);
+    return (selectOnly(inboxMessages)
+    ..addColumns([exp])
+    ..where(CustomExpression('status in (${status.join(",")})'))
+    )
+    .map((row) => row.read(exp)).getSingle();
   }
 }

@@ -14,6 +14,7 @@ final String inboxEmptyListErrorMessage = 'No inbox data to be sent';
 final String inboxSmsUpdateReadStatus = 'Failed to update sms read status. Set the app as default sms app.';
 final String inboxLocalDeleteOldInboxNoDateMessage = 'No date provided';
 final String inboxLocalDeleteOldInboxMessage = 'Failed to delete old inbox messages';
+final String inboxLocalCountErrorMessage = 'Failed to count inbox messages';
 
 final String localErrorMessage = 'Local Failure';
 final String outboxLocalErrorMessageUpdate = 'Failed to update outbox.';
@@ -22,6 +23,7 @@ final String outboxLocalErrorMessageDelete = 'Failed to delete outbox';
 final String outboxLocalEmptyListDeleteErrorMessage = 'No data to be deleted';
 final String outboxLocalDeleteOldOutboxNoDateMessage = 'No date provided';
 final String outboxLocalDeleteOldOutboxMessage = 'Failed to delete old outbox messages';
+final String outboxLocalErrorCountMessages = 'Failed to count outbox messages';
 final String remoteErrorMessage = 'Remote Error';
 final String permissionRequestErrorMessage = 'Failed to request permission.';
 final String permissionFailedToSaveInfo = 'Failed to save info';

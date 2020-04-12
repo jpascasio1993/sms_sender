@@ -15,6 +15,7 @@ abstract class InboxSource {
   Future<bool> updateSmsReadStatus(List<int> ids);
   Future<bool> bulkDeleteInbox(List<InboxMessagesCompanion> messages);
   Future<int> bulkDeleteOldInbox(String date);
+  Future<int> countInbox(List<int> status);
 }
 
 class InboxSourceImpl extends InboxSource {
@@ -96,6 +97,15 @@ class InboxSourceImpl extends InboxSource {
     .inboxMessageDao
     .batchDeleteOldInbox(date)
     .catchError((error) => throw LocalException(message: inboxLocalDeleteOldInboxMessage));
+    return res;
+  }
+
+  @override
+  Future<int> countInbox(List<int> status) async {
+    final res = await appDatabase
+    .inboxMessageDao
+    .countInbox(status)
+    .catchError((error) => throw LocalException(message: inboxLocalCountErrorMessage));
     return res;
   }
 }

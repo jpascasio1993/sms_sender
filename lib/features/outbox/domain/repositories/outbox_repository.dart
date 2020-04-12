@@ -13,4 +13,5 @@ abstract class OutboxRepository {
   Future<Either<Failure, List<OutboxModel>>> sendBulkSms(List<OutboxModel> messages);
   Future<Either<Failure, bool>> bulkDeleteOutbox(List<OutboxMessagesCompanion> messages);
   Future<Either<Failure, int>> bulkDeleteOldOutbox(String date);
+  Future<Either<Failure, int>> countOutbox(List<int> status);
 }

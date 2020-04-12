@@ -81,5 +81,13 @@ class OutboxRepositoryImpl implements OutboxRepository {
     }
   }
 
-  
+  @override
+  Future<Either<Failure, int>> countOutbox(List<int> status) async{
+    try {
+      final res = await localSource.countOubox(status);
+      return Right(res);
+    } on LocalException catch(error) {
+      return Left(LocalFailure(message: error.message));
+    }
+  }
 }

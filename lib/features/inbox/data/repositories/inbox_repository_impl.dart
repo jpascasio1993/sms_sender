@@ -99,4 +99,14 @@ class InboxRepositoryImpl extends InboxRepository {
       return Left(LocalFailure(message: error.message));
     }
   }
+
+  @override
+  Future<Either<Failure, int>> countInbox(List<int> status) async {
+    try {
+      final res = await inboxSource.countInbox(status);
+      return Right(res);
+    } on LocalException catch(error) {
+      return Left(LocalFailure(message: error.message));
+    }
+  }
 }

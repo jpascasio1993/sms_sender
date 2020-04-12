@@ -13,6 +13,7 @@ import 'package:sms_sender/features/inbox/data/datasources/inbox_remote_source.d
 import 'package:sms_sender/features/inbox/data/datasources/inbox_source.dart';
 import 'package:sms_sender/features/inbox/data/repositories/inbox_repository_impl.dart';
 import 'package:sms_sender/features/inbox/domain/repositories/inbox_repository.dart';
+import 'package:sms_sender/features/inbox/domain/usecases/count_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/delete_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/delete_old_inbox.dart';
 import 'package:sms_sender/features/inbox/domain/usecases/get_inbox.dart';
@@ -24,6 +25,7 @@ import 'package:sms_sender/features/outbox/data/datasources/local_source.dart';
 import 'package:sms_sender/features/outbox/data/datasources/remote_source.dart';
 import 'package:sms_sender/features/outbox/data/repositories/outbox_repository_impl.dart';
 import 'package:sms_sender/features/outbox/domain/repositories/outbox_repository.dart';
+import 'package:sms_sender/features/outbox/domain/usecases/count_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/delete_old_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/delete_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/get_outbox.dart';
@@ -91,6 +93,10 @@ class Injector {
         () => DeleteOldOutbox(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<DeleteOldInbox>(
         () => DeleteOldInbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<CountOutbox>(
+      () => CountOutbox(repository: _serviceLocator()));
+    _serviceLocator.registerLazySingleton<CountInbox>(
+      () => CountInbox(repository: _serviceLocator()));
     
     _serviceLocator.registerLazySingleton<SendSmsToServer>(() => SendSmsToServer(repository: _serviceLocator()));
     _serviceLocator.registerLazySingleton<SendOutboxSms>(() => SendOutboxSms(repository: _serviceLocator()));
