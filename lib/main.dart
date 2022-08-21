@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:sms_sender/core/global/constants.dart';
@@ -11,19 +12,14 @@ import 'package:sms_sender/features/outbox/domain/usecases/count_outbox.dart';
 import 'package:sms_sender/features/outbox/domain/usecases/outbox_params.dart';
 import 'package:sms_sender/features/outbox/presentation/bloc/bloc.dart';
 import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
+import 'package:sms_sender/features/utils/domain/use_cases/util_no_params.dart';
 import './injectors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'features/permission/presentation/bloc/bloc.dart';
-// void main() => runApp(MyApp());
+import 'features/utils/domain/use_cases/get_imei.dart';
 
 void main() async {
-  debugPrint = (String message, {int wrapWidth}) {};
   WidgetsFlutterBinding.ensureInitialized();
-  // final imei = await ImeiPlugin.getId();
-  // final version = await GetVersion.appID;
-  // debugPrint('imei ${imei}');
-  // debugPrint('version ${version}');
-  // await di.Injector(mServiceLocator: GetIt.instance).init();
   Injector injector = Injector(serviceLocator: GetIt.instance);
   await injector.init();
   Routes(
@@ -37,7 +33,6 @@ class Routes {
   };
   final Injector injector;
   Routes({@required this.injector}) {
-    // BlocSupervisor.delegate = SimpleBlocDelegate();
     runApp(MyApp(routes: routes, injector: injector));
   }
 }
@@ -61,14 +56,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // return InheritedDependency(
-    //   child: MaterialApp(
-    //     title: 'SMS Sender',
-    //     routes: widget.routes,
-    //     initialRoute: '/',
-    //   ),
-    //   injector: widget.injector
-    // );
     final serviceLocator = widget.injector.serviceLocator;
     return MultiBlocProvider(
       providers: [
@@ -160,55 +147,90 @@ class _RootTabState extends State<RootTab> {
       child: Text('Close')
     );
 
+    final GetImei getImei = serviceLocator<GetImei>();
+    final imei = (await getImei(UtilNoParams())).getOrElse(() => null);
     AlertDialog dialog = AlertDialog(
       title: Text('${selectedTabIndex == 1 ? 'Outbox': 'Inbox'} Information'),
-      content: DataTable(
-        columns: [
-          DataColumn(label: Text('Status', style: TextStyle( fontWeight: FontWeight.bold))),
-          DataColumn(label: Text('Count', style: TextStyle( fontWeight: FontWeight.bold)), numeric: true)
-        ], 
-        rows: [
-          DataRow(
-            selected: false,
-            cells: [
-              DataCell(
-                Text('Pending', style: TextStyle( color: Colors.orangeAccent)),
-              ),
-              DataCell(
-                Text('$pending', style: TextStyle( fontWeight: FontWeight.bold)),
-                onTap: null
-              )
-            ]
-          ),
-          DataRow(
-            selected: false,
-            cells: [
-              DataCell(
-                Text('Sent', style: TextStyle( color: Colors.greenAccent)),
-                onTap: null
-              ),
-              DataCell(
-                Text('$sent', style: TextStyle( fontWeight: FontWeight.bold)),
-                onTap: null
-              )
-            ]
-          ),
-          DataRow(
-            selected: false,
-            cells: [
-              DataCell(
-                Text('Total', style: TextStyle( color: Colors.purpleAccent)),
-              ),
-              DataCell(
-                Text('$total', style: TextStyle( fontWeight: FontWeight.bold)),
-                onTap: null
-              )
-            ]
-          )
-        ]
+      content:  DataTable(
+          columns: [
+            DataColumn(label: Text('Status', style: TextStyle( fontWeight: FontWeight.bold))),
+            DataColumn(label: Text('Count', style: TextStyle( fontWeight: FontWeight.bold)), numeric: true)
+          ],
+          rows: [
+            DataRow(
+                selected: false,
+                cells: [
+                  DataCell(
+                    Text('Pending', style: TextStyle( color: Colors.orangeAccent)),
+                  ),
+                  DataCell(
+                      Text('$pending', style: TextStyle( fontWeight: FontWeight.bold)),
+                      onTap: null
+                  )
+                ]
+            ),
+            DataRow(
+                selected: false,
+                cells: [
+                  DataCell(
+                      Text('Sent', style: TextStyle( color: Colors.greenAccent)),
+                      onTap: null
+                  ),
+                  DataCell(
+                      Text('$sent', style: TextStyle( fontWeight: FontWeight.bold)),
+                      onTap: null
+                  )
+                ]
+            ),
+            DataRow(
+                selected: false,
+                cells: [
+                  DataCell(
+                    Text('Total', style: TextStyle( color: Colors.purpleAccent)),
+                  ),
+                  DataCell(
+                      Text('$total', style: TextStyle( fontWeight: FontWeight.bold)),
+                      onTap: null
+                  )
+                ]
+            )
+          ]
       ),
       actions: <Widget>[
         positiveButton
+      ],
+    );
+    showDialog(context: context, child: dialog);
+  }
+
+  void _onActionDeviceInfoTap(BuildContext context) async {
+    final serviceLocator = InheritedDependency.of(context).serviceLocator;
+    final GetImei getImei = serviceLocator<GetImei>();
+    final imei = (await getImei(UtilNoParams())).getOrElse(() => null);
+
+    FlatButton positiveButton = FlatButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text('Close')
+    );
+
+    FlatButton neutralButton = FlatButton(
+        onPressed: () {
+          Clipboard.setData(ClipboardData(text: imei));
+          Navigator.pop(context);
+        },
+        child: Text('Copy')
+    );
+
+    AlertDialog dialog = AlertDialog(
+      title: Text('Imei'),
+      content: Container(
+        child: Text(imei, textScaleFactor: 1.0, style: TextStyle(fontSize: 13, letterSpacing: 0.5)),
+      ),
+      actions: <Widget>[
+        neutralButton,
+        positiveButton,
       ],
     );
     showDialog(context: context, child: dialog);
@@ -227,12 +249,24 @@ class _RootTabState extends State<RootTab> {
                 Padding(
                   child: GestureDetector(
                     child: Icon(
-                      Icons.info_outline,
+                      Icons.perm_device_info,
                       size: 26
                     ),
                     onTap: () {
-                      _onActionTap(context);
+                      _onActionDeviceInfoTap(context);
                     }
+                  ),
+                  padding: EdgeInsets.only(left: 14, top: 14, bottom: 14),
+                ),
+                Padding(
+                  child: GestureDetector(
+                      child: Icon(
+                          Icons.info_outline,
+                          size: 26
+                      ),
+                      onTap: () {
+                        _onActionTap(context);
+                      }
                   ),
                   padding: EdgeInsets.all(14),
                 )

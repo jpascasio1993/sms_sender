@@ -63,11 +63,12 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
         },(success)async *{
             final res2 = await permissionSaveInfo(PermissionNoParams());
             yield* res2.fold(
-              (failure) async* { yield PermissionErrorState(message: failure.message); }, 
+              (failure) async* {
+                yield PermissionErrorState(message: failure.message); },
               (success) async* {
                 final ignoreBattOptimization = await ignoreBatteryOptimization();
                 final defaultSms = await setAsDefaultSMS();
-                print('RequestPermissionEventz $ignoreBattOptimization || $defaultSms');
+                debugPrint('RequestPermissionEvent $ignoreBattOptimization || $defaultSms');
                 if(!ignoreBattOptimization || !defaultSms) {
                     yield PermissionDeniedState();
                 }else {

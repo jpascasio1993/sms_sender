@@ -24,16 +24,16 @@ void _smsSchedulerCallbackDispatcher() {
     // PluginUtilities.getCallbackFromHandle performs a lookup based on the
     // callback handle and returns a tear-off of the original callback.
     final Function closure = PluginUtilities.getCallbackFromHandle(handle);
-    print('gonna check closure');
+    debugPrint('gonna check closure');
     if (closure == null) {
-      print('Fatal: could not find callback');
+      debugPrint('Fatal: could not find callback');
       exit(-1);
     }
     await closure();
   });
 
   _channel.invokeMethod<void>('sms_scheduler.initialized');
-  print('invokeMethod sms_scheduler.initialized');
+  debugPrint('invokeMethod sms_scheduler.initialized');
 }
 
 abstract class SmsScheduler {

@@ -37,7 +37,7 @@ class _InboxPageState extends State<InboxPage>
   @override
   void initState() {
     super.initState();
-    print('inbox initState');
+    debugPrint('inbox initState');
     WidgetsBinding.instance.addObserver(this);
     _initPlatformState();
     inboxBloc = BlocProvider.of<InboxBloc>(context);
@@ -117,7 +117,8 @@ class _InboxPageState extends State<InboxPage>
     permissionBloc.add(RequestPermissionEvent(permissions: [
       PermissionGroup.sms,
       PermissionGroup.phone,
-      PermissionGroup.contacts
+      PermissionGroup.contacts,
+      PermissionGroup.storage
     ]));
   }
 
@@ -171,6 +172,7 @@ class _InboxPageState extends State<InboxPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return MultiBlocListener(
         listeners: [
           BlocListener<PermissionBloc, PermissionState>(

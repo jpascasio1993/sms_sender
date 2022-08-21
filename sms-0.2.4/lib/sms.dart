@@ -276,7 +276,7 @@ class SmsReceiver {
   /// Create a stream that collect received SMS
   Stream<SmsMessage> get onSmsReceived {
     if (_onSmsReceived == null) {
-      print("Creating sms receiver");
+      debugPrint("Creating sms receiver");
       _onSmsReceived = _channel.receiveBroadcastStream().map((dynamic event) {
         SmsMessage msg = new SmsMessage.fromJson(event);
         msg.kind = SmsMessageKind.Received;

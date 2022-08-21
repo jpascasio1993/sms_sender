@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:sms_sender/core/global/constants.dart';
 import 'package:sms_sender/features/outbox/domain/entities/outbox.dart';
