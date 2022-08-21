@@ -20,22 +20,22 @@ class PermissionRemoteSourceImpl implements PermissionRemoteSource {
   Future<bool> setUpFirebase() async {
     await firebaseDatabase
         .reference()
-        .child(firebaseURLS.inboxPostDelay())
+        .child(await firebaseURLS.inboxPostDelay())
         .keepSynced(true);
 
     await firebaseDatabase
         .reference()
-        .child(firebaseURLS.inboxUrl())
+        .child(await firebaseURLS.inboxUrl())
         .keepSynced(true);
 
     await firebaseDatabase
         .reference()
-        .child(firebaseURLS.outboxFetchDelay())
+        .child(await firebaseURLS.outboxFetchDelay())
         .keepSynced(true);
 
     await firebaseDatabase
         .reference()
-        .child(firebaseURLS.outboxUrl())
+        .child(await firebaseURLS.outboxUrl())
         .keepSynced(true);
 
     return true;

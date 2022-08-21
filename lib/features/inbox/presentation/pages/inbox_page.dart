@@ -171,6 +171,7 @@ class _InboxPageState extends State<InboxPage>
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return MultiBlocListener(
         listeners: [
           BlocListener<PermissionBloc, PermissionState>(
