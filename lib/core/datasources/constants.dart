@@ -1,148 +1,115 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sms_sender/core/global/constants.dart';
+
 
 abstract class FirebaseURLS {
   final SharedPreferences preferences;
-  FirebaseURLS({@required this.preferences});
-  String outboxUrl();
-  String outboxFetchDelay();
-  String inboxUrl();
-  String inboxPostDelay();
-  String deviceStatus();
-  String outboxProcessDelay();
-  String outboxDeleteOld();
-  String inboxDeleteOld();
+  final FlutterSecureStorage secureStorage;
+  FirebaseURLS({@required this.preferences, @required this.secureStorage});
+  Future<String>  outboxUrl();
+  Future<String>  outboxFetchDelay();
+  Future<String>  inboxUrl();
+  Future<String> inboxPostDelay();
+  Future<String> deviceStatus();
+  Future<String>  outboxProcessDelay();
+  Future<String> outboxDeleteOld();
+  Future<String> inboxDeleteOld();
 }
 
 class FirebaseURLSImpl extends FirebaseURLS {
-  FirebaseURLSImpl({@required SharedPreferences preferences})
-      : super(preferences: preferences);
+  FirebaseURLSImpl({@required SharedPreferences preferences, @required FlutterSecureStorage secureStorage})
+      : super(preferences: preferences, secureStorage: secureStorage);
 
   @override
-  String deviceStatus() {
+  Future<String> deviceStatus() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/device_status/$imei';
   }
 
   @override
-  String inboxPostDelay() {
+  Future<String> inboxPostDelay() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/post_delay';
   }
 
   @override
-  String inboxUrl() {
+  Future<String> inboxUrl() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/url';
   }
 
   @override
-  String outboxFetchDelay() {
+  Future<String> outboxFetchDelay() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/fetch_delay';
   }
 
   @override
-  String outboxUrl() {
+  Future<String> outboxUrl() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/url';
   }
 
   @override
-  String outboxProcessDelay() {
+  Future<String> outboxProcessDelay() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/process_delay';
   }
 
   @override
-  String outboxDeleteOld() {
+  Future<String> outboxDeleteOld() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/delete_old_months_ago';
   }
 
   @override
-  String inboxDeleteOld() {
+  Future<String> inboxDeleteOld() async {
     SharedPreferences prefs = preferences;
     prefs.reload();
-    String imei = prefs.getString('imei');
+    FlutterSecureStorage secureStorage = super.secureStorage;
+    String imei = await secureStorage.read(key: SecureStorageKeys.IMEIKEY);
     String projectAppID = prefs.getString('appId');
     bool debug = projectAppID.contains('debug');
     return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/delete_old_months_ago';
   }
-
-  // static String outboxUrl(SharedPreferences preferences) {
-  // SharedPreferences prefs = preferences;
-  // prefs.reload();
-  // String imei = prefs.getString('imei');
-  // String projectAppID = prefs.getString('appId');
-  // bool debug = projectAppID.contains('debug');
-  // return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/url';
-  // }
-
-  // static String outboxFetchDelay(SharedPreferences preferences) {
-  //   SharedPreferences prefs = preferences;
-  //   prefs.reload();
-  //   String imei = prefs.getString('imei');
-  //   String projectAppID = prefs.getString('appId');
-  //   bool debug = projectAppID.contains('debug');
-  //   return '${debug ? "client_updates_debug" : "client_updates"}/outbox/$imei/fetch_delay';
-  // }
-
-  // static String inboxUrl(SharedPreferences preferences) {
-  // SharedPreferences prefs = preferences;
-  // prefs.reload();
-  // String imei = prefs.getString('imei');
-  // String projectAppID = prefs.getString('appId');
-  // bool debug = projectAppID.contains('debug');
-  // return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/url';
-  // }
-
-  // static String inboxPostDelay(SharedPreferences preferences) {
-  // SharedPreferences prefs = preferences;
-  // prefs.reload();
-  // String imei = prefs.getString('imei');
-  // String projectAppID = prefs.getString('appId');
-  // bool debug = projectAppID.contains('debug');
-  // return '${debug ? "client_updates_debug" : "client_updates"}/inbox/$imei/post_delay';
-  // }
-
-  // static String deviceStatus(SharedPreferences preferences) {
-  // SharedPreferences prefs = preferences;
-  // prefs.reload();
-  // String imei = prefs.getString('imei');
-  // String projectAppID = prefs.getString('appId');
-  // bool debug = projectAppID.contains('debug');
-  // return '${debug ? "client_updates_debug" : "client_updates"}/device_status/$imei';
-  // }
 }
 
 abstract class FirebaseReference {
@@ -168,108 +135,74 @@ class FirebaseReferenceImpl extends FirebaseReference {
       : super(firebaseURLS: firebaseURLS, firebaseDatabase: firebaseDatabase);
 
   @override
-  Future<String> deviceStatus() {
+  Future<String> deviceStatus() async {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.deviceStatus())
+        .child(await firebaseURLS.deviceStatus())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<int> inboxPostDelay() {
+  Future<int> inboxPostDelay() async {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.inboxPostDelay())
+        .child(await firebaseURLS.inboxPostDelay())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<String> inboxUrl() {
+  Future<String> inboxUrl() async {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.inboxUrl())
+        .child(await firebaseURLS.inboxUrl())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<int> outboxFetchDelay() {
+  Future<int> outboxFetchDelay() async {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.outboxFetchDelay())
+        .child(await firebaseURLS.outboxFetchDelay())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<String> outboxUrl() {
+  Future<String> outboxUrl() async {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.outboxUrl())
+        .child(await firebaseURLS.outboxUrl())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<int> outboxProcessDelay() {
+  Future<int> outboxProcessDelay() async {
     return firebaseDatabase
         .reference()
-        .child(firebaseURLS.outboxProcessDelay())
+        .child(await firebaseURLS.outboxProcessDelay())
         .once()
         .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<int> deleteOldOutbox() {
+  Future<int> deleteOldOutbox() async {
     return firebaseDatabase
     .reference()
-    .child(firebaseURLS.outboxDeleteOld())
+    .child(await firebaseURLS.outboxDeleteOld())
     .once()
     .then((DataSnapshot snapshot) => snapshot.value);
   }
 
   @override
-  Future<int> deleteOldInbox() {
+  Future<int> deleteOldInbox() async {
     return firebaseDatabase
     .reference()
-    .child(firebaseURLS.inboxDeleteOld())
+    .child(await firebaseURLS.inboxDeleteOld())
     .once()
     .then((DataSnapshot snapshot) => snapshot.value);
   }
-  // static Future<String> outboxUrl(FirebaseDatabase database, String url) =>
-  // database
-  //     .reference()
-  //     .child(url)
-  //     .once()
-  //     .then((DataSnapshot snapshot) => snapshot.value);
-
-  // static Future<int> outboxFetchDelay(FirebaseDatabase database, String url) =>
-  //     database
-  //         .reference()
-  //         .child(url)
-  //         .once()
-  //         .then((DataSnapshot snapshot) => snapshot.value);
-
-  // static Future<String> inboxUrl(FirebaseDatabase database, String url) =>
-  //     database
-  //         .reference()
-  //         .child(url)
-  //         .once()
-  //         .then((DataSnapshot snapshot) => snapshot.value);
-
-  // static Future<int> inboxPostDelay(FirebaseDatabase database, String url) =>
-  //     database
-  //         .reference()
-  //         .child(url)
-  //         .once()
-  //         .then((DataSnapshot snapshot) => snapshot.value);
-
-  // static Future<String> deviceStatus(FirebaseDatabase database, String url) =>
-  //     database
-  //         .reference()
-  //         .child(url)
-  //         .once()
-  //         .then((DataSnapshot snapshot) => snapshot.value);
 }

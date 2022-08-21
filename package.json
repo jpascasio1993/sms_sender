@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "scripts": {
+    "run-local": "flutter run | grep -v \"Error retrieving thread information\""
+  }
+}

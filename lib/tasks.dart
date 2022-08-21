@@ -63,7 +63,7 @@ Future<void> processInbox() async {
 
     final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
     final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-    await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+    await firebaseDatabase.reference().child(await firebaseUrls.deviceStatus()).update({
       'inbox': {
         'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
         'server_timestamp': ServerValue.timestamp
@@ -101,7 +101,7 @@ Future<void> fetchInbox() async {
 
         bool success = await result.fold((failure) => false, (success) => success);
         mainSendPort?.send({'action': SUCCESS_REFETCH_INBOX, 'data': success});
-        await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+        await firebaseDatabase.reference().child(await firebaseUrls.deviceStatus()).update({
           'inbox_refetch': {
             'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
             'server_timestamp': ServerValue.timestamp
@@ -134,7 +134,7 @@ Future<void> fetchOutbox() async {
         mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
          final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
         final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-        await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+        await firebaseDatabase.reference().child(await firebaseUrls.deviceStatus()).update({
           'outbox_refetch': {
             'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
             'server_timestamp': ServerValue.timestamp
@@ -169,7 +169,7 @@ Future<void> processOutbox() async {
       mainSendPort?.send({'action': SUCCESS_REFETCH_OUTBOX, 'data': success});
       final firebaseDatabase = injector.serviceLocator.get<FirebaseDatabase>();
       final firebaseUrls = injector.serviceLocator.get<FirebaseURLS>();
-      await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+      await firebaseDatabase.reference().child(await firebaseUrls.deviceStatus()).update({
         'outbox': {
           'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
           'server_timestamp': ServerValue.timestamp
@@ -204,7 +204,7 @@ Future<void> processDeleteOldOutbox() async {
         .timeout(new Duration(minutes: 1))
         .catchError((error) => 3);
       final DateTime finalDate = DateTime(date.year, date.month-months, date.day, 23, 59, 59);
-      await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+      await firebaseDatabase.reference().child(await firebaseUrls.deviceStatus()).update({
         'outbox_delete_months_old_ago': {
           'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
           'server_timestamp': ServerValue.timestamp
@@ -246,7 +246,7 @@ Future<void> processDeleteOldInbox() async {
         .timeout(new Duration(minutes: 1))
         .catchError((error) => 3);
       final DateTime finalDate = DateTime(date.year, date.month-months, date.day, 23, 59, 59);
-      await firebaseDatabase.reference().child(firebaseUrls.deviceStatus()).update({
+      await firebaseDatabase.reference().child(await firebaseUrls.deviceStatus()).update({
         'inbox_delete_old_months_ago': {
           'timestamp': DateFormat('yyyy-MM-dd hh:mm:ss a').format(date),
           'server_timestamp': ServerValue.timestamp

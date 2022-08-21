@@ -67,7 +67,7 @@ class PermissionBloc extends Bloc<PermissionEvent, PermissionState> {
               (success) async* {
                 final ignoreBattOptimization = await ignoreBatteryOptimization();
                 final defaultSms = await setAsDefaultSMS();
-                print('RequestPermissionEventz $ignoreBattOptimization || $defaultSms');
+                debugPrint('RequestPermissionEvent $ignoreBattOptimization || $defaultSms');
                 if(!ignoreBattOptimization || !defaultSms) {
                     yield PermissionDeniedState();
                 }else {

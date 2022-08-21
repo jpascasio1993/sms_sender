@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
@@ -141,7 +142,7 @@ class Injector {
             client: _serviceLocator()));
     _serviceLocator.registerLazySingleton<PermissionLocalSource>(() =>
         PermissionLocalSourceImpl(
-            preferences: _serviceLocator(), permissionHandler: _serviceLocator()));
+            preferences: _serviceLocator(), permissionHandler: _serviceLocator(), secureStorage: _serviceLocator()));
     _serviceLocator.registerLazySingleton<PermissionRemoteSource>(() =>
         PermissionRemoteSourceImpl(
             firebaseDatabase: _serviceLocator(), firebaseURLS: _serviceLocator()));
@@ -173,6 +174,7 @@ class Injector {
             firebaseURLS: _serviceLocator(), firebaseDatabase: _serviceLocator()));
     _serviceLocator.registerLazySingleton<SmsScheduler>(() => SmsSchedulerImpl());
     _serviceLocator.registerLazySingleton<SmsSender>(() => SmsSender());
+    _serviceLocator.registerLazySingleton<FlutterSecureStorage>(() => FlutterSecureStorage());
     initialized = true;
     return true;
   }

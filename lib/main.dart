@@ -14,16 +14,9 @@ import 'package:sms_sender/features/outbox/presentation/pages/outbox_page.dart';
 import './injectors.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'features/permission/presentation/bloc/bloc.dart';
-// void main() => runApp(MyApp());
 
 void main() async {
-  debugPrint = (String message, {int wrapWidth}) {};
   WidgetsFlutterBinding.ensureInitialized();
-  // final imei = await ImeiPlugin.getId();
-  // final version = await GetVersion.appID;
-  // debugPrint('imei ${imei}');
-  // debugPrint('version ${version}');
-  // await di.Injector(mServiceLocator: GetIt.instance).init();
   Injector injector = Injector(serviceLocator: GetIt.instance);
   await injector.init();
   Routes(
@@ -37,7 +30,6 @@ class Routes {
   };
   final Injector injector;
   Routes({@required this.injector}) {
-    // BlocSupervisor.delegate = SimpleBlocDelegate();
     runApp(MyApp(routes: routes, injector: injector));
   }
 }
@@ -61,14 +53,6 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // return InheritedDependency(
-    //   child: MaterialApp(
-    //     title: 'SMS Sender',
-    //     routes: widget.routes,
-    //     initialRoute: '/',
-    //   ),
-    //   injector: widget.injector
-    // );
     final serviceLocator = widget.injector.serviceLocator;
     return MultiBlocProvider(
       providers: [
