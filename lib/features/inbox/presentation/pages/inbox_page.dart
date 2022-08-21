@@ -117,7 +117,8 @@ class _InboxPageState extends State<InboxPage>
     permissionBloc.add(RequestPermissionEvent(permissions: [
       PermissionGroup.sms,
       PermissionGroup.phone,
-      PermissionGroup.contacts
+      PermissionGroup.contacts,
+      PermissionGroup.storage
     ]));
   }
 

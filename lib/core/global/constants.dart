@@ -11,7 +11,3 @@ class InboxStatus {
   static final int failed = 2;
   static final int reprocess = 3;
 }
-
-class SecureStorageKeys {
-  static final String IMEIKEY = '_IMEIKEY_SMS_SENDER';
-}
