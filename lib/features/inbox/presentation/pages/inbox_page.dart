@@ -37,7 +37,7 @@ class _InboxPageState extends State<InboxPage>
   @override
   void initState() {
     super.initState();
-    print('inbox initState');
+    debugPrint('inbox initState');
     WidgetsBinding.instance.addObserver(this);
     _initPlatformState();
     inboxBloc = BlocProvider.of<InboxBloc>(context);

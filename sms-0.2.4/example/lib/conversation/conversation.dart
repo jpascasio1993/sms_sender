@@ -31,7 +31,7 @@ class _ConversationState extends State<Conversation> {
 
   @override
   Widget build(BuildContext context) {
-    print('building conversation');
+    debugPrint('building conversation');
     return new Scaffold(
       appBar: new AppBar(
         title: new Text(
