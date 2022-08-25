@@ -41,8 +41,8 @@ workflows:
       - flutter build appbundle --release --build-number=$(($PROJECT_BUILD_NUMBER
         + 100))
       - |
-      # generate signed universal apk with user specified keys
-      - android-app-bundle build-universal-apk \
+        # generate signed universal apk with user specified keys
+        android-app-bundle build-universal-apk \
           --bundle build/**/outputs/**/*.aab \
           --ks /tmp/keystore.keystore \
           --ks-pass $CM_KEYSTORE_PASSWORD \
