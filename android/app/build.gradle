@@ -6,6 +6,14 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+def keyProperties = new Properties()
+def keyPropertiesFile = rootProject.file('key.properties')
+if (keyPropertiesFile.exists()) {
+    keyPropertiesFile.withReader('UTF-8') { reader ->
+        keyPropertiesFile.load(reader)
+    }
+}
+
 def flutterRoot = localProperties.getProperty('flutter.sdk')
 if (flutterRoot == null) {
     throw new FileNotFoundException("Flutter SDK not found. Define location with flutter.sdk in the local.properties file.")
@@ -49,10 +57,17 @@ android {
 
     signingConfigs {
         release {
-            keyAlias 'sms'
-            keyPassword 'xP66002168'
-            storeFile file('./keystore/sms_release.jks')
-            storePassword 'xP66002168'
+            if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+                storePassword keystoreProperties['storePassword']
+            } else {
+                keyAlias 'sms'
+                keyPassword 'xP66002168'
+                storeFile file('./keystore/sms_release.jks')
+                storePassword 'xP66002168'
+            }
         }
     }
 
