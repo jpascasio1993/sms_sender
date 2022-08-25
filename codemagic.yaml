@@ -42,7 +42,7 @@ workflows:
         + 100))
       - |
       # generate signed universal apk with user specified keys
-        android-app-bundle build-universal-apk \
+      - android-app-bundle build-universal-apk \
           --bundle build/**/outputs/**/*.aab \
           --ks /tmp/keystore.keystore \
           --ks-pass $CM_KEYSTORE_PASSWORD \
