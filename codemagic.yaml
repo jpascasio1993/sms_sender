@@ -42,12 +42,12 @@ workflows:
         + 100))
       - |
       # generate signed universal apk with user specified keys
-      android-app-bundle build-universal-apk \
-      --bundle build/**/outputs/**/*.aab \
-      --ks /tmp/keystore.keystore \
-      --ks-pass $CM_KEYSTORE_PASSWORD \
-      --ks-key-alias $CM_KEY_ALIAS \
-      --key-pass $CM_KEY_PASSWORD
+        android-app-bundle build-universal-apk \
+          --bundle build/**/outputs/**/*.aab \
+          --ks /tmp/keystore.keystore \
+          --ks-pass $CM_KEYSTORE_PASSWORD \
+          --ks-key-alias $CM_KEY_ALIAS \
+          --key-pass $CM_KEY_PASSWORD
     artifacts:
       - build/**/outputs/apk/**/*.apk
       - build/**/outputs/bundle/**/*.aab
