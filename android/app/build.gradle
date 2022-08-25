@@ -9,9 +9,7 @@ if (localPropertiesFile.exists()) {
 def keyProperties = new Properties()
 def keyPropertiesFile = rootProject.file('key.properties')
 if (keyPropertiesFile.exists()) {
-    keyPropertiesFile.withReader('UTF-8') { reader ->
-        keyPropertiesFile.load(new FileInputStream(keyPropertiesFile))
-    }
+    keyPropertiesFile.load(new FileInputStream(keyPropertiesFile))
 }
 
 def flutterRoot = localProperties.getProperty('flutter.sdk')
