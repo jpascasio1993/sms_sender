@@ -8,7 +8,7 @@ workflows:
     environment:
       flutter: 1.22.6
       ndk: r21d
-      java: 11
+      java: 1.8
       groups:
         - prod
     cache:
