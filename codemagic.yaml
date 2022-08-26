@@ -11,6 +11,7 @@ workflows:
         - prod
     cache:
       cache_paths:
+        - $HOME/.gradle/caches
         - $FLUTTER_ROOT/.pub-cache
     scripts:
       #- |
