@@ -45,6 +45,9 @@ workflows:
       - flutter build appbundle --release --build-number=$(($PROJECT_BUILD_NUMBER
         + 100))
       - |
+        #!/bin/sh
+        printenv
+      - |
         # generate signed universal apk with user specified keys
         android-app-bundle build-universal-apk \
           --bundle build/**/outputs/**/*.aab \
