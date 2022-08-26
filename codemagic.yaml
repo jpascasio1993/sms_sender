@@ -7,7 +7,7 @@ workflows:
     max_build_duration: 60
     environment:
       flutter: 1.22.6
-      ndk: r21e
+      # ndk: r21e
       java: 1.8
       groups:
         - prod
