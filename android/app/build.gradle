@@ -59,7 +59,7 @@ android {
             if (System.getenv()["CI"]) { // CI=true is exported by Codemagic
                 keyAlias keyProperties['keyAlias']
                 keyPassword keyProperties['keyPassword']
-                storeFile keyProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+                storeFile keyProperties['storeFile'] ? file(keyProperties['storeFile']) : null
                 storePassword keyProperties['storePassword']
             } else {
                 keyAlias 'sms'
