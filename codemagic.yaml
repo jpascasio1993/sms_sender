@@ -69,7 +69,7 @@ workflows:
             set -e   # exit on first failed command
             set -x   # print all executed commands to the log
 
-            if [[ -f "$FCI_BUILD_OUTPUT_DIR/app-qa-release-universal.apk" ]]
+            if [[ -f "$FCI_BUILD_OUTPUT_DIR/app-release-universal.apk" ]]
             then
               # Android Firebase App Distribution CLI
               firebase appdistribution:distribute $FCI_BUILD_OUTPUT_DIR/app-release-universal.apk --app \
