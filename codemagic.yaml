@@ -45,9 +45,6 @@ workflows:
       - flutter build appbundle --release --build-number=$(($PROJECT_BUILD_NUMBER
         + 100))
       - |
-        #!/bin/sh
-        printenv
-      - |
         # generate signed universal apk with user specified keys
         android-app-bundle build-universal-apk \
           --bundle build/**/outputs/**/*.aab \
@@ -56,8 +53,8 @@ workflows:
           --ks-key-alias $CM_KEY_ALIAS \
           --key-pass $CM_KEY_PASSWORD
     artifacts:
-      - build/**/outputs/apk/**/*.apk
-      - build/**/outputs/bundle/**/*.aab
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
       - build/**/outputs/**/mapping.txt
       - '*.snap'
       - build/windows/**/*.msix
