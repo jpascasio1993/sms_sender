@@ -73,6 +73,6 @@ workflows:
             then
               # Android Firebase App Distribution CLI
               firebase appdistribution:distribute $FCI_BUILD_OUTPUT_DIR/app-release-universal.apk --app \
-              1:1042396097004:android:ad9660081d7c53df --groups "ripeconcepts-qa-testers" \
+              1:1042396097004:android:ad9660081d7c53df --groups "Testers" \
               --token "$FIREBASE_TOKEN"
             fi
