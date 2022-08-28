@@ -65,6 +65,7 @@ workflows:
           - jpascasio1993@gmail.com
       scripts:
           - |
+            # Publish to Firebase App Distribution
             #!/usr/bin/env sh
             set -e   # exit on first failed command
             set -x   # print all executed commands to the log
