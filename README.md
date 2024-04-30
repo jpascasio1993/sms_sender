@@ -1,16 +1,17 @@
 # sms_sender
 
-A new Flutter project.
+An App that receives SMS and POST data to the server on client's behalf
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+With the absence of the internet, the client sends data in the form of SMS. 
+This app acts as a gateway which receives the SMS and POST the data on client's behalf
+to the configured server.
 
-A few resources to get you started if this is your first Flutter project:
+This app uses FlutterNativeView together with RxJava 
+to run a persistent headless service and execute dart tasks
+in the background while the app is closed.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+
+
