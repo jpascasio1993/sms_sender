@@ -2,7 +2,7 @@
 
 An App that receives SMS and POST data to the server on client's behalf
 
-## Getting Started
+## Overview
 
 With the absence of the internet, the client sends data in the form of SMS. 
 This app acts as a gateway which receives the SMS and POST the data on client's behalf
