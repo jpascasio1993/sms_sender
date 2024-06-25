@@ -1,0 +1,45 @@
+@startuml
+set namespaceSeparator ::
+
+class "lib::src::features::inbox::presentation::bloc::inbox_bloc.dart::InboxBloc" {
+ +GetInbox getInbox
+ +GetSmsAndSaveToDb getSmsAndSaveToDb
+ +UpdateInbox updateInbox
+ +DeleteInbox deleteInbox
+ +Stream mapEventToState
+ +State initialState
+ +Stream transformEvents
+}
+
+'class "lib/features/inbox/domain/repositories/inbox_repository.dart::InboxRepository" {
+'}
+
+class "lib/features/inbox/data/repositories/inbox_repository_impl.dart::InboxRepositoryImpl" {
+ +InboxSource inboxSource;
+ +InboxRemoteSource inboxRemoteSource;
+ +FutureOr getInbox;
+ +FutureOr getSmsAndSaveToDb
+ +FutureOr sendSmsToServer
+ +FutureOr bulkUpdateInbox
+ +FutureOr bulkDeleteInbox
+ +FutureOr bulkDeleteOldInbox
+ +FutureOr countInbox
+}
+
+"lib/features/inbox/domain/repositories/inbox_repository.dart::InboxRepository" <|-- "lib/features/inbox/data/repositories/inbox_repository_impl.dart::InboxRepositoryImpl"
+
+class "lib::src::features::inbox::domain::usecases::get_inbox.dart:GetInbox" {
+    +InboxRepository repository
+    +FutureOr call
+}
+
+"lib::src::features::inbox::domain::usecases::get_inbox.dart:GetInbox" o-- "lib/features/inbox/data/repositories/inbox_repository_impl.dart::InboxRepositoryImpl"
+
+"lib::src::features::inbox::presentation::bloc::inbox_bloc.dart::InboxBloc" o-- "lib::src::features::inbox::domain::usecases::get_inbox.dart:GetInbox"
+"lib::src::features::inbox::presentation::bloc::inbox_bloc.dart::InboxBloc" o-- "lib::src::features::inbox::domain::usecases::get_sms_and_save_to_db.dart::GetSmsAndSaveToDb"
+"lib::src::features::inbox::presentation::bloc::inbox_bloc.dart::InboxBloc" o-- "lib::src::features::inbox::domain::usecases::update_inbox.dart::UpdateInbox"
+"lib::src::features::inbox::presentation::bloc::inbox_bloc.dart::InboxBloc" o-- "lib::src::features::inbox::domain::usecases::delete_inbox.dart::DeleteInbox"
+
+"lib::src::core::usecase.dart::UseCase<T, P>" <|-- "lib::src::features::inbox::domain::usecases::get_inbox.dart:GetInbox"
+"flutter_bloc::Bloc<E,S>" <|-- "lib::src::features::inbox::presentation::bloc::inbox_bloc.dart"
+@enduml
